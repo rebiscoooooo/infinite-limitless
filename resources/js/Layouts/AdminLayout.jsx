@@ -16,7 +16,8 @@ import {
 import FlashToast from '../Components/FlashToast';
 
 export default function AdminLayout({ children, title = 'Admin Portal' }) {
-    const { auth, flash, url } = usePage().props;
+    const { props = {}, url = '' } = usePage();
+    const { auth = {}, flash = {} } = props;
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const navItems = [
@@ -26,7 +27,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
         { name: 'Activity Audit Logs', href: '/admin/activity-logs', icon: FileSpreadsheet },
     ];
 
-    const isActive = (href) => url.startsWith(href);
+    const isActive = (href) => Boolean(url && url.startsWith(href));
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -177,7 +178,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
 
                     <div className="flex items-center gap-4">
                         <span className="text-xs text-slate-400 hidden sm:inline">
-                            Logged in as <strong className="text-ch-teal">{auth.admin?.username}</strong>
+                            Logged in as <strong className="text-ch-teal">{auth?.admin?.username || 'Administrator'}</strong>
                         </span>
                         <Link
                             href="/"

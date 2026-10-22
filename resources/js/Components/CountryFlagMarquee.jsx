@@ -1,16 +1,15 @@
 import React from 'react';
 
 const countries = [
-    { name: 'Burkina Faso', code: 'bf', flag: '/assets/image/flags/bf.svg' },
-    { name: 'Cameroon', code: 'cm', flag: '/assets/image/flags/cm.svg' },
-    { name: 'Côte d\'Ivoire', code: 'ci', flag: '/assets/image/flags/ci.svg' },
-    { name: 'Dem. Rep. Congo', code: 'drc', flag: '/assets/image/flags/cd.svg' },
-    { name: 'Papua New Guinea', code: 'png', flag: '/assets/image/flags/pg.svg' },
-    { name: 'Philippines', code: 'ph', flag: '/assets/image/flags/ph.svg' },
-    { name: 'South Africa', code: 'sa', flag: '/assets/image/flags/za.svg' },
-    { name: 'Togo', code: 'tg', flag: '/assets/image/flags/tg.svg' },
-    { name: 'Uganda', code: 'ug', flag: '/assets/image/flags/ug.svg' },
-    { name: 'Zimbabwe', code: 'zw', flag: '/assets/image/flags/zw.svg' },
+    { name: 'Burkina Faso', code: 'bf', flag: '/assets/image/flags/1.png' },
+    { name: 'Cameroon', code: 'cm', flag: '/assets/image/flags/cameroon.png' },
+    { name: 'Côte d\'Ivoire', code: 'ci', flag: '/assets/image/flags/cote.png' },
+    { name: 'Dem. Rep. Congo', code: 'drc', flag: '/assets/image/flags/dc.png' },
+    { name: 'Papua New Guinea', code: 'png', flag: '/assets/image/flags/pp.png' },
+    { name: 'Philippines', code: 'ph', flag: '/assets/image/flags/ph.png' },
+    { name: 'South Africa', code: 'sa', flag: '/assets/image/flags/sa.png' },
+    { name: 'Togo', code: 'tg', flag: '/assets/image/flags/tg.png' },
+    { name: 'Uganda', code: 'ug', flag: '/assets/image/flags/ug.png' },
 ];
 
 export default function CountryFlagMarquee() {
