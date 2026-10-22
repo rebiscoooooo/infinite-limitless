@@ -26,6 +26,7 @@ Route::get('/olamour', [ProductController::class, 'olamour'])->name('products.ol
 Route::get('/info', [CompanyController::class, 'legitimacy'])->name('company.info');
 Route::get('/select-country', [CountryController::class, 'index'])->name('country.select');
 Route::get('/join-community/{country?}', [RegistrationController::class, 'showCommunity'])->name('community.show');
+Route::get('/join-ph', fn () => redirect()->route('community.show', ['country' => 'ph']))->name('join.ph');
 Route::get('/world-plan', [WorldPlanController::class, 'index'])->name('world-plan.index');
 
 Route::post('/inquiries', [InquiryController::class, 'store'])->name('inquiries.store');
@@ -57,6 +58,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Inquiry Management
         Route::get('/inquiries', [InquiryAdminController::class, 'index'])->name('inquiries.index');
         Route::patch('/inquiries/{inquiry}/toggle-read', [InquiryAdminController::class, 'toggleRead'])->name('inquiries.toggle-read');
+        Route::post('/inquiries/{inquiry}/reply', [InquiryAdminController::class, 'reply'])->name('inquiries.reply');
         Route::delete('/inquiries/{inquiry}', [InquiryAdminController::class, 'destroy'])->name('inquiries.destroy');
 
         // World Plan Registrations

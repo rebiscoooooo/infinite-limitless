@@ -4,458 +4,702 @@ import AppLayout from '../Layouts/AppLayout';
 import CountryFlagMarquee from '../Components/CountryFlagMarquee';
 import PartnerCarousel from '../Components/PartnerCarousel';
 import TestimonialGrid from '../Components/TestimonialGrid';
-import ProductQuickViewModal from '../Components/ProductQuickViewModal';
-import {
-    Sparkles,
-    ArrowRight,
-    Shield,
-    Leaf,
-    Globe2,
-    Award,
-    TrendingUp,
-    Users,
-    CheckCircle2,
-    Eye
-} from 'lucide-react';
-import { motion } from 'framer-motion';
 
-export default function Home({ siteStats, products = [], partners = [], testimonials = [] }) {
-    // Typewriter effect state
-    const typewriterPhrases = ['LIVE LIMITLESS', 'PURE ORGANIC WELLNESS', 'KOREAN RADIANCE SKINCARE', 'GLOBAL WEALTH EMPOWERMENT'];
-    const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
-    const [displayedText, setDisplayedText] = useState('');
+export default function Home({ siteStats, products = [], partners = [], testimonials = [], reviews = [] }) {
+    // Typewriter Animation for "Live Limitless"
+    const textToType = "Live Limitless";
+    const [typedText, setTypedText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Filter tab state
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [quickViewProduct, setQuickViewProduct] = useState(null);
-
     useEffect(() => {
-        const fullPhrase = typewriterPhrases[currentPhraseIndex];
-        const typingSpeed = isDeleting ? 40 : 90;
-
+        const typingSpeed = isDeleting ? 100 : 150;
         const timer = setTimeout(() => {
             if (!isDeleting) {
-                setDisplayedText(fullPhrase.substring(0, displayedText.length + 1));
-                if (displayedText === fullPhrase) {
+                setTypedText(textToType.substring(0, typedText.length + 1));
+                if (typedText === textToType) {
                     setTimeout(() => setIsDeleting(true), 2000);
                 }
             } else {
-                setDisplayedText(fullPhrase.substring(0, displayedText.length - 1));
-                if (displayedText === '') {
+                setTypedText(textToType.substring(0, typedText.length - 1));
+                if (typedText === "") {
                     setIsDeleting(false);
-                    setCurrentPhraseIndex((prev) => (prev + 1) % typewriterPhrases.length);
                 }
             }
         }, typingSpeed);
 
         return () => clearTimeout(timer);
-    }, [displayedText, isDeleting, currentPhraseIndex]);
+    }, [typedText, isDeleting]);
 
-    // Comprehensive catalog list matching original site
-    const catalogProducts = [
+    // 12 Carousel product banners
+    const carouselImages = [
+        '/assets/image/product1.png',
+        '/assets/image/product2.png',
+        '/assets/image/product3.png',
+        '/assets/image/product4.png',
+        '/assets/image/product5.png',
+        '/assets/image/product6.jpeg',
+        '/assets/image/product7.jpeg',
+        '/assets/image/product8.jpeg',
+        '/assets/image/product9.jpeg',
+        '/assets/image/product10.jpeg',
+        '/assets/image/product11.jpeg',
+        '/assets/image/product12.jpeg',
+    ];
+    const [activeBanner, setActiveBanner] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setActiveBanner((prev) => (prev + 1) % carouselImages.length);
+        }, 3500);
+        return () => clearInterval(timer);
+    }, [carouselImages.length]);
+
+    const prevBanner = () => {
+        setActiveBanner((prev) => (prev === 0 ? carouselImages.length - 1 : prev - 1));
+    };
+
+    const nextBanner = () => {
+        setActiveBanner((prev) => (prev + 1) % carouselImages.length);
+    };
+
+    // 18 Products matching legacy catalog exactly
+    const originalProducts = [
         {
-            id: 'infinite-barley',
-            name: 'Infinite Pure Organic Barley',
-            category: 'wellness',
-            image: '/assets/image/Ley.png',
-            desc: '70+ organic trace minerals, Superoxide Dismutase (S.O.D.) & chlorophyll from pristine Australian soil.',
-            badge: 'Top Seller',
-            badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-        },
-        {
-            id: 'infinite-robustus',
-            name: 'Infinite Robustus Black Coffee',
-            category: 'wellness',
-            image: '/assets/image/blackco.png',
-            desc: 'Stevia-sweetened Robusta coffee enriched with alkaline organic barley. Zero sugar spike.',
-            badge: 'Metabolic Boost',
-            badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-        },
-        {
-            id: 'white-plus-gluta',
-            name: 'White Plus Glutathione',
-            category: 'wellness',
-            image: '/assets/image/Plus.png',
-            desc: 'Master antioxidant formulation with NAC precursor, Collagen, Vitamin C & Alpha Lipoic Acid.',
-            badge: 'Clinical Grade',
-            badgeColor: 'bg-sky-500/20 text-sky-400 border-sky-500/30'
-        },
-        {
-            id: 'olamour-essence',
-            name: 'O\'Lamour Facial Essence',
-            category: 'olamour',
-            image: '/assets/image/product1.png',
-            desc: 'Galactomyces ferment filtrate & hyaluronic complexes for profound dermal barrier hydration.',
-            badge: 'Luxury Korean',
-            badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
-        },
-        {
-            id: 'olamour-ampoule',
-            name: 'O\'Lamour Radiance Ampoule',
-            category: 'olamour',
-            image: '/assets/image/product2.png',
-            desc: 'High-potency Niacinamide & Tranexamic acid targeting melasma and hyperpigmentation.',
-            badge: 'Radiance Core',
-            badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
-        },
-        {
-            id: 'olamour-cream',
-            name: 'O\'Lamour CoreLaCrème',
             category: 'skincare',
-            image: '/assets/image/product3.png',
-            desc: 'Triple-ceramide complex with Centella Asiatica for lipid recovery and anti-redness protection.',
-            badge: 'Intense Repair',
-            badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+            title: 'Infinite Botox Serum',
+            img: '/assets/image/product/INFINITE_BOTOX_SERUM.png',
+            desc: 'INFINITE BOTOX Serum, a high-performance blend of Niacinamide, Aloe Vera, Tea Tree Extract, Glutathione, Snail Extract.',
+            fullDesc: 'INFINITE BOTOX Serum, a high-performance blend of Niacinamide, Aloe Vera, Tea Tree Extract, Glutathione, Snail Extract, and Sakura Extract. This unique formula mimics Botox effects without the needles, smoothing fine lines, wrinkles, and blemishes while deeply hydrating your skin. Perfect for a non-invasive, age- defying solution, it delivers a youthful, radiant glow with every use.',
         },
         {
-            id: 'olamour-bb',
-            name: 'O\'Lamour PrimeRenew BB Cream',
             category: 'skincare',
-            image: '/assets/image/product4.png',
-            desc: 'Broad spectrum SPF 50+ PA++++ with self-adjusting color adapt technology for all skin tones.',
-            badge: 'SPF 50+ Shield',
-            badgeColor: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+            title: 'INFINITE Brightening Serum',
+            img: '/assets/image/product/INFINITE_Brightening_Serum.png',
+            desc: 'Achieve brighter, clearer skin with INFINITE BRIGHTENING Serum, featuring Rose Water, Niacinamide, Vitamin C, and Tea Tree Extract.',
+            fullDesc: 'Achieve brighter, clearer skin with INFINITE BRIGHTENING Serum, featuring Rose Water, Niacinamide, Vitamin C, and Tea Tree Extract. This lightweight, glow-boosting formula hydrates, evens out skin tone, and combats blemishes, leaving your complexion refreshed and radiant. Say goodbye to dullness and hello to a youthful, luminous glow.',
         },
         {
-            id: 'olamour-set',
-            name: 'O\'LAMOUR Premium 4-Step Set',
-            category: 'olamour',
-            image: '/assets/image/product5.png',
-            desc: 'The complete luxury 4-step ritual for glass skin: Essence, Ampoule, CoreLaCrème & BB Cream.',
-            badge: 'Complete Ritual',
-            badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-        }
+            category: 'skincare',
+            title: 'INFINITE White Body Lotion',
+            img: '/assets/image/product/INFINITE_White_Body_Lotion.png',
+            desc: 'Achieve a luminous, even complexion with INFINITE WHITE Body Lotion, a luxurious formula designed to brighten and perfect your skin.',
+            fullDesc: 'Achieve a luminous, even complexion with INFINITE WHITE Body Lotion, a luxurious formula designed to brighten and perfect your skin. Infused with AHA, Vitamin C, and Niacinamide, it fades dark spots, hyperpigmentation, and discoloration while promoting a radiant glow. This advanced lotion leaves your skin smoother, brighter, and more youthful, delivering visible results with every use.',
+        },
+        {
+            category: 'skincare',
+            title: 'INFINITE Glow-Up Soap',
+            img: '/assets/image/product/INFINITE_Glow_Up_Soap.png',
+            desc: 'Unveil your skin’s natural glow with INFINITE GLOW UP Soap, enriched with Kojic Acid, Arbutin, and Niacinamide.',
+            fullDesc: 'Unveil your skin’s natural glow with INFINITE GLOW UP Soap, enriched with Kojic Acid, Arbutin, and Niacinamide. This powerful trio works together to brighten, even out your skin tone, and reduce dark spots and pigmentation. Perfect for tackling uneven skin tone and hyperpigmentation, it leaves your skin smoother, clearer, and radiant.',
+        },
+        {
+            category: 'skincare',
+            title: 'INFINITE Deowhite Soap',
+            img: '/assets/image/product/INFINITE_Deowhite_Soap.png',
+            desc: 'Experience the refreshing power of INFINITE DEOWHITE Soap, featuring Tea Tree Oil, Niacinamide, and Peppermint.',
+            fullDesc: 'Experience the refreshing power of INFINITE DEOWHITE Soap, featuring Tea Tree Oil, Niacinamide, and Peppermint. This all-natural soap cleanses, fights odor, and cools the skin, leaving you feeling fresh and invigorated. Ideal for daily use, it combines antibacterial properties, soothing benefits, and a refreshing sensation to keep you energized all day.',
+        },
+        {
+            category: 'skincare',
+            title: 'Vida Lotus Soothing Toner',
+            img: '/assets/image/product/Vida_Lotus_Soothing_Toner.png',
+            desc: 'Vida Skin Lotus Soothing Toner rejuvenates and restores hydration for tired skin creating refreshed and vibrant skin.',
+            fullDesc: 'Rejuvenates and restores hydration for tired skin creating refreshed and vibrant skin texture with its powerful moisturizing effect.',
+        },
+        {
+            category: 'skincare',
+            title: 'Vida Tone-Up Sun Serum',
+            img: '/assets/image/product/Vida_Tone_Up_Sun Serum.png',
+            desc: 'Vida Skin Tone-Up Sun Serum provides lightweight, hydrating sun protection with natural mineral powders and brightening ingredients.',
+            fullDesc: 'Vida Skin Tone-Up Sun Serum provides lightweight, hydrating sun protection with natural mineral powders and brightening ingredients like niacinamide and glutathione. This serum helps even skin tone while delivering a radiant, glowing finish-perfect for daily wear.',
+        },
+        {
+            category: 'skincare',
+            title: 'Vida Doux Cleanser',
+            img: '/assets/image/product/Vida_Doux_Cleanser.png',
+            desc: 'Vida Skin Doux Cleanser\'s fine bubble system removes excess sebum and other residues within the pores leaving skin feeling refreshed.',
+            fullDesc: 'Vida Skin Doux Cleanser\'s fine bubble system removes excess sebum and other residues within the pores leaving skin feeling refreshed and comfortable, yet not drying with powerful hydrating and calming properties.',
+        },
+        {
+            category: 'skincare',
+            title: 'Vida Skin Lotus Booster Ampoule',
+            img: '/assets/image/product/Vida_Skin_Lotus_Booster_Ampoule.png',
+            desc: 'Vida Skin Lotus Booster Ampoule keeps the skin moisturized from the inside and softens the skin texture by strengthening barrier.',
+            fullDesc: 'Vida Skin Lotus Booster Ampoule keeps the skin moisturized from the inside and softens the skin texture by strengthening the skin barrier creating a firm and healthy skin.',
+        },
+        {
+            category: 'skincare',
+            title: 'Vida Skin Glow Vita Cream',
+            img: '/assets/image/product/Vida_Skin_Glow_Vita_Cream.png',
+            desc: 'Vida Skin Glow Vita Cream uses VIDA\'s special formula to balance healthy skin oil and moisture levels, creating healthy skin.',
+            fullDesc: 'Vida Skin Glow Vita Cream uses VIDA\'s special formula to balance healthy skin oil and moisture levels, creating healthy moisturized and vitalized skin conditions.',
+        },
+        {
+            category: 'wellness',
+            title: 'Barley Pure Organic Powder',
+            img: '/assets/image/product/INFINITE_BARLEY_Pure_Organic_Barley_Powder.png',
+            desc: 'A natural supplement made from 100% organic barley grass, rich in vitamins, minerals, and antioxidants.',
+            fullDesc: 'A nutrient-rich superfood made from pure, organic young barley grass. Rich in antioxidants and fiber, INFINITE BARLEY supports immune health, aids digestion, promotes detoxification, and helps boost energy levels naturally.',
+        },
+        {
+            category: 'wellness',
+            title: 'INFINITE Black Coffee with Pure Organic Barley',
+            img: '/assets/image/product/INFINITE_Black_Coffe_with_Pure_Organic_Barley_Powdered_Drink_mix.png',
+            desc: 'INFINITE ROBUSTUS blends the bold richness of black coffee with nourishing power of pure organic barley, lightly sweetened with stevia.',
+            fullDesc: 'INFINITE ROBUSTUS blends the bold richness of black coffee with nourishing power of pure organic barley, lightly sweetened with natural stevia for a guilt-free boost. Designed to energize between flavor and function. Enjoy a cup that satisfies your craving and elevates your daily routine.',
+        },
+        {
+            category: 'wellness',
+            title: 'White Plus Glutathione',
+            img: '/assets/image/product/White_Plus_Glutathione.png',
+            desc: 'Harness the power of Glutathione with INFINITE WHITE PLUS, an advanced formula featuring Glutathione, NAC, Vitamin C, Collagen.',
+            fullDesc: 'Harness the power of Glutathione with INFINITE WHITE PLUS, an advanced formula featuring Glutathione, N-Acetylcysteine, Vitamin C, Collagen, and Alpha Lipoic Acid. This potent supplement detoxifies your system, neutralizes free radicals, and supports overall wellness. Boost your health and vitality with every dose for a brighter, more energized you.',
+        },
+        {
+            category: 'o\'lamour',
+            title: 'O\'Lamour Facial Essence',
+            img: '/assets/image/product/O_LAMOUR_Facial_Essence.png',
+            desc: 'A scientifically advanced multi-function Facial Essence designed to revitalize, and improve skin clarity.',
+            fullDesc: 'Formulated with BIO E.G.F, it stimulates skin renewal. Hydrolyzed Collagen and Volufiline work in synergy and help to plump, firm and lift-the skin for a youthful complexion.',
+        },
+        {
+            category: 'o\'lamour',
+            title: 'O\'Lamour Aeterna BB Cream',
+            img: '/assets/image/product/O’LAMOUR_Aeterna_BB_Cream.png',
+            desc: 'A multi-functional complexion refiner designed to deliver full coverage with an exceptionally lightweight and breathable feel.',
+            fullDesc: 'A multi-functional complexion refiner designed to deliver full coverage with an exceptionally lightweight and breathable feel. Formulated with SPF 50 / PA+++ broad-spectrum protection, it shields the skin against UVA and UVB damage while preserving comfort and long-lasting wear throughtout the day.',
+        },
+        {
+            category: 'o\'lamour',
+            title: 'O\'Lamour Quintessence Ampoule',
+            img: '/assets/image/product/O’LAMOUR_Quintessence_Ampoule.png',
+            desc: 'A premium multi-function skincare innovation expertly formulated to help reduce the appearance of wrinkles and brighten skin.',
+            fullDesc: 'A premium multi-function skincare innvation expertly formulated to help reduce the apperance of wrinkles and help brighten the skin. Powered by PDRN (Polydeoxyribonu-cleo-tide) Sodium DNA, a clinically recognized bioactive compound plus 12X plant-based essential extracts, this fast-acting ampoule works at the skin\'s foundational level to reveal a more radiant complexion.',
+        },
+        {
+            category: 'o\'lamour',
+            title: 'O\'Lamour Core La Crème',
+            img: '/assets/image/product/O’LAMOUR_CoreLaCrème.png',
+            desc: 'An ultra-premium, science-driven cream powered by Centella Asiatica Leaf, Hydrolyzed Collagen, and EGF for youthful radiance.',
+            fullDesc: 'An ultra-premium, science-driven cream powered by Centella Asiatica Leaf, Hydrolyzed Collagen, and Epidermal Growth Factor (EGF) for a youthful radiance. Infused with PDRN Sodium DNA, Niacinamide, Euphorbia Cerifera, and Chamomilla Recutita, it deeply hydrates skin tone for a smoother, brighter complexion.',
+        },
+        {
+            category: 'o\'lamour',
+            title: 'O\'Lamour Essence Bar',
+            isComingSoon: true,
+            img: '/assets/image/product/O’LAMOUR_Essence_Bar.png',
+            desc: 'An exquisitely crafted cleansing bar soap infused with 2X AHA + BHA complex to gently cleanse and brighten the skin.',
+            fullDesc: 'An exquisitely crafted cleansin bar soap infused with 2X AHA + BHA complex to gently cleanse and brighten the skin. Glycolic and Lactic Acids refine texture and enhance luminosity, while Salicylic Acid puurifies pores for a smoother,cleaer apperance.',
+        },
     ];
 
-    const filteredProducts = selectedCategory === 'all'
-        ? catalogProducts
-        : catalogProducts.filter((p) => p.category === selectedCategory);
+    const [activeFilter, setActiveFilter] = useState('all');
+    const [modalData, setModalData] = useState(null);
+
+    const filteredList = activeFilter === 'all'
+        ? originalProducts
+        : originalProducts.filter((p) => p.category === activeFilter);
 
     return (
         <AppLayout>
-            <Head title="INFINITE - Live Limitless | Premium Wellness & Skincare Global Network" />
+            <Head title="Infinite | Live Limitless" />
 
             {/* HERO SECTION */}
-            <section className="relative overflow-hidden pt-12 pb-24 md:pt-16 md:pb-32 bg-dot-matrix">
-                {/* Ambient glow orbs */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-ch-teal/15 rounded-full blur-[120px] pointer-events-none" />
-                <div className="absolute top-10 right-10 w-72 h-72 bg-amber-500/10 rounded-full blur-[90px] pointer-events-none" />
+            <section id="hero" style={{ position: 'relative', overflow: 'hidden', paddingTop: '160px', paddingBottom: '100px' }}>
+                <div
+                    className="hero-bg"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: "linear-gradient(rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.95)), url('/assets/image/bg/office.jpg') center center / cover no-repeat",
+                        zIndex: 0,
+                    }}
+                >
+                    <div className="hero-grid-lines"></div>
+                </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                    {/* Eyebrow badge with pulse */}
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-slate-900/90 border border-ch-teal/40 shadow-glow-teal mb-8"
-                    >
-                        <span className="relative flex h-2.5 w-2.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ch-teal opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-ch-teal" />
-                        </span>
-                        <span className="text-xs uppercase font-bold tracking-[0.2em] text-ch-teal-light">
-                            GLOBAL BORDERLESS PLATFORM
-                        </span>
-                    </motion.div>
-
-                    {/* Massive Bebas Neue Title with Typewriter */}
-                    <motion.h1
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="font-bebas text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-wider leading-[0.9] text-glow-teal"
-                    >
-                        <span>INFINITE: </span>
-                        <span className="text-ch-teal block sm:inline">{displayedText}</span>
-                        <span className="inline-block w-2 sm:w-3 h-10 sm:h-16 bg-ch-teal ml-1 animate-pulse align-middle" />
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="mt-6 text-base sm:text-xl text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed"
-                    >
-                        Revolutionary Australian organic superfoods, clinical Korean skincare, and an empowering global compensation system designed for sustainable entrepreneurship.
-                    </motion.p>
-
-                    {/* CTA Actions */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-                    >
-                        <Link
-                            href="/world-plan"
-                            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-extrabold text-sm uppercase tracking-widest transition-all duration-300 shadow-xl hover:shadow-glow-teal hover:scale-105 flex items-center justify-center gap-2"
-                        >
-                            <span>Explore World Plan</span>
-                            <ArrowRight className="w-4 h-4 stroke-[3]" />
-                        </Link>
-                        <Link
-                            href="/barley"
-                            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-100 border border-white/15 font-bold text-sm uppercase tracking-wider transition-all duration-200 hover:border-ch-teal/50 flex items-center justify-center gap-2"
-                        >
-                            <Sparkles className="w-4 h-4 text-ch-teal" />
-                            <span>Wellness Showcase</span>
-                        </Link>
-                    </motion.div>
-
-                    {/* Hero Metric Pills */}
-                    <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                        <div className="rounded-2xl p-4 bg-slate-900/70 border border-white/10 backdrop-blur-md">
-                            <div className="font-bebas text-3xl sm:text-4xl text-ch-teal font-black">
-                                {siteStats ? numberFormat(siteStats.total_visits) : '12,540+'}
+                <div className="container-fluid px-3 px-lg-5 hero-content reveal visible" style={{ position: 'relative', zIndex: 1 }}>
+                    <div className="row justify-content-center">
+                        <div className="col-lg-11 col-xl-10 text-center">
+                            <div className="hero-eyebrow justify-content-center mx-auto mb-3">
+                                <span className="dot"></span>WELCOME TO
                             </div>
-                            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Global Visits</div>
-                        </div>
-                        <div className="rounded-2xl p-4 bg-slate-900/70 border border-white/10 backdrop-blur-md">
-                            <div className="font-bebas text-3xl sm:text-4xl text-amber-400 font-black">
-                                {siteStats ? numberFormat(siteStats.product_clicks) : '8,430+'}
+
+                            <h1 className="hero-title">
+                                <span className="bold">INFINITE</span>
+                                <span className="elegant-cursive blinking-cursor" id="typewriter-text">
+                                    {typedText || '\u00A0'}
+                                </span>
+                            </h1>
+
+                            <p className="hero-desc mx-auto text-white mt-4" style={{ maxWidth: '800px', opacity: 0.9 }}>
+                                Building limitless opportunities through leadership, premium products, and global expansion.
+                            </p>
+                            <Link href="/join-ph" className="btn btn-outline-light mt-4 fw-bold px-4 py-2" style={{ borderRadius: '50px' }}>
+                                <i className="bi bi-play-circle me-2"></i>
+                                <b>Learn More</b>
+                            </Link>
+
+                            <br /><br />
+                            <br /><br />
+
+                            <div className="container text-center mb-5 reveal visible">
+                                <span className="section-tag">GLOBAL EXPANSION</span>
+
+                                <h2 className="section-title1 fw-bold text-white">
+                                    Growing Across The <span style={{ color: 'var(--ch-teal)' }}>World</span>
+                                </h2>
+
+                                <p className="hero-desc mx-auto text-white mt-4 px-3">
+                                    Connecting opportunities and leaders worldwide.
+                                </p>
                             </div>
-                            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Product Orders</div>
-                        </div>
-                        <div className="rounded-2xl p-4 bg-slate-900/70 border border-white/10 backdrop-blur-md">
-                            <div className="font-bebas text-3xl sm:text-4xl text-white font-black">10+</div>
-                            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Active Nations</div>
-                        </div>
-                        <div className="rounded-2xl p-4 bg-slate-900/70 border border-white/10 backdrop-blur-md">
-                            <div className="font-bebas text-3xl sm:text-4xl text-emerald-400 font-black">100%</div>
-                            <div className="text-xs uppercase tracking-wider text-slate-400 font-semibold mt-0.5">Certified Organic</div>
+
+                            <CountryFlagMarquee />
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* INFINITE FLAG MARQUEE */}
-            <CountryFlagMarquee />
-
-            {/* VALUE PILLARS & VISION */}
-            <section className="py-24 bg-slate-950 border-b border-white/10 relative">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">OUR FOUNDATIONAL PILLARS</span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-2">
-                            WHY THE WORLD CHOOSES INFINITE
-                        </h2>
-                        <p className="text-slate-400 text-sm sm:text-base mt-2">
-                            A synergy of purity, clinical potency, and authentic international leadership.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <div className="rounded-3xl p-8 bg-slate-900/80 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 group hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-ch-teal/15 text-ch-teal flex items-center justify-center mb-6 group-hover:bg-ch-teal group-hover:text-ch-dark-slate transition-colors">
-                                <Leaf className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bebas text-2xl tracking-wider text-white">AUSTRALIAN ORGANIC</h3>
-                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                Our young green barley shoots are harvested in Australia under strict ACO certified farming with live enzymes and intact Superoxide Dismutase.
-                            </p>
-                        </div>
-
-                        <div className="rounded-3xl p-8 bg-slate-900/80 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 group hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-sky-500/15 text-sky-400 flex items-center justify-center mb-6 group-hover:bg-sky-400 group-hover:text-ch-dark-slate transition-colors">
-                                <Sparkles className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bebas text-2xl tracking-wider text-white">KOREAN DERMA-LABS</h3>
-                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                O'Lamour skincare line combines Galactomyces ferment, multi-ceramides, and SPF 50+ tone-adapt coverage formulated in Seoul.
-                            </p>
-                        </div>
-
-                        <div className="rounded-3xl p-8 bg-slate-900/80 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 group hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center mb-6 group-hover:bg-amber-400 group-hover:text-ch-dark-slate transition-colors">
-                                <TrendingUp className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bebas text-2xl tracking-wider text-white">30% RETAIL MARGIN</h3>
-                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                Direct retail earnings plus team pairing matrix, enroller bonuses, and 3% to 19% unilevel volume rebates across global hubs.
-                            </p>
-                        </div>
-
-                        <div className="rounded-3xl p-8 bg-slate-900/80 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 group hover:-translate-y-1">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-6 group-hover:bg-emerald-400 group-hover:text-ch-dark-slate transition-colors">
-                                <Globe2 className="w-6 h-6" />
-                            </div>
-                            <h3 className="font-bebas text-2xl tracking-wider text-white">DHL AIR LOGISTICS</h3>
-                            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                Seamless door-to-door delivery with customs tracking across Africa, Asia-Pacific, and South America with zero transit delays.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* PRODUCT FILTER CATALOG */}
-            <section id="menu" className="py-24 bg-ch-dark-slate relative">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-                        <div>
-                            <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">SIGNATURE SELECTIONS</span>
-                            <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                                PRODUCT SHOWCASE
+            {/* FEATURES SECTION */}
+            <section id="features" className="section-pad">
+                <div className="container-fluid px-3 px-lg-5">
+                    <div className="row mb-5">
+                        <div className="col-lg-6 reveal visible">
+                            <span className="section-tag">Why Infinite?</span>
+                            <h2 className="section-title">
+                                "Build Your <span className="highlight">Future </span>Without Limits."
                             </h2>
-                            <p className="text-slate-400 text-sm mt-1">Explore our premium wellness and clinical skincare lines.</p>
                         </div>
-
-                        {/* Filter Tabs */}
-                        <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-900 border border-white/10">
-                            {[
-                                { id: 'all', label: 'All Formulations' },
-                                { id: 'wellness', label: 'Wellness Staples' },
-                                { id: 'skincare', label: 'Skincare' },
-                                { id: 'olamour', label: 'O\'Lamour Rituals' },
-                            ].map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setSelectedCategory(tab.id)}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-                                        selectedCategory === tab.id
-                                            ? 'bg-ch-teal text-ch-dark-slate shadow-md'
-                                            : 'text-slate-400 hover:text-white hover:bg-white/5'
-                                    }`}
-                                >
-                                    {tab.label}
-                                </button>
-                            ))}
+                        <div className="col-lg-6 reveal visible">
+                            <p className="text-muted mt-3 mt-lg-4" style={{ fontSize: '1rem', maxWidth: '600px' }}>
+                                We are currently in our pioneering stage giving early partners a powerful advantage as the company prepares for international expansion. INFINITE is built for leaders, visionaries, and entrepreneurs who want to grow with a company from its foundation stage.
+                            </p>
                         </div>
                     </div>
 
-                    {/* Product Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {filteredProducts.map((p) => (
-                            <div
-                                key={p.id}
-                                className="rounded-3xl p-6 bg-slate-900/90 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 hover:-translate-y-1.5 group flex flex-col justify-between shadow-xl"
-                            >
-                                <div>
-                                    <div className="flex justify-between items-start mb-4">
-                                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${p.badgeColor}`}>
-                                            {p.badge}
-                                        </span>
-                                        <button
-                                            onClick={() => setQuickViewProduct(p)}
-                                            className="p-1.5 rounded-lg bg-white/5 hover:bg-ch-teal/20 text-slate-400 hover:text-ch-teal transition-colors"
-                                            title="Quick View"
-                                        >
-                                            <Eye className="w-4 h-4" />
-                                        </button>
-                                    </div>
+                    {/* 12 Image Carousel */}
+                    <div
+                        id="carouselExampleRide"
+                        className="carousel slide position-relative"
+                        style={{
+                            borderRadius: '1.5rem',
+                            overflow: 'hidden',
+                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                        }}
+                    >
+                        <div className="carousel-inner">
+                            <div className="carousel-item active">
+                                <img
+                                    src={carouselImages[activeBanner]}
+                                    className="d-block w-100"
+                                    alt={`Product Banner ${activeBanner + 1}`}
+                                    style={{
+                                        width: '100%',
+                                        maxHeight: '520px',
+                                        objectFit: 'cover',
+                                        transition: 'all 0.5s ease',
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <button
+                            className="carousel-control-prev"
+                            type="button"
+                            onClick={prevBanner}
+                            aria-label="Previous"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                position: 'absolute',
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                width: '15%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                opacity: 0.8,
+                            }}
+                        >
+                            <span
+                                className="carousel-control-prev-icon"
+                                aria-hidden="true"
+                                style={{ backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '1.5rem' }}
+                            ></span>
+                            <span className="visually-hidden">Previous</span>
+                        </button>
+                        <button
+                            className="carousel-control-next"
+                            type="button"
+                            onClick={nextBanner}
+                            aria-label="Next"
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                position: 'absolute',
+                                top: 0,
+                                bottom: 0,
+                                right: 0,
+                                width: '15%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                opacity: 0.8,
+                            }}
+                        >
+                            <span
+                                className="carousel-control-next-icon"
+                                aria-hidden="true"
+                                style={{ backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '1.5rem' }}
+                            ></span>
+                            <span className="visually-hidden">Next</span>
+                        </button>
+                    </div>
 
-                                    {/* Product Image */}
-                                    <div className="w-full h-48 rounded-2xl bg-slate-950/60 p-4 flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300">
-                                        <img
-                                            src={p.image}
-                                            alt={p.name}
-                                            className="max-h-full max-w-full object-contain filter drop-shadow-md"
-                                            onError={(e) => {
-                                                e.target.src = '/assets/image/Barley.png';
-                                            }}
-                                        />
+                    {/* 4 Mission Pillars */}
+                    <div className="row justify-content-center mt-5">
+                        <div className="col-xl-10 reveal visible">
+                            <div className="text-center mb-5">
+                                <span className="section-tag">Why Leaders Choose INFINITE?</span>
+                            </div>
+                            <div className="row g-4">
+                                <div className="col-md-6 col-lg-3">
+                                    <div className="mission-item flex-column text-center p-4">
+                                        <div className="mission-icon mb-3 me-0">
+                                            <i className="fa-solid fa-earth-americas"></i>
+                                        </div>
+                                        <div className="mission-text">Sustainable business opportunities</div>
                                     </div>
-
-                                    <h3 className="font-bebas text-2xl tracking-wide text-white group-hover:text-ch-teal transition-colors">
-                                        {p.name}
-                                    </h3>
-                                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                                        {p.desc}
-                                    </p>
                                 </div>
-
-                                <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-2">
-                                    <button
-                                        onClick={() => setQuickViewProduct(p)}
-                                        className="flex-1 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold text-center transition-colors"
-                                    >
-                                        Details
-                                    </button>
+                                <div className="col-md-6 col-lg-3">
+                                    <div className="mission-item flex-column text-center p-4">
+                                        <div className="mission-icon mb-3 me-0">
+                                            <i className="fa-solid fa-spa"></i>
+                                        </div>
+                                        <div className="mission-text">Premium skincare and wellness products</div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6 col-lg-3">
+                                    <div className="mission-item flex-column text-center p-4">
+                                        <div className="mission-icon mb-3 me-0">
+                                            <i className="fa-solid fa-scale-balanced"></i>
+                                        </div>
+                                        <div className="mission-text">Ethical and transparent compensation programs</div>
+                                    </div>
+                                </div>
+                                <div className="col-md-6 col-lg-3">
+                                    <div className="mission-item flex-column text-center p-4">
+                                        <div className="mission-icon mb-3 me-0">
+                                            <i className="fa-solid fa-arrow-trend-up"></i>
+                                        </div>
+                                        <div className="mission-text">A platform for personal and financial growth</div>
+                                    </div>
+                                </div>
+                                <div className="col-12 reveal visible text-center mx-auto mt-5">
                                     <Link
-                                        href="/world-plan"
-                                        className="py-2.5 px-4 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
+                                        href="/select-country"
+                                        className="btn fw-bold px-5 py-3 shadow-sm text-decoration-none"
+                                        style={{ backgroundColor: 'var(--ch-teal)', color: '#fff', borderRadius: '50px' }}
                                     >
-                                        Order
+                                        Join now<i className="bi bi-arrow-down ms-2"></i>
                                     </Link>
                                 </div>
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* GLOBAL AMBASSADORS / PARTNER CAROUSEL */}
-            <section className="py-24 bg-slate-950 border-t border-white/10 relative">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">INTERNATIONAL LEADERSHIP</span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            GLOBAL HUBS & AMBASSADORS
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            Connect directly with our authorized regional country directors via WhatsApp.
-                        </p>
+            {/* DISCOVER OUR PRODUCTS (#menu) */}
+            <section id="menu" className="section-pad bg-light">
+                <div className="container-fluid px-3 px-lg-5">
+                    <div className="row align-items-end mb-5">
+                        <div className="col-md-6 reveal visible text-center text-md-start">
+                            <span className="section-tag">Discover</span>
+                            <h2 className="section-title">Our Products</h2>
+                        </div>
+                        <div className="col-md-6 reveal visible">
+                            <div className="menu-filters justify-content-center justify-content-md-end mt-3 mt-md-0">
+                                <button
+                                    className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
+                                    onClick={() => setActiveFilter('all')}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    className={`filter-btn ${activeFilter === 'wellness' ? 'active' : ''}`}
+                                    onClick={() => setActiveFilter('wellness')}
+                                >
+                                    Wellness
+                                </button>
+                                <button
+                                    className={`filter-btn ${activeFilter === 'skincare' ? 'active' : ''}`}
+                                    onClick={() => setActiveFilter('skincare')}
+                                >
+                                    Skincare
+                                </button>
+                                <button
+                                    className={`filter-btn ${activeFilter === "o'lamour" ? 'active' : ''}`}
+                                    onClick={() => setActiveFilter("o'lamour")}
+                                >
+                                    O'Lamour
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Products Grid */}
+                    <div className="row g-4" id="menuGrid">
+                        {filteredList.map((p, idx) => (
+                            <div key={idx} className="col-12 col-sm-6 col-md-4 col-xl-3 menu-item reveal visible" data-category={p.category}>
+                                <div className="product-card h-100 d-flex flex-column position-relative">
+                                    {p.isComingSoon && (
+                                        <div className="position-absolute top-0 end-0 m-3" style={{ zIndex: 3 }}>
+                                            <span
+                                                className="badge rounded-pill"
+                                                style={{
+                                                    backgroundColor: 'var(--ch-teal)',
+                                                    color: '#fff',
+                                                    fontFamily: "'Barlow', sans-serif",
+                                                    fontWeight: 800,
+                                                    letterSpacing: '1.5px',
+                                                    padding: '0.6em 1.2em',
+                                                    fontSize: '0.85rem',
+                                                    boxShadow: '0 4px 15px rgba(20, 184, 166, 0.4)',
+                                                }}
+                                            >
+                                                COMING SOON
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="card-img-wrapper text-center">
+                                        <img src={p.img} className="img-fluid" alt={p.title} />
+                                    </div>
+                                    <div className="card-body p-4 d-flex flex-column flex-grow-1">
+                                        <h5 className="product-title">{p.title}</h5>
+                                        <p className="product-desc flex-grow-1">{p.desc}</p>
+                                        <div className="product-footer mt-3">
+                                            <button
+                                                type="button"
+                                                className="read-more-link bg-transparent border-0 p-0"
+                                                onClick={() => setModalData(p)}
+                                            >
+                                                Read More <i className="bi bi-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* View Product Catalog Button */}
+                        <div className="col-12 text-center mt-5 mb-3 reveal visible">
+                            <a
+                                href="https://t.me/+alDRLOJNgo1lZGY1"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="btn shadow-sm"
+                                style={{
+                                    backgroundColor: 'var(--ch-teal)',
+                                    color: 'var(--ch-white)',
+                                    borderRadius: '50px',
+                                    padding: '8px 24px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                }}
+                            >
+                                <i className="bi bi-journal-text me-2"></i>View Product Catalog
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* TEAM SECTION (#team) */}
+            <section id="team" className="section-pad">
+                <div className="container-fluid px-3 px-lg-5">
+                    <div className="row justify-content-center text-center mb-5 reveal visible">
+                        <div className="col-lg-8 col-xl-6">
+                            <h2 className="section-title mb-3">Meet Our Global Partners</h2>
+                            <p className="text-muted" style={{ fontSize: '1.15rem' }}>
+                                A global community of passionate individuals building opportunities, inspiring growth, and living limitless together.
+                            </p>
+                        </div>
                     </div>
 
                     <PartnerCarousel partners={partners} />
                 </div>
             </section>
 
-            {/* TESTIMONIALS & CLINICAL PROOF */}
-            <section id="testimonials" className="py-24 bg-ch-dark-slate border-t border-white/10 relative">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">TRANSFORMATIONAL RESULTS</span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            BEFORE & AFTER CLINICAL JOURNEYS
+            {/* CORPORATE HERO SECTION */}
+            <section className="corporate-hero-section">
+                <div className="corporate-container">
+                    <div className="corporate-content">
+                        <span className="corporate-badge">
+                            <i className="fa-solid fa-building-shield me-2"></i>Company Profile
+                        </span>
+                        <h1 className="corporate-title">
+                            Built on Trust.
+                            <span className="gradient-text">Proven Excellence.</span>
+                        </h1>
+                        <h2 className="corporate-script">Infinite Possibilities</h2>
+                        <p className="corporate-desc">
+                            Discover the foundation of our success. Learn about our mission, explore our blogs, and verify our legitimacy as a globally recognized brand.
+                        </p>
+                        <Link href="/info" className="corporate-btn">
+                            Read Our Story <i className="fa-solid fa-arrow-right"></i>
+                        </Link>
+                    </div>
+                    <div className="corporate-image-wrapper">
+                        <div className="corporate-glow-orb"></div>
+                        <div className="corporate-glass-panel"></div>
+                        <img
+                            src="/assets/image/bg/office.jpg"
+                            alt="Company Profile and Legitimacy"
+                            className="corporate-img"
+                            style={{ objectFit: 'cover', aspectRatio: '4/3' }}
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* O'LAMOUR HERO SECTION */}
+            <section className="olamour-hero-section">
+                <div className="olamour-container">
+                    <div className="olamour-image-wrapper">
+                        <div className="olamour-glow-orb"></div>
+                        <div className="olamour-glass-panel"></div>
+                        <img src="/assets/image/banner(1).png" alt="Olamour Premium Skincare" className="olamour-img" />
+                    </div>
+                    <div className="olamour-content">
+                        <span className="olamour-badge">
+                            <i className="fa-solid fa-sparkles me-2"></i>Premium Skincare
+                        </span>
+                        <h1 className="olamour-title">
+                            Elevate Your Beauty with
+                            <span className="gradient-text">O’LAMOUR Skincare</span>
+                        </h1>
+                        <h2 className="olamour-script">Glow Beyond Limits</h2>
+                        <p className="olamour-desc">
+                            Discover O’LAMOUR Premium Skincare — where science meets luxury for timeless beauty.
+                        </p>
+                        <Link href="/olamour" className="olamour-btn">
+                            Explore O’LAMOUR <i className="fa-solid fa-arrow-right"></i>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* BARLEY HERO SECTION */}
+            <section className="barley-hero-section">
+                <div className="barley-container">
+                    <div className="barley-content">
+                        <span className="barley-badge">
+                            <i className="fa-solid fa-leaf me-2"></i>INFINITE Wellness
+                        </span>
+                        <h1 className="barley-title">
+                            Live Well.
+                            <span className="gradient-text">Glow Naturally.</span>
+                        </h1>
+                        <h2 className="barley-script">Live With Strength</h2>
+                        <p className="barley-desc">
+                            Unlock your ultimate wellness journey with premium health &amp; beauty products designed for a better you.
+                        </p>
+                        <Link href="/barley" className="barley-btn">
+                            Explore Infinite Barley <i className="fa-solid fa-arrow-right"></i>
+                        </Link>
+                    </div>
+                    <div className="barley-image-wrapper">
+                        <div className="barley-blob"></div>
+                        <img src="/assets/image/Barley.png" alt="Infinite Wellness" className="barley-img" />
+                    </div>
+                </div>
+            </section>
+
+            {/* PRODUCTS TESTIMONY SECTION (#testimonials) */}
+            <section id="testimonials" className="section-pad" style={{ backgroundColor: '#f8fafc' }}>
+                <div className="container-fluid px-3 px-lg-5">
+                    <div className="text-center mb-5 reveal visible">
+                        <span className="section-tag">PRODUCTS TESTIMONY</span>
+                        <h2 className="section-title fw-bold">
+                            Real Stories.{' '}
+                            <span className="highlight">Real Growth.</span>{' '}
+                            Real Partnerships.
                         </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            Drag the interactive divider to observe authentic skin tone and wellness progressions.
+                        <p className="text-muted mt-3">
+                            <b>See how our solutions are making a measurable difference.</b>
                         </p>
                     </div>
 
-                    <TestimonialGrid testimonials={testimonials} />
+                    <TestimonialGrid testimonials={testimonials} reviews={reviews} />
                 </div>
             </section>
 
-            {/* WORLD PLAN CALL TO ACTION */}
-            <section className="py-20 bg-gradient-to-r from-ch-dark-slate via-slate-900 to-ch-dark-slate border-y border-ch-teal/30 relative">
-                <div className="max-w-5xl mx-auto px-4 text-center">
-                    <span className="text-xs uppercase tracking-[0.3em] font-bold text-ch-teal">START YOUR GLOBAL BUSINESS</span>
-                    <h2 className="font-bebas text-4xl sm:text-6xl text-white tracking-wider mt-2">
-                        READY TO LIVE LIMITLESS?
-                    </h2>
-                    <p className="text-slate-300 text-base max-w-xl mx-auto mt-4">
-                        Join an elite global fraternity of wellness leaders with up to 19% executive overrides and direct weekly compensation.
-                    </p>
-                    <div className="mt-8 flex flex-wrap justify-center gap-4">
-                        <Link
-                            href="/world-plan"
-                            className="px-8 py-4 rounded-2xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-extrabold text-sm uppercase tracking-widest transition-all duration-300 shadow-xl hover:shadow-glow-teal hover:scale-105"
-                        >
-                            Register for World Plan
-                        </Link>
-                        <Link
-                            href="/select-country"
-                            className="px-8 py-4 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm uppercase tracking-wider border border-white/10"
-                        >
-                            Choose Your Country
-                        </Link>
+            {/* PRODUCT PREVIEW MODAL */}
+            {modalData && (
+                <div
+                    className="modal fade show"
+                    id="productModal"
+                    style={{
+                        display: 'block',
+                        backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                        zIndex: 10050,
+                    }}
+                    tabIndex="-1"
+                    onClick={() => setModalData(null)}
+                >
+                    <div
+                        className="modal-dialog modal-dialog-centered modal-lg"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '1.5rem', overflow: 'hidden' }}>
+                            <button
+                                type="button"
+                                className="btn-close position-absolute top-0 end-0 m-3 bg-white"
+                                onClick={() => setModalData(null)}
+                                style={{
+                                    zIndex: 10,
+                                    padding: '0.6rem',
+                                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                                    cursor: 'pointer',
+                                }}
+                            ></button>
+                            <div className="row g-0">
+                                <div className="col-md-5 bg-light d-flex align-items-center justify-content-center p-4">
+                                    <img
+                                        src={modalData.img}
+                                        id="modalImg"
+                                        className="img-fluid"
+                                        style={{ maxHeight: '40vh', objectFit: 'contain' }}
+                                        alt={modalData.title}
+                                    />
+                                </div>
+                                <div className="col-md-7 p-4 p-md-5 d-flex flex-column justify-content-center">
+                                    <h3 className="fw-bold mb-3" id="productModalLabel" style={{ color: 'var(--ch-dark-slate)' }}>
+                                        {modalData.title}
+                                    </h3>
+                                    <p id="modalDesc" className="text-muted mb-4" style={{ lineHeight: 1.6 }}>
+                                        {modalData.fullDesc}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        className="btn w-100 fw-bold py-2 mt-auto text-white"
+                                        onClick={() => setModalData(null)}
+                                        style={{ backgroundColor: 'var(--ch-dark-slate)', borderRadius: '50px' }}
+                                    >
+                                        Close Preview
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
-
-            {/* Quick View Modal */}
-            <ProductQuickViewModal
-                product={quickViewProduct}
-                isOpen={!!quickViewProduct}
-                onClose={() => setQuickViewProduct(null)}
-            />
+            )}
         </AppLayout>
     );
-}
-
-function numberFormat(val) {
-    if (!val) return '0';
-    return Number(val).toLocaleString();
 }

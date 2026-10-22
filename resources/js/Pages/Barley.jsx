@@ -1,416 +1,591 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../Layouts/AppLayout';
-import {
-    ShieldCheck,
-    Flame,
-    HeartPulse,
-    Sparkles,
-    Sun,
-    Moon,
-    ChevronDown,
-    CheckCircle2,
-    ArrowRight,
-    ShoppingBag
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
-export default function Barley({ variations = [], bioActiveIngredients = [], barleyCategories = [] }) {
-    // Active variation index: 0 = Robustus, 1 = Barley, 2 = White Plus Gluta
-    const [activeVarIndex, setActiveVarIndex] = useState(1);
-    const activeVar = variations[activeVarIndex] || variations[0];
-
-    // FAQ open index state
-    const [openFaq, setOpenFaq] = useState(0);
-
-    const faqs = [
+export default function Barley() {
+    const variations = [
         {
-            q: 'How does Infinite Barley differ from regular grocery-store barley grass?',
-            a: 'Infinite Barley is harvested strictly at the peak nutritional vegetative phase (day 10-14) from pristine certified Australian farmland. It is cold-milled into a fine bio-active powder without heat denaturation, preserving live Superoxide Dismutase (S.O.D.) enzymes, chlorophyll, and trace minerals.'
+            product_title: "INFINITE ROBUSTUS",
+            sub_label: "BLENDED WITH STEVIA LEAVES",
+            sub_title: "BLACK COFFEE WITH PURE ORGANIC BARLEY",
+            bg_color: "#2f1b02",
+            main_image: "/assets/image/blackco.png",
+            description: "Experience the bold taste of pure Robusta beans blended with our signature organic barley. This is a guilt-free wellness ritual designed for sustained physical energy and mental clarity.",
+            jobs: [
+                { title: "Job 1: Zero Sugar Spike", text: "Sweetened strictly with Stevia leaves. It provides a rich taste without triggering an insulin response, making it perfectly diabetic-friendly." },
+                { title: "Job 2: Fat Burning Catalyst", text: "Robusta beans contain higher levels of Chlorogenic Acid than Arabica, scientifically proven to boost resting metabolism and aid in fat loss." },
+                { title: "Job 3: Acid Buffer", text: "The addition of alkaline Organic Barley neutralizes the high acidity typical of black coffee, making it exceptionally gentle on the stomach." }
+            ],
+            replaces: "High-Sugar Cafe Drinks + Synthetic Pre-Workouts + Acidic Instant Coffees"
         },
         {
-            q: 'Is Infinite Robustus safe for people with acid reflux or hyperacidity?',
-            a: 'Yes! Unlike commercial black coffees which carry high acidity levels (pH 4.8-5.2), Infinite Robustus is infused with alkaline organic barley powder. The natural alkaline minerals buffer stomach acid while Stevia leaves eliminate sugar-induced gut fermentation.'
+            product_title: "INFINITE BARLEY",
+            sub_label: "100% ORGANIC & HALAL CERTIFIED",
+            sub_title: "PURE ORGANIC BARLEY POWDER FROM AUSTRALIA",
+            bg_color: "#2d4a22",
+            main_image: "/assets/image/Ley.png",
+            description: "A powerhouse daily superfood packed with 70+ organic trace minerals, vital chemical precursors, and live structural enzymes harvested directly from pristine Australian farmland.",
+            jobs: [
+                { title: "Job 1: Cellular Anti-Aging", text: "Contains Superoxide Dismutase (S.O.D.), a critical enzyme that scientifically dismantles oxygen free radicals, slowing down cellular breakdown." },
+                { title: "Job 2: Deep Blood Purifier", text: "Rich in natural Chlorophyll which acts as an internal cleanser, pulling heavy metals and toxins from the liver and bloodstream." },
+                { title: "Job 3: Gut Health & Weight Control", text: "High in soluble fiber to optimize digestion, naturally lower bad cholesterol, and prevent blood sugar spikes." }
+            ],
+            replaces: "Synthetic Multivitamin + Fiber Supplement + Detox Teas"
         },
         {
-            q: 'Is Glutathione only for skin whitening?',
-            a: 'This is a widespread consumer myth. Glutathione is the body\'s master antioxidant synthesized inside every living cell. Its primary biological function is cellular detoxification, mitochondrial protection, and liver defense. Radiant, brighter skin is simply a visible biomarker of low systemic oxidation.'
-        },
-        {
-            q: 'Can I consume Infinite Barley together with Infinite Robustus coffee?',
-            a: 'Absolutely. Many global leaders follow our Morning Activation Protocol: One sachet of Infinite Barley taken with room-temperature water upon waking, followed 30-45 minutes later by a warm mug of Infinite Robustus Black Coffee for sustained mental stamina.'
-        },
-        {
-            q: 'How are orders dispatched to West Africa, Papua New Guinea, and global hubs?',
-            a: 'All international orders through the World Plan are dispatched directly via insured DHL Global Express air cargo. Local collection is also available at our central hubs in Ouagadougou, Abidjan, Douala, and Port Moresby.'
+            product_title: "WHITE PLUS GLUTATHIONE",
+            sub_label: "NO APPROVED THERAPEUTIC CLAIMS",
+            sub_title: "ADVANCED FORMULA WITH NAC, VIT C, COLLAGEN & ALA (30 CAPSULES)",
+            bg_color: "#1E3A5F",
+            main_image: "/assets/image/Plus.png",
+            description: "A powerful clinical blend that works deep inside your body. It is a myth that Glutathione is only for skin whitening; it is your body's master antioxidant.",
+            jobs: [
+                { title: "Job 1: Liver & Toxin Defense", text: "Uses N-Acetyl Cysteine (NAC), a crucial amino acid precursor that allows your liver to synthesize massive amounts of its own intracellular glutathione." },
+                { title: "Job 2: Sleep & Insomnia Support", text: "By neutralizing neuro-inflammation and regulating glutamate levels in the brain (via NAC), it calms the nervous system for deeper, higher-quality sleep." },
+                { title: "Job 3: Total Skin Transformation", text: "Vitamin C, Collagen, and Alpha Lipoic Acid (ALA) work synergistically to recycle antioxidants, improve skin elasticity, and promote a radiant, even glow from within." }
+            ],
+            replaces: "Basic Gluta Pills + Sleep Aids + Standalone Collagen"
         }
     ];
 
-    const getIngredientIcon = (name) => {
-        if (name.includes('S.O.D.')) return ShieldCheck;
-        if (name.includes('Robusta') || name.includes('Chlorogenic')) return Flame;
-        if (name.includes('NAC')) return HeartPulse;
-        return Sparkles;
+    const barleyCategories = [
+        {
+            title: "Cardiovascular & Blood",
+            icon: "bi-heart-pulse-fill",
+            color: "#ef4444",
+            bg: "rgba(239, 68, 68, 0.1)",
+            items: ["Anemia", "Blood Pressure", "Cholesterol", "High Blood", "Hypertension", "Leukemia", "Stroke"]
+        },
+        {
+            title: "Reproductive & Hormonal",
+            icon: "bi-person-heart",
+            color: "#ec4899",
+            bg: "rgba(236, 72, 153, 0.1)",
+            items: ["Breast Cancer", "Cervical Cancer", "Dysmenorrhea", "Endometriosis", "Hormonal Imbalance", "Infertility", "Irregular Menstruation", "Low Sperm Count", "Myoma", "Prostate Cancer"]
+        },
+        {
+            title: "Digestive & Internal Organs",
+            icon: "bi-activity",
+            color: "#f59e0b",
+            bg: "rgba(245, 158, 11, 0.1)",
+            items: ["Constipation", "Detox", "Diabetes", "Gallstone", "Goiter", "Hepatitis", "Hyperacidity", "Kidney Disease", "Kidney Stones", "Liver Problem", "Thyroid Problem", "Ulcer"]
+        },
+        {
+            title: "Immunity, Pain & General",
+            icon: "bi-shield-fill-plus",
+            color: "var(--ch-teal)",
+            bg: "rgba(20, 184, 166, 0.1)",
+            items: ["Arthritis", "Asthma", "Bronchitis", "Cancer", "Cataract", "Cyst", "Gout", "Immune Deficiency", "Insomnia", "Mental Tiredness", "Migraine", "Muscle & Nerve Pain", "Overweight", "Psoriasis", "Skin Disease/Acne", "Slow Ageing Process", "Tuberculosis", "Tumor"]
+        }
+    ];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const currentItem = variations[currentIndex];
+
+    const cycleProduct = () => {
+        setCurrentIndex((prev) => (prev + 1) % variations.length);
+    };
+
+    const goToProduct = (index) => {
+        setCurrentIndex(index);
     };
 
     return (
         <AppLayout>
-            <Head title="INFINITE WELLNESS | Pure Organic Barley, Robustus & White Plus Gluta" />
+            <Head>
+                <title>INFINITE WELLNESS | Pure. Organic. Powerful.</title>
+                <link rel="stylesheet" href="/assets/css/barley.css" />
+            </Head>
 
-            {/* PRODUCT HERO WITH DYNAMIC VARIATION SWITCHER */}
-            <section className="py-12 md:py-20 relative overflow-hidden bg-dot-matrix">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Header Eyebrow */}
-                    <div className="text-center max-w-2xl mx-auto mb-10">
-                        <span className="text-xs uppercase font-bold tracking-[0.25em] text-ch-teal">
-                            CLINICAL WELLNESS MATRIX
-                        </span>
-                        <h1 className="font-bebas text-5xl sm:text-7xl tracking-wide text-white mt-1">
-                            PURE. ORGANIC. POWERFUL.
-                        </h1>
-                        <p className="text-slate-300 text-sm sm:text-base mt-2">
-                            Select a formulation thumbnail below to inspect its cellular jobs and active ingredient architecture.
-                        </p>
+            {/* HERO SECTION */}
+            <section id="hero" style={{ position: 'relative', overflow: 'hidden', paddingTop: '160px', paddingBottom: '100px' }}>
+                <div
+                    className="hero-bg"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)), url(/assets/image/Barley.png) center center / cover no-repeat',
+                        zIndex: 0
+                    }}
+                >
+                    <div className="hero-grid-lines"></div>
+                </div>
+
+                <div className="container-fluid px-3 px-lg-5 hero-content reveal visible" style={{ position: 'relative', zIndex: 1 }}>
+                    <div className="row justify-content-center">
+                        <div className="col-12 col-md-11 col-xl-10 text-center">
+                            <div className="hero-eyebrow justify-content-center mx-auto mb-3">
+                                <span className="dot"></span>PURE. ORGANIC. POWERFUL.
+                            </div>
+
+                            <p className="ola-script mt-2">/well-ness/</p>
+                            <h1 className="ola-hero-title">INFINITE WELLNESS</h1>
+
+                            <p className="hero-desc mx-auto text-white mt-4 px-2" style={{ maxWidth: '800px', opacity: 0.9, lineHeight: 1.8, fontSize: '1.15rem' }}>
+                                Nature’s most potent ingredients engineered for modern health. Discover the synergy of 100% Organic Australian Barley, Metabolic Robustus Coffee, and Cellular-repairing White Plus Glutathione.
+                            </p>
+
+                            <a href="#collection" className="btn btn-outline-light mt-4 fw-bold px-4 py-3" style={{ borderRadius: '50px', borderWidth: '2px', letterSpacing: '1px' }}>
+                                Explore The Collection <i className="bi bi-arrow-down ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* TOTAL SYSTEM CARE */}
+            <section className="section-pad" style={{ background: 'var(--ch-bg-light)' }}>
+                <div className="container reveal visible">
+                    <div className="row justify-content-center text-center px-3">
+                        <div className="col-12 col-lg-10">
+                            <span className="section-tag">Total System Care</span>
+                            <h2 className="section-title mb-4">The Infinite <span style={{ color: 'var(--ch-teal)' }}>Standard</span></h2>
+                            <p className="fs-5 text-muted" style={{ lineHeight: 1.8 }}>
+                                We believe true wellness isn't achieved by masking symptoms, but by repairing the body at a cellular level. Every product in the Infinite line is formulated with a <strong>Multi-Action Synergy</strong>. By addressing detox, energy, and cellular repair simultaneously, our simple 3-product system replaces your entire supplement cabinet—giving you less clutter and 100% more potency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* PRODUCT CATALOGUE INTERACTIVE SHOWCASE */}
+            <section id="collection" className="section-pad" style={{ background: '#f8fafc' }}>
+                <div className="container-fluid px-3 px-xl-5">
+                    <div className="text-center mb-5">
+                        <span className="section-tag" style={{ color: '#5eead4' }}>Product Catalogue</span>
+                        <h2 className="section-title text-var(--ch-dark-slate)">Discover Our Formulations</h2>
                     </div>
 
-                    {/* Interactive Modern Product Card with Smooth Color Shift */}
-                    <motion.div
-                        animate={{ backgroundColor: activeVar.bg_color }}
-                        transition={{ duration: 0.5, ease: 'easeInOut' }}
-                        className="rounded-3xl p-6 sm:p-10 md:p-12 border border-white/15 shadow-2xl relative overflow-hidden text-slate-100"
+                    <div
+                        className="product-card-modern"
+                        id="main-container"
+                        style={{ backgroundColor: currentItem.bg_color, transition: 'background-color 0.5s ease' }}
                     >
-                        {/* Ambient Card Backlight */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+                        <div className="card-body-modern">
+                            {/* Left Column */}
+                            <div className="left-column-modern">
+                                <div className="badge-modern" id="badge-label">{currentItem.sub_label}</div>
+                                <h1 id="main-title">{currentItem.product_title}</h1>
+                                <div className="product-subtitle-modern" id="main-subtitle">{currentItem.sub_title}</div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                            {/* Left: Product Image & Thumbnail Selector */}
-                            <div className="lg:col-span-5 flex flex-col items-center">
-                                {/* Pouch Hero Image with Keyed Animation */}
-                                <div className="w-64 h-72 sm:w-80 sm:h-96 relative flex items-center justify-center">
-                                    <AnimatePresence mode="wait">
-                                        <motion.img
-                                            key={activeVar.product_title}
-                                            src={activeVar.main_image}
-                                            alt={activeVar.product_title}
-                                            initial={{ opacity: 0, scale: 0.85, y: 15 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.85, y: -15 }}
-                                            transition={{ duration: 0.4 }}
-                                            className="max-h-full max-w-full object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.6)]"
-                                            onError={(e) => {
-                                                e.target.src = '/assets/image/Barley.png';
+                                <p className="main-description-modern" id="main-desc">
+                                    {currentItem.description}
+                                </p>
+
+                                <div className="thumb-section-title-modern">SELECT PRODUCT</div>
+                                <div className="thumbnail-row-modern">
+                                    {variations.map((variant, index) => (
+                                        <div
+                                            key={index}
+                                            className={`thumb-box-modern ${index === currentIndex ? 'active' : ''}`}
+                                            id={`thumb-${index}`}
+                                            style={{ backgroundImage: `url('${variant.main_image}')` }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                goToProduct(index);
                                             }}
-                                        />
-                                    </AnimatePresence>
-                                </div>
-
-                                {/* Thumbnail Switcher Buttons */}
-                                <div className="flex gap-4 mt-8 bg-black/40 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
-                                    {variations.map((v, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => setActiveVarIndex(idx)}
-                                            className={`relative p-2 rounded-xl border transition-all duration-300 flex flex-col items-center gap-1 w-24 ${
-                                                activeVarIndex === idx
-                                                    ? 'border-ch-teal bg-white/10 scale-105 shadow-glow-teal'
-                                                    : 'border-transparent hover:border-white/20 opacity-70 hover:opacity-100'
-                                            }`}
-                                        >
-                                            <div className="w-12 h-12 flex items-center justify-center">
-                                                <img
-                                                    src={v.main_image}
-                                                    alt={v.product_title}
-                                                    className="max-h-full max-w-full object-contain"
-                                                />
-                                            </div>
-                                            <span className="text-[9px] font-bold uppercase tracking-wider text-center line-clamp-1">
-                                                {v.product_title.replace('INFINITE ', '')}
-                                            </span>
-                                        </button>
+                                        ></div>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Right: Formulation Details & 3 Jobs Breakdown */}
-                            <div className="lg:col-span-7 space-y-6">
-                                <AnimatePresence mode="wait">
-                                    <motion.div
-                                        key={activeVar.product_title}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="space-y-6"
-                                    >
-                                        <div>
-                                            <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[10px] font-bold uppercase tracking-widest text-ch-teal-light mb-2">
-                                                {activeVar.sub_label}
-                                            </div>
-                                            <h2 className="font-bebas text-4xl sm:text-6xl text-white tracking-wider leading-none">
-                                                {activeVar.product_title}
-                                            </h2>
-                                            <p className="text-xs uppercase tracking-widest font-semibold text-slate-300 mt-1">
-                                                {activeVar.sub_title}
-                                            </p>
-                                        </div>
+                            {/* Center Column */}
+                            <div className="center-column-modern" onClick={cycleProduct} style={{ cursor: 'pointer' }}>
+                                <img
+                                    id="product-pouch"
+                                    className="pouch-img-modern"
+                                    src={currentItem.main_image}
+                                    alt="Product Pouch"
+                                    style={{ transition: 'all 0.3s ease' }}
+                                />
+                            </div>
 
-                                        <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-light">
-                                            {activeVar.description}
-                                        </p>
-
-                                        {/* Dynamic 3 Jobs Bullet Breakdown */}
-                                        <div className="space-y-3 pt-2">
-                                            {activeVar.jobs.map((job, jIdx) => (
-                                                <div
-                                                    key={jIdx}
-                                                    className="rounded-2xl p-4 bg-black/30 border border-white/10 backdrop-blur-sm"
-                                                >
-                                                    <h4 className="text-xs font-bold uppercase tracking-wider text-ch-teal-light mb-1">
-                                                        {job.title}
-                                                    </h4>
-                                                    <p className="text-xs text-slate-200 leading-normal">
-                                                        {job.text}
-                                                    </p>
-                                                </div>
-                                            ))}
+                            {/* Right Column */}
+                            <div className="right-column-modern">
+                                <div id="jobs-wrapper-modern">
+                                    {currentItem.jobs.map((job, idx) => (
+                                        <div key={idx} className="job-item-modern">
+                                            <div className="job-title-modern">{job.title}</div>
+                                            <div className="job-text-modern">{job.text}</div>
                                         </div>
+                                    ))}
+                                </div>
 
-                                        {/* Replaces 3 Harmful Habits Callout */}
-                                        <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-200 text-xs">
-                                            <span className="font-bold uppercase tracking-wider block mb-1">
-                                                Replaces Harmful Routines:
-                                            </span>
-                                            <p className="text-slate-200">{activeVar.replaces}</p>
-                                        </div>
-
-                                        {/* Actions */}
-                                        <div className="pt-2 flex flex-wrap gap-4">
-                                            <Link
-                                                href="/world-plan"
-                                                className="px-6 py-3.5 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-extrabold text-xs uppercase tracking-widest flex items-center gap-2 shadow-lg transition-all duration-200"
-                                            >
-                                                <ShoppingBag className="w-4 h-4" />
-                                                <span>Order via World Plan</span>
-                                            </Link>
-                                            <Link
-                                                href="/select-country"
-                                                className="px-6 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs uppercase tracking-wider border border-white/15 transition-colors"
-                                            >
-                                                View Local Currency
-                                            </Link>
-                                        </div>
-                                    </motion.div>
-                                </AnimatePresence>
+                                <div className="replaces-box-modern">
+                                    <div className="replaces-title-modern">⚡ REPLACES 3 HARMFUL HABITS</div>
+                                    <div className="replaces-content-modern" id="replaces-text-modern">
+                                        {currentItem.replaces}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </section>
 
-            {/* BIO-ACTIVE INGREDIENTS 4-COLUMN GRID */}
-            <section className="py-24 bg-slate-950 border-t border-white/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">
-                            CELLULAR BIO-CHEMISTRY
-                        </span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            HERO BIO-ACTIVE INGREDIENTS
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            Engineered for high bioavailability, intracellular uptake, and antioxidant synergy.
-                        </p>
+            {/* HERO INGREDIENTS */}
+            <section id="ingredients" className="section-pad" style={{ backgroundColor: 'var(--ch-bg-light)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 pb-3 px-3">
+                        <span className="section-tag">Hero Ingredients</span>
+                        <h2 className="section-title mb-3">Powered By <span style={{ color: 'var(--ch-teal)' }}>Science</span></h2>
+                        <p className="fs-5 text-muted">The clinical bio-actives driving the Infinite Wellness standard.</p>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {bioActiveIngredients.map((item, idx) => {
-                            const IconComponent = getIngredientIcon(item.name);
-                            return (
-                                <div
-                                    key={idx}
-                                    className="rounded-3xl p-6 bg-slate-900 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 hover:-translate-y-1 shadow-xl flex flex-col justify-between"
-                                >
-                                    <div>
-                                        <div className="w-12 h-12 rounded-2xl bg-ch-teal/15 text-ch-teal flex items-center justify-center mb-6">
-                                            <IconComponent className="w-6 h-6" />
-                                        </div>
-                                        <h3 className="font-bebas text-2xl tracking-wide text-white">{item.name}</h3>
-                                        <div className="text-[11px] font-bold text-ch-teal uppercase tracking-wider mt-1">
-                                            Source: {item.source}
-                                        </div>
-                                        <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-                                            {item.description}
-                                        </p>
-                                    </div>
-                                    <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-1.5 text-[11px] text-slate-400">
-                                        <CheckCircle2 className="w-3.5 h-3.5 text-ch-teal" />
-                                        <span>Laboratory Verified Potency</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    <div className="row g-4 justify-content-center px-3">
+                        <div className="col-12 col-md-6 col-lg-3">
+                            <div className="product-card text-center p-4 h-100 bg-white rounded-4 shadow-sm border border-light">
+                                <i className="fa-solid fa-leaf mb-4" style={{ fontSize: '3rem', color: 'var(--ch-teal)' }}></i>
+                                <h4 className="fw-bold mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.8rem', letterSpacing: '1px' }}>
+                                    S.O.D. <br /><span className="fs-6 text-muted font-monospace" style={{ fontFamily: "'Barlow', sans-serif", letterSpacing: 0 }}>(Superoxide Dismutase)</span>
+                                </h4>
+                                <p className="fs-6 text-muted mb-0">Found heavily in young Barley leaves, this powerful enzyme is the body’s first line of defense against the most dangerous free radicals, vastly outperforming basic vitamins.</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-lg-3">
+                            <div className="product-card text-center p-4 h-100 bg-white rounded-4 shadow-sm border border-light">
+                                <i className="fa-solid fa-mug-hot mb-4" style={{ fontSize: '3rem', color: 'var(--ch-yellow-dk)' }}></i>
+                                <h4 className="fw-bold mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.8rem', letterSpacing: '1px' }}>
+                                    Robusta <br /><span className="fs-6 text-muted font-monospace" style={{ fontFamily: "'Barlow', sans-serif", letterSpacing: 0 }}>(Chlorogenic Acid)</span>
+                                </h4>
+                                <p className="fs-6 text-muted mb-0">Contains almost double the antioxidants and caffeine of Arabica. Its high Chlorogenic Acid content actively slows carbohydrate absorption and burns fat.</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-lg-3">
+                            <div className="product-card text-center p-4 h-100 bg-white rounded-4 shadow-sm border border-light">
+                                <i className="fa-solid fa-capsules mb-4" style={{ fontSize: '3rem', color: '#db2777' }}></i>
+                                <h4 className="fw-bold mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.8rem', letterSpacing: '1px' }}>
+                                    NAC <br /><span className="fs-6 text-muted font-monospace" style={{ fontFamily: "'Barlow', sans-serif", letterSpacing: 0 }}>(N-Acetyl Cysteine)</span>
+                                </h4>
+                                <p className="fs-6 text-muted mb-0">Oral glutathione is poorly absorbed. NAC acts as the crucial building block that easily enters cells, instructing your liver to synthesize its own master antioxidants.</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-lg-3">
+                            <div className="product-card text-center p-4 h-100 bg-white rounded-4 shadow-sm border border-light">
+                                <i className="fa-solid fa-network-wired mb-4" style={{ fontSize: '3rem', color: 'var(--ch-teal)' }}></i>
+                                <h4 className="fw-bold mb-3" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '1.8rem', letterSpacing: '1px' }}>
+                                    ALA <br /><span className="fs-6 text-muted font-monospace" style={{ fontFamily: "'Barlow', sans-serif", letterSpacing: 0 }}>(Alpha Lipoic Acid)</span>
+                                </h4>
+                                <p className="fs-6 text-muted mb-0">A unique antioxidant that is both fat and water-soluble, allowing it to enter all parts of the cell to protect DNA and effectively recycle used Vitamin C and Glutathione.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* CONDITIONS RESPONSIVE TO BARLEY */}
-            <section className="py-24 bg-ch-dark-slate border-t border-white/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">
-                            HOLISTIC WELLNESS SUPPORT
-                        </span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            CONDITIONS RESPONSIVE TO BARLEY
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            Documented nutritional support categories utilizing pure organic young green barley.
+            <section id="conditions" className="section-pad" style={{ background: 'var(--ch-white)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 px-3">
+                        <span className="section-tag">Healing Potential</span>
+                        <h2 className="section-title mb-3">Conditions Responsive to <span style={{ color: 'var(--ch-teal)' }}>Barley</span></h2>
+                        <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '800px' }}>
+                            Powered by <strong>68 micronutrients</strong> found in pure organic barley, supporting the body's natural ability to heal and restore balance.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {barleyCategories.map((cat, idx) => (
-                            <div
-                                key={idx}
-                                className="rounded-3xl p-6 bg-slate-900/90 border border-white/10 hover:border-ch-teal/40 transition-all duration-300 shadow-xl flex flex-col justify-between"
-                            >
-                                <div>
-                                    <div
-                                        className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border"
-                                        style={{ backgroundColor: cat.bg, color: cat.color, borderColor: cat.color }}
-                                    >
-                                        {cat.title}
+                    <div className="row g-4 px-3">
+                        {barleyCategories.map((category, idx) => (
+                            <div key={idx} className="col-12 col-lg-6">
+                                <div className="condition-card">
+                                    <div className="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div className="condition-icon-wrapper me-3 shadow-sm" style={{ color: category.color, background: category.bg }}>
+                                            <i className={`bi ${category.icon}`}></i>
+                                        </div>
+                                        <h4 className="fw-bold mb-0" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '0.5px', fontSize: '1.3rem' }}>
+                                            {category.title}
+                                        </h4>
                                     </div>
-
-                                    <div className="flex flex-wrap gap-1.5 mt-2">
-                                        {cat.items.map((it, iIdx) => (
-                                            <span
-                                                key={iIdx}
-                                                className="px-2.5 py-1 rounded-lg bg-slate-950 text-slate-300 text-xs border border-white/5"
-                                            >
-                                                {it}
-                                            </span>
+                                    <ul className="condition-list">
+                                        {category.items.map((item, itemIdx) => (
+                                            <li key={itemIdx}>
+                                                <i className="bi bi-check-circle-fill me-2" style={{ color: category.color }}></i>
+                                                <span className="fw-medium">{item.toUpperCase()}</span>
+                                            </li>
                                         ))}
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 pt-4 border-t border-white/5 text-[11px] text-slate-400">
-                                    Complementary nutritional superfood
+                                    </ul>
                                 </div>
                             </div>
                         ))}
                     </div>
+
+                    {/* Trust Badges */}
+                    <div className="row justify-content-center px-3 mt-5 pt-3">
+                        <div className="col-12">
+                            <div
+                                className="bg-white rounded-4 p-4 p-md-5 shadow-sm border border-light d-flex flex-wrap justify-content-around align-items-center gap-4 text-center"
+                                style={{ backgroundImage: 'linear-gradient(to right, rgba(20, 184, 166, 0.02), rgba(20, 184, 166, 0.05))' }}
+                            >
+                                <div className="px-2">
+                                    <i className="bi bi-shield-check fs-2 mb-2" style={{ color: 'var(--ch-teal)', filter: 'drop-shadow(0 4px 6px rgba(20, 184, 166, 0.2))' }}></i>
+                                    <div className="small fw-bolder mt-1" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '1px' }}>100% ORGANIC</div>
+                                </div>
+                                <div className="px-2">
+                                    <i className="bi bi-patch-check fs-2 mb-2" style={{ color: 'var(--ch-teal)', filter: 'drop-shadow(0 4px 6px rgba(20, 184, 166, 0.2))' }}></i>
+                                    <div className="small fw-bolder mt-1" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '1px' }}>HALAL CERTIFIED</div>
+                                </div>
+                                <div className="px-2">
+                                    <i className="bi bi-lightning-charge fs-2 mb-2" style={{ color: 'var(--ch-teal)', filter: 'drop-shadow(0 4px 6px rgba(20, 184, 166, 0.2))' }}></i>
+                                    <div className="small fw-bolder mt-1" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '1px' }}>NATURAL DETOXIFIER</div>
+                                </div>
+                                <div className="px-2">
+                                    <i className="bi bi-heart-pulse fs-2 mb-2" style={{ color: 'var(--ch-teal)', filter: 'drop-shadow(0 4px 6px rgba(20, 184, 166, 0.2))' }}></i>
+                                    <div className="small fw-bolder mt-1" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '1px' }}>SUPPORTS IMMUNITY</div>
+                                </div>
+                                <div className="px-2">
+                                    <i className="bi bi-droplet fs-2 mb-2" style={{ color: 'var(--ch-teal)', filter: 'drop-shadow(0 4px 6px rgba(20, 184, 166, 0.2))' }}></i>
+                                    <div className="small fw-bolder mt-1" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Barlow', sans-serif", letterSpacing: '1px' }}>RICH IN NUTRIENTS</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* CONSUMER MISCONCEPTIONS & DAILY REGIMEN */}
-            <section className="py-24 bg-slate-950 border-t border-white/10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">
-                            MAXIMIZE YOUR BIOLOGICAL RESULTS
-                        </span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            DAILY PROTOCOL ARCHITECTURE
-                        </h2>
-                        <p className="text-slate-400 text-sm mt-1">
-                            Align your daily intake with your natural circadian and metabolic rhythms.
+            {/* WELLNESS EDUCATION / INSIGHTS */}
+            <section id="insights" className="section-pad" style={{ background: 'var(--ch-white)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 px-3">
+                        <span className="section-tag">Wellness Education</span>
+                        <h2 className="section-title mb-3">Understanding Your <span style={{ color: 'var(--ch-teal)' }}>Body</span></h2>
+                        <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '800px' }}>
+                            We arm our community with the biological facts that make our formulations naturally authoritative.
+                        </p>
+                    </div>
+                    <div className="row g-4 px-3">
+                        <div className="col-12 col-md-6 col-lg-4">
+                            <div className="insight-card">
+                                <div className="insight-badge"><i className="bi bi-search text-secondary"></i> The Sugar Spike Trap</div>
+                                <p className="text-muted mb-3"><strong>The Problem:</strong> Most instant coffees use white sugar or artificial creamers, spiking insulin, storing fat, and causing severe afternoon energy crashes.</p>
+                                <p className="text-muted mb-0"><strong>The Solution:</strong> Robustus uses Stevia. It provides zero glycemic impact. You retain steady physical energy and keep your body in a fat-burning state all day.</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-lg-4">
+                            <div className="insight-card">
+                                <div className="insight-badge"><i className="bi bi-search text-secondary"></i> The Acidic Coffee Dilemma</div>
+                                <p className="text-muted mb-3"><strong>The Problem:</strong> Coffee drinkers often suffer from acid reflux, bloating, or stomach pain due to the high acidity of poorly processed beans.</p>
+                                <p className="text-muted mb-0"><strong>The Solution:</strong> The pure organic barley in Robustus acts as an alkaline buffer. It neutralizes the stomach environment, giving you the focus of coffee with the comfort of tea.</p>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-6 col-lg-4">
+                            <div className="insight-card">
+                                <div className="insight-badge"><i className="bi bi-search text-secondary"></i> The Whitening Myth</div>
+                                <p className="text-muted mb-3"><strong>The Problem:</strong> The market treats Glutathione strictly as a cosmetic whitening pill, ignoring its primary biological function.</p>
+                                <p className="text-muted mb-0"><strong>The Solution:</strong> White Plus respects Glutathione as a liver defender. Skin brightening is merely a side-effect of a deeply cleansed liver and reduced internal oxidative stress.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* TOP 3 HEALTH MISCONCEPTIONS */}
+            <section className="section-pad" style={{ background: 'var(--ch-bg-light)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 px-3">
+                        <span className="section-tag">Consumer Education</span>
+                        <h2 className="section-title mb-3">Top 3 Health <span style={{ color: 'var(--ch-teal)' }}>Misconceptions</span></h2>
+                        <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '800px' }}>
+                            Data-backed answers to the most common questions regarding supplementation.
+                        </p>
+                    </div>
+                    <div className="row g-4 px-3 mb-5">
+                        <div className="col-12 col-lg-4">
+                            <div className="objection-card">
+                                <h5 className="fw-bold mb-4 text-center">"I eat vegetables, I don't need Barley."</h5>
+                                <div className="skeptic-bubble">
+                                    <strong>The Assumption:</strong><br />
+                                    "My normal diet provides enough greens and fiber for my body to detox naturally."
+                                </div>
+                                <div className="reality-bubble">
+                                    <strong className="text-dark">The Infinite Reality:</strong><br />
+                                    <span className="text-dark fw-bold d-block mt-2 mb-1">Soil Depletion:</span>
+                                    Modern agriculture has severely depleted soil minerals. Infinite Barley is grown in pristine Australian soil and harvested specifically at the "young leaf" stage—when trace minerals, chlorophyll, and amino acids are at their absolute peak concentration, far exceeding standard grocery vegetables.
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-12 col-lg-4">
+                            <div className="objection-card">
+                                <h5 className="fw-bold mb-4 text-center">"Coffee makes me palpitate."</h5>
+                                <div className="skeptic-bubble">
+                                    <strong>The Assumption:</strong><br />
+                                    "I avoid strong coffee because it gives me jitters, anxiety, and an upset stomach."
+                                </div>
+                                <div className="reality-bubble">
+                                    <strong className="text-dark">The Infinite Reality:</strong><br />
+                                    <span className="text-dark fw-bold d-block mt-2 mb-1">The Clean Energy Matrix:</span>
+                                    Palpitations are often caused by sugar spikes combined with synthetic caffeine. Robustus uses natural Robusta caffeine balanced with Stevia (no sugar spike) and alkaline Barley (soothes the stomach). This creates a steady, focused "clean energy" release without the harsh physiological crash.
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-12 col-lg-4">
+                            <div className="objection-card">
+                                <h5 className="fw-bold mb-4 text-center">"Glutathione pills don't work for me."</h5>
+                                <div className="skeptic-bubble">
+                                    <strong>The Assumption:</strong><br />
+                                    "I've tried standard glutathione capsules before and didn't see any improvement in my skin or energy."
+                                </div>
+                                <div className="reality-bubble">
+                                    <strong className="text-dark">The Infinite Reality:</strong><br />
+                                    <span className="text-dark fw-bold d-block mt-2 mb-1">The Bio-Availability Problem:</span>
+                                    Plain oral glutathione gets destroyed by stomach acid. White Plus solves this by including NAC (N-Acetyl Cysteine), which survives digestion and travels to the liver, providing the exact raw materials your body needs to manufacture its own highly-absorbable Glutathione internally.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* THE DAILY REGIMEN */}
+            <section id="regimen" className="section-pad" style={{ background: 'var(--ch-white)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 px-3">
+                        <span className="section-tag">Application Guide</span>
+                        <h2 className="section-title mb-3">The Daily <span style={{ color: 'var(--ch-teal)' }}>Regimen</span></h2>
+                        <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '800px' }}>
+                            Maximize your results with our targeted morning and evening protocols.
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                        {/* Morning Protocol */}
-                        <div className="rounded-3xl p-8 bg-slate-900 border border-ch-teal/30 shadow-glow-teal relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                                    <Sun className="w-6 h-6" />
+                    <div className="row g-4 px-3 mb-5">
+                        <div className="col-12 col-lg-6">
+                            <div className="bg-white rounded-4 p-4 p-lg-5 border shadow-sm h-100">
+                                <div className="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                    <i className="bi bi-sun-fill fs-1 me-3" style={{ color: 'var(--ch-yellow)' }}></i>
+                                    <div>
+                                        <h4 className="fw-bold mb-1" style={{ color: 'var(--ch-dark-slate)' }}>Morning: The Activation Phase</h4>
+                                        <p className="text-muted mb-0 small fw-bold text-uppercase" style={{ letterSpacing: '0.5px' }}>Goal: Detoxification, Metabolism, and Focus</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">PHASE 1 (06:00 - 09:00)</span>
-                                    <h3 className="font-bebas text-3xl text-white tracking-wide">MORNING ACTIVATION</h3>
-                                </div>
+                                <ul className="job-list">
+                                    <li><span className="job-title">Wake Up with Infinite Barley:</span> Mix 1 scoop (or sachet) in 150ml of cold or room-temperature water. Drink on an <strong>empty stomach</strong>. The chlorophyll instantly begins flushing out toxins accumulated overnight, while the alkaline nature balances your gut pH.</li>
+                                    <li><span className="job-title">Fuel Up with Robustus:</span> Replace your morning cafe drink with 1 sachet of Robustus Black Coffee mixed in hot water. The Robusta caffeine sharpens your mind for work, while the Stevia keeps your body in a low-insulin, fat-burning state until lunch.</li>
+                                </ul>
                             </div>
-
-                            <ul className="space-y-4 text-xs sm:text-sm text-slate-300">
-                                <li className="flex items-start gap-3">
-                                    <CheckCircle2 className="w-4 h-4 text-ch-teal shrink-0 mt-0.5" />
-                                    <span><strong>Empty Stomach:</strong> Drink 1 glass of cold/room-temperature water with 1 sachet of Infinite Pure Organic Barley. Never use boiling water to avoid destroying live enzymes.</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <CheckCircle2 className="w-4 h-4 text-ch-teal shrink-0 mt-0.5" />
-                                    <span><strong>Sustained Focus:</strong> 30 minutes later, enjoy 1 cup of Infinite Robustus Black Coffee for clean chlorogenic energy and appetite balance.</span>
-                                </li>
-                            </ul>
                         </div>
 
-                        {/* Evening Protocol */}
-                        <div className="rounded-3xl p-8 bg-slate-900 border border-sky-500/30 shadow-xl relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
-                                    <Moon className="w-6 h-6" />
+                        <div className="col-12 col-lg-6">
+                            <div className="rounded-4 p-4 p-lg-5 border shadow-sm h-100 text-white" style={{ backgroundColor: 'var(--ch-dark-slate)', borderColor: '#334155' }}>
+                                <div className="d-flex align-items-center mb-4 pb-3 border-bottom" style={{ borderColor: '#334155' }}>
+                                    <i className="bi bi-moon-stars-fill fs-1 me-3" style={{ color: '#cbd5e1' }}></i>
+                                    <div>
+                                        <h4 className="fw-bold mb-1 text-white">Evening: The Recovery Phase</h4>
+                                        <p className="text-white-50 mb-0 small fw-bold text-uppercase" style={{ letterSpacing: '0.5px' }}>Goal: Liver Repair, Deep Sleep, and Cellular Anti-Aging</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span className="text-xs uppercase font-bold text-sky-400 tracking-wider">PHASE 2 (20:00 - 22:00)</span>
-                                    <h3 className="font-bebas text-3xl text-white tracking-wide">EVENING CELLULAR REPAIR</h3>
-                                </div>
+                                <ul className="job-list">
+                                    <li style={{ color: '#cbd5e1' }}><span className="job-title text-white">Repair with White Plus:</span> Take 1-2 capsules of White Plus Glutathione 30 minutes before bed. During the night, your liver does its heaviest detox work. The NAC and ALA provide the biological tools to repair cellular damage from daily pollution.</li>
+                                    <li style={{ color: '#cbd5e1' }}><span className="job-title text-white">Sleep Optimization:</span> By reducing neuro-inflammation, the formulation actively calms the brain, promoting faster sleep onset and allowing you to wake up feeling refreshed and looking radiant.</li>
+                                </ul>
                             </div>
-
-                            <ul className="space-y-4 text-xs sm:text-sm text-slate-300">
-                                <li className="flex items-start gap-3">
-                                    <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                                    <span><strong>Master Antioxidant Shield:</strong> Take 1 capsule of White Plus Glutathione with water prior to bedtime to assist hepatic phase II detoxification.</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                                    <span><strong>Neuro-Calm:</strong> The NAC and Alpha Lipoic Acid components help down-regulate evening neuro-excitation for deeper restorative REM sleep cycles.</span>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ACCORDION FAQ SECTION */}
-            <section className="py-24 bg-ch-dark-slate border-t border-white/10">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6">
-                    <div className="text-center mb-16">
-                        <span className="text-xs uppercase tracking-[0.25em] font-bold text-ch-teal">CLARITY & COMPLIANCE</span>
-                        <h2 className="font-bebas text-4xl sm:text-5xl tracking-wide text-white mt-1">
-                            FREQUENTLY ASKED QUESTIONS
-                        </h2>
+            {/* GLOBAL BUSINESS OPPORTUNITY CTA */}
+            <section className="section-pad position-relative" style={{ background: 'linear-gradient(135deg, var(--ch-dark-slate) 0%, #1e293b 100%)', overflow: 'hidden' }}>
+                <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundImage: 'radial-gradient(circle at 20% 150%, rgba(20, 184, 166, 0.15) 0%, transparent 50%)', zIndex: 0, pointerEvents: 'none' }}></div>
+                <div className="position-absolute top-0 end-0 w-100 h-100" style={{ backgroundImage: 'radial-gradient(circle at 80% -50%, rgba(20, 184, 166, 0.1) 0%, transparent 50%)', zIndex: 0, pointerEvents: 'none' }}></div>
+
+                <div className="container reveal visible position-relative" style={{ zIndex: 1 }}>
+                    <div className="row justify-content-center text-center px-3">
+                        <div className="col-12 col-lg-8 col-xl-7">
+                            <span className="section-tag mb-3" style={{ color: 'var(--ch-yellow)', letterSpacing: '3px' }}>Global Business Opportunity</span>
+
+                            <h2 className="section-title1 mb-4" style={{ color: 'var(--ch-white)', fontSize: 'clamp(2.8rem, 6vw, 4.5rem)', textShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+                                Ready to Build Your <br /><span style={{ color: 'var(--ch-teal)' }}>Wellness Empire?</span>
+                            </h2>
+
+                            <p className="fs-5 mb-5 text-white-50 mx-auto" style={{ lineHeight: 1.8 }}>
+                                Join a network of visionary leaders and redefine the standard of health in your market. Step into the future of biological nutrition and build a limitless business.
+                            </p>
+
+                            <Link
+                                href="/select-country"
+                                className="btn btn-lg shadow-lg text-decoration-none"
+                                style={{
+                                    background: 'var(--ch-teal)',
+                                    color: 'var(--ch-white)',
+                                    borderRadius: '50px',
+                                    fontFamily: "'Barlow', sans-serif",
+                                    fontWeight: 700,
+                                    padding: '1.1rem 2.5rem',
+                                    fontSize: 'clamp(1rem, 2vw, 1.15rem)',
+                                    letterSpacing: '1px',
+                                    transition: 'all 0.3s ease',
+                                    border: '2px solid transparent'
+                                }}
+                            >
+                                See How To Join <i className="bi bi-arrow-right-circle ms-2 fs-5 align-middle"></i>
+                            </Link>
+                        </div>
                     </div>
+                </div>
+            </section>
 
-                    <div className="space-y-4">
-                        {faqs.map((faq, idx) => {
-                            const isOpen = openFaq === idx;
-                            return (
-                                <div
-                                    key={idx}
-                                    className="rounded-2xl bg-slate-900 border border-white/10 overflow-hidden transition-colors"
-                                >
-                                    <button
-                                        onClick={() => setOpenFaq(isOpen ? null : idx)}
-                                        className="w-full p-5 text-left flex justify-between items-center gap-4 focus:outline-none"
-                                    >
-                                        <span className="font-semibold text-sm sm:text-base text-white">{faq.q}</span>
-                                        <ChevronDown className={`w-5 h-5 text-ch-teal transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
-                                    </button>
-
-                                    <AnimatePresence>
-                                        {isOpen && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                className="px-5 pb-5 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 pt-3"
-                                            >
-                                                {faq.a}
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+            {/* FREQUENTLY ASKED QUESTIONS */}
+            <section className="section-pad" style={{ background: 'var(--ch-white)' }}>
+                <div className="container reveal visible">
+                    <div className="text-center mb-5 px-3">
+                        <span className="section-tag">Help Center</span>
+                        <h2 className="section-title">Frequently Asked <span style={{ color: 'var(--ch-teal)' }}>Questions</span></h2>
+                        <p className="fs-5 text-muted mt-2">Everything you need to know about the Infinite Wellness standard.</p>
+                    </div>
+                    <div className="row justify-content-center px-3">
+                        <div className="col-12 col-lg-9">
+                            <div className="accordion" id="faqAccordion">
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                                            Can I drink Infinite Barley with hot water?
+                                        </button>
+                                    </h2>
+                                    <div id="q1" className="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                        <div className="accordion-body">
+                                            No, it is highly recommended to mix Infinite Barley with cold or room-temperature water. Hot water can destroy the delicate, live enzymes (like S.O.D.) and diminish the product's nutritional potency.
+                                        </div>
+                                    </div>
                                 </div>
-                            );
-                        })}
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                                            Are these products safe for pregnant or nursing women?
+                                        </button>
+                                    </h2>
+                                    <div id="q2" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div className="accordion-body">
+                                            While Infinite Barley is 100% organic and generally safe as a whole food, we always advise pregnant or nursing women to consult their healthcare provider before adding any new supplement (including Robustus and White Plus) to their routine.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                                            Is Robustus coffee safe for people with acid reflux (GERD)?
+                                        </button>
+                                    </h2>
+                                    <div id="q3" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div className="accordion-body">
+                                            Yes, many users with sensitive stomachs tolerate Robustus very well. The infusion of pure organic barley acts as a natural alkaline buffer, significantly reducing the acidity usually associated with black coffee.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="accordion-item">
+                                    <h2 className="accordion-header">
+                                        <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
+                                            How soon will I see results from White Plus Glutathione?
+                                        </button>
+                                    </h2>
+                                    <div id="q4" className="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                        <div className="accordion-body">
+                                            Many users notice improved sleep quality and higher energy levels within the first week due to the liver detoxifying effects of NAC. Visible skin brightening and evening of tone typically require 4 to 8 weeks of consistent daily use, as skin cells take time to turn over.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

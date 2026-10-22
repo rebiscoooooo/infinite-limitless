@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function BackToTop() {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         const toggleVisibility = () => {
-            if (window.scrollY > 400) {
+            if (window.scrollY > 300) {
                 setVisible(true);
             } else {
                 setVisible(false);
@@ -25,20 +23,31 @@ export default function BackToTop() {
         });
     };
 
+    if (!visible) return null;
+
     return (
-        <AnimatePresence>
-            {visible && (
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={scrollToTop}
-                    aria-label="Back to top"
-                    className="fixed bottom-6 right-6 z-40 p-3 rounded-full bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white shadow-lg transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ch-teal focus:ring-offset-2 focus:ring-offset-ch-dark-slate"
-                >
-                    <ArrowUp className="w-5 h-5 stroke-[2.5]" />
-                </motion.button>
-            )}
-        </AnimatePresence>
+        <button
+            id="backToTop"
+            onClick={scrollToTop}
+            className="btn border-0 shadow"
+            aria-label="Back to top"
+            style={{
+                position: 'fixed',
+                bottom: '30px',
+                right: '30px',
+                display: 'flex',
+                backgroundColor: 'var(--ch-teal)',
+                color: '#fff',
+                borderRadius: '50%',
+                width: '50px',
+                height: '50px',
+                zIndex: 999,
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+            }}
+        >
+            <i className="bi bi-arrow-up fs-5"></i>
+        </button>
     );
 }

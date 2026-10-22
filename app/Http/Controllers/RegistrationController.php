@@ -149,12 +149,27 @@ class RegistrationController extends Controller
             ],
             'regular' => [
                 [
+                    'id' => 'reg-gem',
+                    'tier' => 'GEM',
+                    'name' => 'Regular Starter Set',
+                    'price' => $isCfa ? 'CFA 25,000' : ($isPhp ? '₱1,888' : ($isPng ? 'K 150' : '$45')),
+                    'worth' => '10% Extra Value Added',
+                    'badge' => '/assets/image/badge/GEM.png',
+                    'inclusions' => [
+                        '2x Infinite Robustus Black Coffee',
+                        '1x Infinite Organic Barley Powder',
+                        'Distributor ID & Reorder Discounts',
+                        'Weekly Cap: ' . ($isCfa ? 'CFA 135,000' : ($isPhp ? '₱12,500' : '$300')),
+                    ],
+                    'recommended' => false,
+                ],
+                [
                     'id' => 'reg-emerald',
                     'tier' => 'EMERALD',
                     'name' => 'Regular Health Set',
                     'price' => $regPrices['emerald'],
                     'worth' => '10% Extra Value Added',
-                    'badge' => '/assets/image/badge/Emerald_logo.png',
+                    'badge' => '/assets/image/badge/emerald.png',
                     'inclusions' => [
                         '5x Infinite Robustus Black Coffee',
                         '3x Infinite Organic Barley Powder',
@@ -170,7 +185,7 @@ class RegistrationController extends Controller
                     'name' => 'Regular Pro Health Set',
                     'price' => $regPrices['pearl'],
                     'worth' => '15% Extra Value Added',
-                    'badge' => '/assets/image/badge/Pearl_logo.png',
+                    'badge' => '/assets/image/badge/pearl.png',
                     'inclusions' => [
                         '8x Infinite Robustus Black Coffee',
                         '5x Infinite Organic Barley Powder',
@@ -186,7 +201,7 @@ class RegistrationController extends Controller
                     'name' => 'Regular Director Health Set',
                     'price' => $regPrices['ruby'],
                     'worth' => '20% Extra Value Added',
-                    'badge' => '/assets/image/badge/Ruby_logo.png',
+                    'badge' => '/assets/image/badge/ruby.png',
                     'inclusions' => [
                         '20x Infinite Robustus Black Coffee',
                         '15x Infinite Organic Barley Powder',
@@ -202,7 +217,7 @@ class RegistrationController extends Controller
                     'name' => 'Regular Ambassador Health Set',
                     'price' => $regPrices['sapphire'],
                     'worth' => '25% Extra Value Added',
-                    'badge' => '/assets/image/badge/Sapphire_logo.png',
+                    'badge' => '/assets/image/badge/sapphire.png',
                     'inclusions' => [
                         '50x Infinite Robustus Black Coffee',
                         '35x Infinite Organic Barley Powder',
@@ -218,7 +233,7 @@ class RegistrationController extends Controller
                     'name' => 'Regular Supreme Health Set',
                     'price' => $regPrices['diamond'],
                     'worth' => '30% Extra Value Added',
-                    'badge' => '/assets/image/badge/Diamond_logo.png',
+                    'badge' => '/assets/image/badge/diamond.png',
                     'inclusions' => [
                         '80x Infinite Robustus Black Coffee',
                         '60x Infinite Organic Barley Powder',

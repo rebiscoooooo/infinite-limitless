@@ -16,8 +16,8 @@
   }
 
   body {
-    background-color: #0f172a;
-    color: #f8fafc;
+    background-color: #fff;
+    color: #0f172a;
     font-family: 'Barlow', sans-serif;
   }
 
@@ -94,3 +94,29 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Ensure navbar menu links are always displayed on desktop */
+#mainNav .navbar-collapse {
+  visibility: visible !important;
+}
+
+@media (min-width: 992px) {
+  #mainNav .navbar-collapse {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-basis: auto !important;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #mainNav .navbar-collapse:not(.show) {
+    display: none !important;
+  }
+  #mainNav .navbar-collapse.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+

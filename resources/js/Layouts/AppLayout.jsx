@@ -10,14 +10,14 @@ export default function AppLayout({ children, hideFooter = false }) {
     const { flash } = usePage().props;
 
     return (
-        <div className="min-h-screen flex flex-col bg-ch-dark-slate text-slate-100 font-barlow selection:bg-ch-teal selection:text-ch-dark-slate">
+        <div className="min-h-screen flex flex-col font-barlow selection:bg-ch-teal selection:text-ch-dark-slate">
             <Preloader />
             <AppNavbar />
 
             {/* Flash message popups */}
             <FlashToast flash={flash} />
 
-            <main className="flex-1 pt-24 sm:pt-28">
+            <main className="flex-1">
                 {children}
             </main>
 

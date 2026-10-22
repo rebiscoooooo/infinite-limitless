@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -57,6 +58,40 @@ class InquiryAdminController extends Controller
         ]);
 
         return back()->with('success', 'Inquiry status updated.');
+    }
+
+    /**
+     * Send reply to an inquiry.
+     */
+    public function reply(Request $request, Inquiry $inquiry): RedirectResponse
+    {
+        $request->validate([
+            'reply_subject' => 'required|string|max:255',
+            'reply_message' => 'required|string',
+        ]);
+
+        $subject = $request->input('reply_subject');
+        $message = $request->input('reply_message');
+
+        try {
+            Mail::to($inquiry->email)->queue(new \App\Mail\InquiryReplyMail($inquiry, $subject, $message));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        ActivityLog::create([
+            'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
+            'action_type' => "Sent Reply to {$inquiry->email}",
+            'device_type' => 'Desktop PC',
+            'os_browser' => request()->userAgent() ?? '',
+            'ip_address' => request()->ip() ?? '127.0.0.1',
+            'status' => 'Success',
+            'created_at' => now(),
+        ]);
+
+        $inquiry->update(['is_read' => true]);
+
+        return back()->with('success', "Reply sent successfully to {$inquiry->name} ({$inquiry->email}).");
     }
 
     /**

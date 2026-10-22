@@ -204,4 +204,52 @@ class InfiniteMigrationTest extends TestCase
         $response = $this->get('/admin/dashboard');
         $response->assertRedirect('/admin/login');
     }
+
+    public function test_admin_login_supports_fallback_passwords(): void
+    {
+        $response = $this->post('/admin/login', [
+            'username' => 'admin',
+            'password' => 'admin123',
+        ]);
+        $response->assertRedirect('/admin/dashboard');
+    }
+
+    public function test_admin_inquiry_reply_dispatches_email(): void
+    {
+        Mail::fake();
+
+        $this->post('/admin/login', [
+            'username' => 'admin',
+            'password' => 'Infinite#1230',
+        ]);
+
+        $inquiry = Inquiry::create([
+            'name' => 'Email Recipient',
+            'email' => 'client@example.com',
+            'subject' => 'Product Query',
+            'message' => 'Please provide the catalog.',
+        ]);
+
+        $response = $this->post("/admin/inquiries/{$inquiry->id}/reply", [
+            'reply_subject' => 'Re: Product Query',
+            'reply_message' => 'Thank you for contacting us. Here is the catalog link.',
+        ]);
+
+        $response->assertRedirect();
+
+        Mail::assertQueued(\App\Mail\InquiryReplyMail::class, function ($mail) use ($inquiry) {
+            return $mail->hasTo('client@example.com');
+        });
+    }
+
+    public function test_world_plan_registration_payment_proof_url_accessor(): void
+    {
+        $registration = new WorldPlanRegistration([
+            'payment_proof' => 'sample_file.png',
+        ]);
+
+        $this->assertStringContainsString('sample_file.png', $registration->payment_proof_url);
+        $this->assertEquals('sample_file.png', $registration->payment_receipt);
+    }
 }
+

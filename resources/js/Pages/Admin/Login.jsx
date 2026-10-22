@@ -24,11 +24,11 @@ export default function Login() {
             <div className="w-full max-w-md relative z-10">
                 {/* Brand Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex flex-col items-center">
+                    <Link href="/" className="inline-flex flex-col items-center text-decoration-none">
                         <span className="font-bebas text-5xl font-black text-white tracking-widest leading-none">
                             INFINITE<span className="text-ch-teal">.</span>
                         </span>
-                        <span className="text-[10px] uppercase font-bold tracking-[0.35em] text-ch-teal">
+                        <span className="text-[10px] uppercase font-bold tracking-[0.35em] text-ch-teal mt-1">
                             EXECUTIVE PORTAL ACCESS
                         </span>
                     </Link>
@@ -81,14 +81,14 @@ export default function Login() {
                                     required
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                                    placeholder="••••••••"
                                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-950 border border-white/15 text-white text-sm focus:outline-none focus:ring-2 focus:ring-ch-teal"
                                 />
                             </div>
                         </div>
 
                         <div className="flex items-center justify-between text-xs pt-1">
-                            <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300">
+                            <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 mb-0">
                                 <input
                                     type="checkbox"
                                     checked={data.remember}
@@ -102,7 +102,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full mt-4 py-3.5 px-6 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all duration-200 disabled:opacity-60"
+                            className="w-full mt-4 py-3.5 px-6 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all duration-200 disabled:opacity-60 border-0"
                         >
                             {processing ? (
                                 <>
@@ -120,7 +120,7 @@ export default function Login() {
                 </div>
 
                 <div className="mt-8 text-center text-xs text-slate-500">
-                    <Link href="/" className="hover:text-ch-teal transition-colors">
+                    <Link href="/" className="hover:text-ch-teal transition-colors text-decoration-none text-slate-400">
                         &larr; Return to Public Website
                     </Link>
                 </div>

@@ -1,188 +1,280 @@
 import React, { useState, useEffect } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import { Menu, X, Globe, ArrowRight, ShieldCheck, Sparkles, Coffee } from 'lucide-react';
+import { Link, usePage, router } from '@inertiajs/react';
 
 export default function AppNavbar() {
     const { url } = usePage();
     const [scrolled, setScrolled] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [activeSection, setActiveSection] = useState('home');
 
+    const isHomePage = url === '/' || url === '' || url.startsWith('/#') || url.startsWith('/?');
+    const isAlwaysSolidPage = url.startsWith('/world-plan') || url.startsWith('/select-country');
+    const isNavbarScrolled = scrolled || isAlwaysSolidPage;
+
+    // Scroll listener for sticky navbar background and active section detection
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 20) {
+            if (window.scrollY > 40) {
                 setScrolled(true);
             } else {
                 setScrolled(false);
             }
+
+            // Detect active section on scroll if on home page
+            if (isHomePage) {
+                const sections = ['contact', 'testimonials', 'team', 'menu', 'features'];
+                const scrollPos = window.scrollY + 200;
+
+                for (const sec of sections) {
+                    const el = document.getElementById(sec);
+                    if (el && el.offsetTop <= scrollPos) {
+                        setActiveSection(sec);
+                        return;
+                    }
+                }
+                setActiveSection('home');
+            }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
+    }, [isHomePage]);
+
+    // Close mobile menu on desktop resize
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 992) {
+                setMenuOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const navLinks = [
-        { name: 'Home', href: '/' },
-        { name: 'Infinite Barley', href: '/barley', icon: Coffee },
-        { name: 'O\'Lamour', href: '/olamour', icon: Sparkles },
-        { name: 'World Plan', href: '/world-plan' },
-        { name: 'Legitimacy', href: '/info', icon: ShieldCheck },
-        { name: 'Region', href: '/select-country', icon: Globe },
-    ];
+    // Handle initial hash scrolling on mount or Inertia url change
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.location.hash) {
+            const targetId = window.location.hash.replace('#', '');
+            const timer = setTimeout(() => {
+                const el = document.getElementById(targetId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                    setActiveSection(targetId);
+                }
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [url]);
 
-    const isActive = (href) => {
-        if (href === '/' && url === '/') return true;
-        if (href !== '/' && url.startsWith(href)) return true;
-        return false;
+    const closeMenu = () => setMenuOpen(false);
+
+    // Smooth scroll handler for Home & Logo clicks
+    const handleHomeClick = (e) => {
+        closeMenu();
+        if (isHomePage) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.history.pushState(null, '', '/');
+            setActiveSection('home');
+        } else {
+            router.visit('/');
+        }
+    };
+
+    // Smooth scroll handler for anchor links (About, Products, Team, Testimony, Contact)
+    const handleNavClick = (e, targetId) => {
+        closeMenu();
+        if (isHomePage) {
+            e.preventDefault();
+            const el = document.getElementById(targetId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+                window.history.pushState(null, '', `/#${targetId}`);
+                setActiveSection(targetId);
+            }
+        } else {
+            e.preventDefault();
+            router.visit(`/#${targetId}`, {
+                onFinish: () => {
+                    setTimeout(() => {
+                        const el = document.getElementById(targetId);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth' });
+                            setActiveSection(targetId);
+                        }
+                    }, 250);
+                }
+            });
+        }
     };
 
     return (
-        <>
-            <header
-                className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-                    scrolled
-                        ? 'bg-slate-950/90 backdrop-blur-md border-b border-white/10 shadow-lg py-3'
-                        : 'bg-transparent py-5'
-                }`}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between">
-                        {/* Logo */}
-                        <Link href="/" className="flex flex-col items-center group">
-                            <span className="font-bebas text-4xl sm:text-5xl font-black text-white tracking-widest leading-none group-hover:text-ch-teal transition-colors">
-                                INFINITE
-                            </span>
-                            <span className="text-[10px] sm:text-[11px] font-bold text-ch-teal tracking-[0.35em] uppercase -mt-1">
-                                LIVE LIMITLESS
-                            </span>
-                        </Link>
+        <nav
+            className={`navbar navbar-expand-lg fixed-top ${isNavbarScrolled ? 'scrolled' : ''}`}
+            id="mainNav"
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                width: '100%',
+                zIndex: 1040,
+                transition: 'all 0.3s ease',
+                padding: isNavbarScrolled ? '10px 0' : '15px 0',
+                background: isNavbarScrolled ? 'rgba(15, 23, 42, 0.95)' : 'transparent',
+                backdropFilter: isNavbarScrolled ? 'blur(15px)' : 'none',
+                WebkitBackdropFilter: isNavbarScrolled ? 'blur(15px)' : 'none',
+                boxShadow: isNavbarScrolled ? '0 4px 30px rgba(0, 0, 0, 0.25)' : 'none',
+                borderBottom: isNavbarScrolled ? '1px solid rgba(148, 163, 184, 0.15)' : 'none',
+            }}
+        >
+            <div className="container-fluid px-3 px-lg-5 d-flex flex-wrap align-items-center justify-content-between">
+                {/* Brand Logo (Left on desktop, centered on mobile) */}
+                <Link
+                    className="text-logo d-flex flex-column align-items-center text-decoration-none me-auto me-lg-4"
+                    href="/"
+                    onClick={handleHomeClick}
+                    style={{ flexShrink: 0 }}
+                >
+                    <span
+                        style={{
+                            color: '#fff',
+                            fontFamily: "'Bebas Neue', sans-serif",
+                            fontWeight: 900,
+                            lineHeight: 0.8,
+                            letterSpacing: '1.5px',
+                            fontSize: 'clamp(32px, 5vw, 46px)',
+                        }}
+                    >
+                        INFINITE
+                    </span>
+                    <span
+                        style={{
+                            color: 'var(--ch-teal, #14b8a6)',
+                            fontFamily: "'Barlow', sans-serif",
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '4px',
+                            fontSize: 'clamp(9px, 1.5vw, 11px)',
+                            marginTop: '2px',
+                        }}
+                    >
+                        LIVE LIMITLESS
+                    </span>
+                </Link>
 
-                        {/* Desktop Navigation Links */}
-                        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-                            {navLinks.map((link) => {
-                                const active = isActive(link.href);
-                                return (
-                                    <Link
-                                        key={link.name}
-                                        href={link.href}
-                                        className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
-                                            active
-                                                ? 'bg-ch-teal/15 text-ch-teal font-semibold'
-                                                : 'text-slate-300 hover:text-white hover:bg-white/5'
-                                        }`}
-                                    >
-                                        {link.icon && <link.icon className="w-3.5 h-3.5 opacity-80" />}
-                                        {link.name}
-                                    </Link>
-                                );
-                            })}
-                        </nav>
+                {/* Right Actions & Mobile Hamburger (Right) */}
+                <div className="d-flex align-items-center gap-2 gap-lg-3 order-lg-3 ms-auto ms-lg-0">
+                    <Link
+                        href="/admin/login"
+                        className="btn-nav-order nav-link d-none d-lg-inline-flex text-decoration-none"
+                    >
+                        Login
+                    </Link>
+                    <Link
+                        href="/join-ph"
+                        className="btn-nav-order nav-link d-none d-lg-inline-flex text-decoration-none"
+                        style={{
+                            background: 'var(--ch-teal, #14b8a6)',
+                            color: '#fff !important',
+                            borderColor: 'var(--ch-teal, #14b8a6)',
+                        }}
+                    >
+                        Join Us <i className="bi bi-arrow-right ms-1"></i>
+                    </Link>
 
-                        {/* CTA Buttons */}
-                        <div className="hidden lg:flex items-center gap-3">
-                            <Link
-                                href="/admin/login"
-                                className="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-                            >
-                                Portal
-                            </Link>
-                            <Link
-                                href="/join-community/ph"
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-md hover:shadow-glow-teal hover:scale-[1.02]"
-                            >
-                                <span>Join Us</span>
-                                <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                            </Link>
-                        </div>
-
-                        {/* Mobile Menu Trigger */}
-                        <div className="flex lg:hidden items-center gap-2">
-                            <Link
-                                href="/join-community/ph"
-                                className="px-3 py-1.5 rounded-lg bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider"
-                            >
-                                Join
-                            </Link>
-                            <button
-                                onClick={() => setMobileOpen(!mobileOpen)}
-                                className="p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 focus:outline-none"
-                                aria-label="Toggle mobile menu"
-                            >
-                                {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                            </button>
-                        </div>
-                    </div>
+                    {/* Hamburger Button on Mobile */}
+                    <button
+                        className="navbar-toggler border-0 shadow-none d-lg-none"
+                        type="button"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        aria-label="Toggle navigation"
+                        style={{ background: 'transparent', padding: '0.25rem 0.5rem' }}
+                    >
+                        <i className={`bi ${menuOpen ? 'bi-x-lg' : 'bi-list'} text-white`} style={{ fontSize: '1.85rem' }}></i>
+                    </button>
                 </div>
-            </header>
 
-            {/* Mobile Drawer */}
-            {mobileOpen && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    {/* Backdrop */}
-                    <div
-                        onClick={() => setMobileOpen(false)}
-                        className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm"
-                    />
-
-                    {/* Drawer Content */}
-                    <div className="fixed inset-y-0 right-0 w-full max-w-xs bg-slate-900 border-l border-white/10 p-6 flex flex-col justify-between shadow-2xl">
-                        <div>
-                            <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                                <Link href="/" onClick={() => setMobileOpen(false)} className="flex flex-col">
-                                    <span className="font-bebas text-3xl tracking-widest text-white">INFINITE</span>
-                                    <span className="text-[9px] font-bold text-ch-teal tracking-[0.25em] uppercase">LIVE LIMITLESS</span>
-                                </Link>
-                                <button
-                                    onClick={() => setMobileOpen(false)}
-                                    className="p-2 rounded-lg text-slate-400 hover:text-white"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <nav className="mt-6 flex flex-col gap-2">
-                                {navLinks.map((link) => {
-                                    const active = isActive(link.href);
-                                    return (
-                                        <Link
-                                            key={link.name}
-                                            href={link.href}
-                                            onClick={() => setMobileOpen(false)}
-                                            className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
-                                                active
-                                                    ? 'bg-ch-teal text-ch-dark-slate font-bold'
-                                                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                                            }`}
-                                        >
-                                            <span className="flex items-center gap-2">
-                                                {link.icon && <link.icon className="w-4 h-4 opacity-75" />}
-                                                {link.name}
-                                            </span>
-                                            <ArrowRight className="w-3.5 h-3.5 opacity-50" />
-                                        </Link>
-                                    );
-                                })}
-                            </nav>
-                        </div>
-
-                        <div className="pt-6 border-t border-white/10 flex flex-col gap-3">
-                            <Link
-                                href="/join-community/ph"
-                                onClick={() => setMobileOpen(false)}
-                                className="w-full py-3 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-center text-sm uppercase tracking-wider"
-                            >
-                                Join Community
+                {/* Center Navigation Links (Center on desktop / Dropdown on mobile) */}
+                <div
+                    className={`navbar-collapse order-lg-2 flex-grow-1 ${menuOpen ? 'show d-block' : 'd-none d-lg-flex'}`}
+                    id="navMenu"
+                    style={{
+                        visibility: 'visible',
+                        opacity: 1,
+                        ...(menuOpen ? {
+                            background: 'rgba(15, 23, 42, 0.98)',
+                            borderRadius: '1rem',
+                            padding: '1.25rem',
+                            marginTop: '0.75rem',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+                            width: '100%',
+                        } : {})
+                    }}
+                >
+                    <ul className="navbar-nav mx-auto gap-lg-1 text-start text-lg-center ps-2 ps-lg-0 pt-3 pt-lg-0 align-items-lg-center">
+                        <li className={`nav-item ${isHomePage && activeSection === 'home' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/" onClick={handleHomeClick}>
+                                Home
+                            </a>
+                        </li>
+                        <li className={`nav-item ${isHomePage && activeSection === 'features' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/#features" onClick={(e) => handleNavClick(e, 'features')}>
+                                About
+                            </a>
+                        </li>
+                        <li className={`nav-item ${isHomePage && activeSection === 'menu' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/#menu" onClick={(e) => handleNavClick(e, 'menu')}>
+                                Products
+                            </a>
+                        </li>
+                        <li className={`nav-item ${isHomePage && activeSection === 'team' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/#team" onClick={(e) => handleNavClick(e, 'team')}>
+                                Team
+                            </a>
+                        </li>
+                        <li className={`nav-item ${isHomePage && activeSection === 'testimonials' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/#testimonials" onClick={(e) => handleNavClick(e, 'testimonials')}>
+                                Testimony
+                            </a>
+                        </li>
+                        <li className={`nav-item ${isHomePage && activeSection === 'contact' ? 'active' : ''}`}>
+                            <a className="nav-link" href="/#contact" onClick={(e) => handleNavClick(e, 'contact')}>
+                                Contact
+                            </a>
+                        </li>
+                        <li className={`nav-item ${url.startsWith('/world-plan') ? 'active' : ''}`}>
+                            <Link className="nav-link" href="/world-plan" onClick={closeMenu}>
+                                World Plan
                             </Link>
+                        </li>
+
+                        {/* Mobile Only Links inside collapse */}
+                        <li className="nav-item d-lg-none mt-3 pt-3 border-top border-secondary border-opacity-25">
                             <Link
+                                className="nav-link py-2.5 px-4 text-center rounded-pill text-white text-decoration-none shadow-sm"
+                                href="/join-ph"
+                                onClick={closeMenu}
+                                style={{ background: 'var(--ch-teal, #14b8a6)', fontWeight: 700 }}
+                            >
+                                Join Us <i className="bi bi-arrow-right ms-1"></i>
+                            </Link>
+                        </li>
+                        <li className="nav-item d-lg-none mt-2">
+                            <Link
+                                className="nav-link py-2.5 px-4 text-center rounded-pill text-white text-decoration-none border"
                                 href="/admin/login"
-                                onClick={() => setMobileOpen(false)}
-                                className="w-full py-2.5 rounded-xl border border-white/15 text-slate-300 hover:text-white font-medium text-center text-xs uppercase tracking-wider"
+                                onClick={closeMenu}
+                                style={{ borderColor: 'rgba(255,255,255,0.2)', fontWeight: 600 }}
                             >
-                                Administrator Portal
+                                Login
                             </Link>
-                        </div>
-                    </div>
+                        </li>
+                    </ul>
                 </div>
-            )}
-        </>
+            </div>
+        </nav>
     );
 }

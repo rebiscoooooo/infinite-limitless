@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
 import {
     Search,
     CheckCircle,
     XCircle,
-    FileText,
     Download,
     Eye,
     Trash2,
     X,
-    AlertCircle
+    AlertCircle,
+    FileText,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WorldPlanRegistrations({ registrations = { data: [] }, filters = {} }) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || '');
     const [proofModalItem, setProofModalItem] = useState(null);
+
+    const regList = registrations.data || [];
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -25,7 +26,7 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
     };
 
     const updateStatus = (id, newStatus, name) => {
-        if (confirm(`Set application for "${name}" to ${newStatus}? A queued notification email will be dispatched.`)) {
+        if (confirm(`Set application for "${name}" to ${newStatus}?`)) {
             router.patch(`/admin/world-plan/${id}/status`, { status: newStatus }, { preserveScroll: true });
         }
     };
@@ -56,31 +57,31 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                         </div>
                         <button
                             type="submit"
-                            className="px-4 py-2.5 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider"
+                            className="px-4 py-2.5 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider border-0"
                         >
                             Filter
                         </button>
                     </form>
 
-                    <div className="flex gap-2 w-full sm:w-auto">
+                    <div className="flex gap-2 w-full sm:w-auto flex-wrap">
                         <button
                             onClick={() => {
                                 setStatus('');
                                 router.get('/admin/world-plan', { search, status: '' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                !status ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                !status ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
-                            All ({registrations.total || 0})
+                            All ({registrations.total || regList.length})
                         </button>
                         <button
                             onClick={() => {
                                 setStatus('Pending');
                                 router.get('/admin/world-plan', { search, status: 'Pending' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                status === 'Pending' ? 'bg-amber-500/20 text-amber-300' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                status === 'Pending' ? 'bg-amber-500/20 text-amber-300' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             Pending
@@ -90,8 +91,8 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                                 setStatus('Approved');
                                 router.get('/admin/world-plan', { search, status: 'Approved' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                status === 'Approved' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                status === 'Approved' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             Approved
@@ -101,8 +102,8 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                                 setStatus('Rejected');
                                 router.get('/admin/world-plan', { search, status: 'Rejected' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                status === 'Rejected' ? 'bg-rose-500/20 text-rose-300' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                status === 'Rejected' ? 'bg-rose-500/20 text-rose-300' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             Rejected
@@ -116,94 +117,99 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                         <table className="w-full text-left text-xs">
                             <thead className="bg-slate-950 text-slate-400 uppercase tracking-wider font-semibold border-b border-white/10">
                                 <tr>
-                                    <th className="py-4 px-6">Applicant</th>
-                                    <th className="py-4 px-6">Package</th>
+                                    <th className="py-4 px-6">ID</th>
+                                    <th className="py-4 px-6">Applicant Info</th>
+                                    <th className="py-4 px-6">Package Type</th>
                                     <th className="py-4 px-6">Payment Proof</th>
-                                    <th className="py-4 px-6">Contact & Shipping</th>
+                                    <th className="py-4 px-6">Payment Date</th>
                                     <th className="py-4 px-6">Status</th>
-                                    <th className="py-4 px-6 text-right">Review Actions</th>
+                                    <th className="py-4 px-6 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5 text-slate-300">
-                                {registrations.data?.length === 0 ? (
+                                {regList.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="py-12 text-center text-slate-500">
-                                            No world plan applications found.
+                                        <td colSpan="7" className="py-12 text-center text-slate-500">
+                                            <FileText className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                                            <span>No applications matching criteria found.</span>
                                         </td>
                                     </tr>
                                 ) : (
-                                    registrations.data.map((reg) => (
+                                    regList.map((reg) => (
                                         <tr key={reg.id} className="hover:bg-white/[0.02] transition-colors">
+                                            <td className="py-4 px-6 font-mono text-slate-500">#{reg.id}</td>
+
                                             <td className="py-4 px-6">
                                                 <div className="font-bold text-white text-sm">
-                                                    {reg.full_name || `${reg.first_name} ${reg.last_name}`}
+                                                    {reg.full_name || `${reg.first_name || ''} ${reg.last_name || ''}`.trim()}
                                                 </div>
-                                                <span className="text-ch-teal block text-[11px]">@{reg.username}</span>
-                                                <span className="text-slate-500 text-[10px]">{reg.email}</span>
+                                                <div className="text-slate-400 text-xs">
+                                                    @{reg.username} &bull; {reg.email}
+                                                </div>
                                             </td>
 
                                             <td className="py-4 px-6">
-                                                <span className="px-2.5 py-1 rounded-lg bg-slate-950 border border-white/5 font-bold text-slate-200">
+                                                <span className="px-2.5 py-1 rounded-lg bg-teal-500/10 text-ch-teal border border-teal-500/20 font-semibold">
                                                     {reg.package_type}
                                                 </span>
-                                                <span className="text-[10px] text-slate-500 block mt-1">Paid: {reg.payment_date}</span>
                                             </td>
 
                                             <td className="py-4 px-6">
-                                                {reg.payment_proof ? (
+                                                {(reg.payment_proof_url || reg.payment_proof || reg.payment_receipt) ? (
                                                     <button
                                                         onClick={() => setProofModalItem(reg)}
-                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-ch-teal/10 border border-white/10 text-ch-teal text-xs font-semibold transition-colors"
+                                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-ch-teal border border-white/10 transition-colors"
                                                     >
                                                         <Eye className="w-3.5 h-3.5" />
-                                                        <span>View Receipt</span>
+                                                        <span>View Proof</span>
                                                     </button>
                                                 ) : (
-                                                    <span className="text-slate-600 italic">No receipt attached</span>
+                                                    <span className="text-slate-500 italic">No proof uploaded</span>
                                                 )}
                                             </td>
 
-                                            <td className="py-4 px-6 max-w-xs">
-                                                <div className="text-white font-medium">{reg.contact_no}</div>
-                                                <div className="text-slate-400 line-clamp-1">{reg.address}</div>
+                                            <td className="py-4 px-6 whitespace-nowrap text-slate-400">
+                                                {reg.payment_date || 'N/A'}
                                             </td>
 
                                             <td className="py-4 px-6">
-                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                                    reg.status === 'Approved'
-                                                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                                        : reg.status === 'Rejected'
-                                                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                                }`}>
+                                                <span
+                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                                        reg.status === 'Approved'
+                                                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                            : reg.status === 'Rejected'
+                                                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                                            : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                                    }`}
+                                                >
                                                     {reg.status}
                                                 </span>
                                             </td>
 
                                             <td className="py-4 px-6 text-right whitespace-nowrap">
-                                                <div className="flex items-center justify-end gap-1.5">
+                                                <div className="flex items-center justify-end gap-2">
                                                     {reg.status !== 'Approved' && (
                                                         <button
-                                                            onClick={() => updateStatus(reg.id, 'Approved', reg.full_name || reg.username)}
-                                                            className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/30 text-emerald-400 hover:text-white transition-colors"
-                                                            title="Approve Member Application"
+                                                            onClick={() => updateStatus(reg.id, 'Approved', reg.full_name)}
+                                                            className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors border-0"
+                                                            title="Approve Application"
                                                         >
                                                             <CheckCircle className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                     {reg.status !== 'Rejected' && (
                                                         <button
-                                                            onClick={() => updateStatus(reg.id, 'Rejected', reg.full_name || reg.username)}
-                                                            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/30 text-rose-400 hover:text-white transition-colors"
-                                                            title="Reject Member Application"
+                                                            onClick={() => updateStatus(reg.id, 'Rejected', reg.full_name)}
+                                                            className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 transition-colors border-0"
+                                                            title="Reject Application"
                                                         >
                                                             <XCircle className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                     <button
-                                                        onClick={() => handleDelete(reg.id, reg.full_name || reg.username)}
-                                                        className="p-2 rounded-xl bg-white/5 hover:bg-rose-950/40 text-slate-500 hover:text-rose-400 transition-colors"
-                                                        title="Delete Application"
+                                                        onClick={() => handleDelete(reg.id, reg.full_name)}
+                                                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border-0"
+                                                        title="Delete Record"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
@@ -217,25 +223,23 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                     </div>
 
                     {/* Pagination */}
-                    {registrations.links?.length > 3 && (
-                        <div className="p-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                            <div>
-                                Showing {registrations.from} to {registrations.to} of {registrations.total} applications
-                            </div>
+                    {registrations.links && registrations.links.length > 3 && (
+                        <div className="p-4 bg-slate-950 border-t border-white/5 flex items-center justify-between text-xs">
+                            <span className="text-slate-400">
+                                Showing {registrations.from || 0} to {registrations.to || 0} of {registrations.total || 0} entries
+                            </span>
                             <div className="flex gap-1">
-                                {registrations.links.map((link, i) => (
-                                    <Link
-                                        key={i}
-                                        href={link.url || '#'}
-                                        preserveScroll
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                        className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+                                {registrations.links.map((link, idx) => (
+                                    <button
+                                        key={idx}
+                                        disabled={!link.url}
+                                        onClick={() => link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })}
+                                        className={`px-3 py-1.5 rounded-lg border-0 ${
                                             link.active
-                                                ? 'bg-ch-teal border-ch-teal text-ch-dark-slate font-bold'
-                                                : link.url
-                                                ? 'border-white/10 hover:bg-white/5 text-slate-300'
-                                                : 'border-transparent text-slate-600 cursor-not-allowed'
+                                                ? 'bg-ch-teal text-ch-dark-slate font-bold'
+                                                : 'bg-white/5 text-slate-400 hover:text-white'
                                         }`}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
                             </div>
@@ -244,98 +248,75 @@ export default function WorldPlanRegistrations({ registrations = { data: [] }, f
                 </div>
             </div>
 
-            {/* PAYMENT PROOF MODAL */}
-            <AnimatePresence>
-                {proofModalItem && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setProofModalItem(null)}
-                            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
-                        />
+            {/* Payment Proof Modal */}
+            {proofModalItem && (() => {
+                const proofUrl = proofModalItem.payment_proof_url ||
+                    (proofModalItem.payment_proof ? (
+                        proofModalItem.payment_proof.startsWith('http') || proofModalItem.payment_proof.startsWith('/')
+                            ? proofModalItem.payment_proof
+                            : `/storage/payment_proofs/${proofModalItem.payment_proof}`
+                    ) : (
+                        proofModalItem.payment_receipt ? `/storage/${proofModalItem.payment_receipt}` : ''
+                    ));
+                const isPdf = proofUrl.toLowerCase().includes('.pdf');
 
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="relative z-10 w-full max-w-3xl rounded-3xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden"
-                        >
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-950/60">
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                        <div className="bg-slate-900 border border-white/10 rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative">
+                            <div className="flex items-center justify-between pb-4 border-b border-white/10">
                                 <div>
-                                    <span className="text-xs uppercase font-bold text-ch-teal">PAYMENT PROOF VERIFICATION</span>
-                                    <h3 className="font-bebas text-2xl text-white">
-                                        {proofModalItem.full_name || proofModalItem.username} ({proofModalItem.package_type})
-                                    </h3>
+                                    <h3 className="font-bold text-white text-base">Payment Receipt Proof</h3>
+                                    <span className="text-xs text-slate-400">
+                                        Applicant: {proofModalItem.full_name || proofModalItem.username}
+                                    </span>
                                 </div>
-                                <button
-                                    onClick={() => setProofModalItem(null)}
-                                    className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5"
-                                >
+                                <button onClick={() => setProofModalItem(null)} className="text-slate-400 hover:text-white border-0 bg-transparent">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <div className="p-6 bg-slate-950 flex flex-col items-center justify-center min-h-[300px] max-h-[70vh] overflow-y-auto">
-                                {proofModalItem.payment_proof.endsWith('.pdf') ? (
-                                    <div className="text-center p-8">
-                                        <FileText className="w-16 h-16 text-ch-teal mx-auto mb-3" />
-                                        <p className="text-sm text-slate-300">PDF Document Proof of Payment</p>
-                                        <a
-                                            href={`/storage/payment_proofs/${proofModalItem.payment_proof}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider"
-                                        >
-                                            <Download className="w-4 h-4" />
-                                            <span>Open PDF Receipt</span>
-                                        </a>
-                                    </div>
+                            <div className="mt-4 p-4 rounded-2xl bg-slate-950 border border-white/5 flex items-center justify-center min-h-[300px] max-h-[65vh] overflow-hidden">
+                                {isPdf ? (
+                                    <iframe
+                                        src={proofUrl}
+                                        className="w-full h-96 rounded-xl border-0"
+                                        title="Payment Proof PDF"
+                                    />
                                 ) : (
                                     <img
-                                        src={`/storage/payment_proofs/${proofModalItem.payment_proof}`}
-                                        alt="Payment Proof Receipt"
-                                        className="max-h-[60vh] max-w-full rounded-xl object-contain shadow-2xl border border-white/10"
+                                        src={proofUrl}
+                                        alt="Payment Receipt"
+                                        className="max-h-[60vh] max-w-full object-contain rounded-xl"
                                         onError={(e) => {
-                                            e.target.src = '/assets/image/proof1.jpg';
+                                            e.target.src = '/assets/image/testimony/100.png';
                                         }}
                                     />
                                 )}
                             </div>
 
-                            <div className="px-6 py-4 border-t border-white/10 bg-slate-950/60 flex items-center justify-between">
+                            <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/10">
                                 <a
-                                    href={`/storage/payment_proofs/${proofModalItem.payment_proof}`}
+                                    href={proofUrl}
                                     download
-                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-2 hover:bg-emerald-500/30 transition-colors text-decoration-none"
                                 >
                                     <Download className="w-4 h-4" />
-                                    <span>Download File</span>
+                                    <span>Download Proof</span>
                                 </a>
 
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            updateStatus(proofModalItem.id, 'Approved', proofModalItem.full_name);
-                                            setProofModalItem(null);
-                                        }}
-                                        className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-colors"
-                                    >
-                                        Approve
-                                    </button>
-                                    <button
-                                        onClick={() => setProofModalItem(null)}
-                                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
-                                    >
-                                        Close
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={() => setProofModalItem(null)}
+                                    className="px-4 py-2 rounded-xl bg-white/10 text-white font-semibold text-xs border-0"
+                                >
+                                    Close
+                                </button>
                             </div>
-                        </motion.div>
+                        </div>
                     </div>
-                )}
-            </AnimatePresence>
+                );
+            })()}
         </AdminLayout>
     );
 }

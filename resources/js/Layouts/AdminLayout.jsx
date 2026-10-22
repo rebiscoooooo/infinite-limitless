@@ -1,51 +1,49 @@
 import React, { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
+import FlashToast from '../Components/FlashToast';
 import {
     LayoutDashboard,
     Inbox,
     Globe,
-    FileSpreadsheet,
+    ShieldCheck,
     LogOut,
     Menu,
     X,
     ExternalLink,
-    Shield,
-    Bell,
-    User
+    User,
 } from 'lucide-react';
-import FlashToast from '../Components/FlashToast';
 
 export default function AdminLayout({ children, title = 'Admin Portal' }) {
-    const { props = {}, url = '' } = usePage();
-    const { auth = {}, flash = {} } = props;
+    const page = usePage();
+    const { auth, flash } = page.props || {};
+    const currentUrl = page.url || '';
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    const navItems = [
-        { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-        { name: 'Inquiries', href: '/admin/inquiries', icon: Inbox },
-        { name: 'World Plan Registrations', href: '/admin/world-plan', icon: Globe },
-        { name: 'Activity Audit Logs', href: '/admin/activity-logs', icon: FileSpreadsheet },
-    ];
-
-    const isActive = (href) => Boolean(url && url.startsWith(href));
 
     const handleLogout = (e) => {
         e.preventDefault();
         router.post('/admin/logout');
     };
 
+    const navItems = [
+        { name: 'Analytics Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+        { name: 'Contact Inquiries', href: '/admin/inquiries', icon: Inbox },
+        { name: 'World Plan Registrations', href: '/admin/world-plan', icon: Globe },
+        { name: 'Activity Audit Logs', href: '/admin/activity-logs', icon: ShieldCheck },
+    ];
+
+    const isActive = (href) => currentUrl === href || (href !== '/admin' && currentUrl.startsWith(href));
+
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex font-barlow">
-            {/* Flash Toasts */}
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex font-barlow selection:bg-ch-teal selection:text-ch-dark-slate">
             <FlashToast flash={flash} />
 
-            {/* Sidebar Desktop */}
-            <aside className="hidden lg:flex w-64 flex-col justify-between bg-slate-900 border-r border-white/10 p-6 shrink-0">
+            {/* Desktop Fixed Sidebar */}
+            <aside className="hidden lg:flex flex-col w-64 bg-slate-900 border-r border-white/10 p-6 justify-between shrink-0 h-screen sticky top-0">
                 <div>
                     {/* Brand */}
-                    <div className="pb-6 border-b border-white/10 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-ch-teal/15 border border-ch-teal/30 flex items-center justify-center">
-                            <Shield className="w-5 h-5 text-ch-teal" />
+                    <div className="flex items-center gap-3 pb-6 border-b border-white/10">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-ch-teal to-teal-400 flex items-center justify-center font-bebas text-2xl text-ch-dark-slate shadow-lg font-black">
+                            IN
                         </div>
                         <div>
                             <span className="font-bebas text-2xl tracking-wider text-white block leading-none">
@@ -66,7 +64,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`w-full px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all ${
+                                    className={`w-full px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all text-decoration-none ${
                                         active
                                             ? 'bg-ch-teal text-ch-dark-slate shadow-md'
                                             : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -83,12 +81,12 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                 {/* Bottom Profile & Actions */}
                 <div className="pt-6 border-t border-white/10 space-y-3">
                     <div className="flex items-center gap-3 px-2">
-                        <div className="w-9 h-9 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-ch-teal">
-                            <User className="w-4 h-4" />
+                        <div className="w-9 h-9 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-ch-teal font-bold">
+                            {auth?.admin?.username?.charAt(0).toUpperCase() || 'A'}
                         </div>
                         <div className="flex-1 min-w-0">
                             <span className="text-xs font-bold text-white block truncate">
-                                {auth.admin?.username || 'Administrator'}
+                                {auth?.admin?.username || 'Administrator'}
                             </span>
                             <span className="text-[10px] text-emerald-400 block">Authenticated</span>
                         </div>
@@ -98,14 +96,14 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                         <Link
                             href="/"
                             target="_blank"
-                            className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center justify-between"
+                            className="w-full px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 flex items-center justify-between text-decoration-none"
                         >
                             <span>Live Website</span>
                             <ExternalLink className="w-3.5 h-3.5" />
                         </Link>
                         <button
                             onClick={handleLogout}
-                            className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 flex items-center gap-2 transition-colors text-left"
+                            className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 flex items-center gap-2 transition-colors text-left border-0 bg-transparent"
                         >
                             <LogOut className="w-3.5 h-3.5" />
                             <span>Sign Out</span>
@@ -118,14 +116,14 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <div onClick={() => setSidebarOpen(false)} className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm" />
-                    <aside className="fixed inset-y-0 left-0 w-64 bg-slate-900 border-r border-white/10 p-6 flex flex-col justify-between">
+                    <aside className="fixed inset-y-0 left-0 w-64 bg-slate-900 border-r border-white/10 p-6 flex flex-col justify-between z-10">
                         <div>
                             <div className="flex items-center justify-between pb-6 border-b border-white/10">
                                 <div>
                                     <span className="font-bebas text-2xl text-white">INFINITE PORTAL</span>
                                     <span className="text-[9px] uppercase font-bold text-ch-teal block">ADMIN CONSOLE</span>
                                 </div>
-                                <button onClick={() => setSidebarOpen(false)} className="p-1 rounded text-slate-400">
+                                <button onClick={() => setSidebarOpen(false)} className="p-1 rounded text-slate-400 border-0 bg-transparent">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
@@ -138,7 +136,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                                             key={item.name}
                                             href={item.href}
                                             onClick={() => setSidebarOpen(false)}
-                                            className={`w-full px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 ${
+                                            className={`w-full px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 text-decoration-none ${
                                                 active ? 'bg-ch-teal text-ch-dark-slate' : 'text-slate-400 hover:text-white'
                                             }`}
                                         >
@@ -152,7 +150,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                         <div className="pt-6 border-t border-white/10">
                             <button
                                 onClick={handleLogout}
-                                className="w-full px-4 py-3 rounded-xl bg-rose-950/60 text-rose-300 text-xs font-semibold flex items-center gap-2"
+                                className="w-full px-4 py-3 rounded-xl bg-rose-950/60 text-rose-300 text-xs font-semibold flex items-center gap-2 border-0"
                             >
                                 <LogOut className="w-4 h-4" />
                                 <span>Sign Out</span>
@@ -169,11 +167,11 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white"
+                            className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white border-0 bg-transparent"
                         >
                             <Menu className="w-5 h-5" />
                         </button>
-                        <h1 className="text-base sm:text-lg font-bold text-white tracking-wide">{title}</h1>
+                        <h1 className="text-base sm:text-lg font-bold text-white tracking-wide mb-0">{title}</h1>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -183,7 +181,7 @@ export default function AdminLayout({ children, title = 'Admin Portal' }) {
                         <Link
                             href="/"
                             target="_blank"
-                            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-slate-300 flex items-center gap-1.5 text-decoration-none"
                         >
                             <span>Live Site</span>
                             <ExternalLink className="w-3 h-3" />

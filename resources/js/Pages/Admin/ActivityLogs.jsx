@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
-import { Search, Monitor, Smartphone, Tablet, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import {
+    Search,
+    Monitor,
+    Smartphone,
+    Tablet,
+    ShieldAlert,
+    CheckCircle2,
+    Shield,
+} from 'lucide-react';
 
 export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
     const [search, setSearch] = useState(filters.search || '');
     const [device, setDevice] = useState(filters.device || '');
+
+    const logList = logs.data || [];
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -14,8 +24,9 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
 
     const getDeviceIcon = (dev) => {
         if (!dev) return Monitor;
-        if (dev.includes('Mobile')) return Smartphone;
-        if (dev.includes('Tablet')) return Tablet;
+        const d = dev.toLowerCase();
+        if (d.includes('mobile') || d.includes('phone')) return Smartphone;
+        if (d.includes('tablet') || d.includes('ipad')) return Tablet;
         return Monitor;
     };
 
@@ -39,20 +50,20 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
                         </div>
                         <button
                             type="submit"
-                            className="px-4 py-2.5 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider"
+                            className="px-4 py-2.5 rounded-xl bg-ch-teal text-ch-dark-slate font-bold text-xs uppercase tracking-wider border-0"
                         >
                             Filter
                         </button>
                     </form>
 
-                    <div className="flex gap-2 w-full sm:w-auto">
+                    <div className="flex gap-2 w-full sm:w-auto flex-wrap">
                         <button
                             onClick={() => {
                                 setDevice('');
                                 router.get('/admin/activity-logs', { search, device: '' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                !device ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                !device ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             All Devices
@@ -62,8 +73,8 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
                                 setDevice('Desktop PC');
                                 router.get('/admin/activity-logs', { search, device: 'Desktop PC' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                device === 'Desktop PC' ? 'bg-ch-teal/20 text-ch-teal' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                device === 'Desktop PC' ? 'bg-ch-teal/20 text-ch-teal' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             Desktop
@@ -73,8 +84,8 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
                                 setDevice('Mobile Phone');
                                 router.get('/admin/activity-logs', { search, device: 'Mobile Phone' });
                             }}
-                            className={`px-3 py-2 rounded-xl text-xs font-semibold ${
-                                device === 'Mobile Phone' ? 'bg-ch-teal/20 text-ch-teal' : 'text-slate-400 hover:text-white'
+                            className={`px-3 py-2 rounded-xl text-xs font-semibold border-0 ${
+                                device === 'Mobile Phone' ? 'bg-ch-teal/20 text-ch-teal' : 'text-slate-400 hover:text-white bg-transparent'
                             }`}
                         >
                             Mobile
@@ -98,55 +109,61 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5 text-slate-300">
-                                {logs.data?.length === 0 ? (
+                                {logList.length === 0 ? (
                                     <tr>
                                         <td colSpan="7" className="py-12 text-center text-slate-500">
-                                            No audit logs found.
+                                            <ShieldAlert className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                                            <span>No system audit activities recorded.</span>
                                         </td>
                                     </tr>
                                 ) : (
-                                    logs.data.map((log) => {
-                                        const DevIcon = getDeviceIcon(log.device_type);
+                                    logList.map((log) => {
+                                        const DeviceIcon = getDeviceIcon(log.device_type);
+                                        const dateStr = new Date(log.created_at).toLocaleDateString('en-PH', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        });
+
                                         return (
                                             <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                                                <td className="py-4 px-6 whitespace-nowrap text-slate-400 font-mono">
-                                                    {new Date(log.created_at).toLocaleString()}
+                                                <td className="py-4 px-6 whitespace-nowrap text-slate-400">
+                                                    {dateStr}
                                                 </td>
 
                                                 <td className="py-4 px-6">
-                                                    <span className="font-bold text-white">
+                                                    <span className="font-bold text-white text-xs">
                                                         {log.admin_user}
                                                     </span>
                                                 </td>
 
                                                 <td className="py-4 px-6">
-                                                    <span className="font-semibold text-slate-200">
+                                                    <span className="px-2.5 py-1 rounded-lg bg-teal-500/10 text-ch-teal border border-teal-500/20 font-semibold inline-block">
                                                         {log.action_type}
                                                     </span>
                                                 </td>
 
-                                                <td className="py-4 px-6 whitespace-nowrap">
-                                                    <div className="flex items-center gap-2">
-                                                        <DevIcon className="w-4 h-4 text-slate-400" />
-                                                        <span>{log.device_type}</span>
+                                                <td className="py-4 px-6">
+                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                        <DeviceIcon className="w-4 h-4 text-slate-400" />
+                                                        <span>{log.device_type || 'Desktop PC'}</span>
                                                     </div>
                                                 </td>
 
                                                 <td className="py-4 px-6 max-w-xs truncate text-slate-400">
-                                                    {log.os_browser}
+                                                    {log.os_browser || 'Unknown Client'}
                                                 </td>
 
-                                                <td className="py-4 px-6 font-mono text-ch-teal">
+                                                <td className="py-4 px-6 font-mono text-slate-400">
                                                     {log.ip_address}
                                                 </td>
 
-                                                <td className="py-4 px-6 text-right">
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                                        log.status === 'Success'
-                                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                                            : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                                                    }`}>
-                                                        {log.status}
+                                                <td className="py-4 px-6 text-right whitespace-nowrap">
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                                        <span>{log.status || 'Success'}</span>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -158,25 +175,23 @@ export default function ActivityLogs({ logs = { data: [] }, filters = {} }) {
                     </div>
 
                     {/* Pagination */}
-                    {logs.links?.length > 3 && (
-                        <div className="p-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                            <div>
-                                Showing {logs.from} to {logs.to} of {logs.total} audit entries
-                            </div>
+                    {logs.links && logs.links.length > 3 && (
+                        <div className="p-4 bg-slate-950 border-t border-white/5 flex items-center justify-between text-xs">
+                            <span className="text-slate-400">
+                                Showing {logs.from || 0} to {logs.to || 0} of {logs.total || 0} entries
+                            </span>
                             <div className="flex gap-1">
-                                {logs.links.map((link, i) => (
-                                    <Link
-                                        key={i}
-                                        href={link.url || '#'}
-                                        preserveScroll
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                        className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+                                {logs.links.map((link, idx) => (
+                                    <button
+                                        key={idx}
+                                        disabled={!link.url}
+                                        onClick={() => link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })}
+                                        className={`px-3 py-1.5 rounded-lg border-0 ${
                                             link.active
-                                                ? 'bg-ch-teal border-ch-teal text-ch-dark-slate font-bold'
-                                                : link.url
-                                                ? 'border-white/10 hover:bg-white/5 text-slate-300'
-                                                : 'border-transparent text-slate-600 cursor-not-allowed'
+                                                ? 'bg-ch-teal text-ch-dark-slate font-bold'
+                                                : 'bg-white/5 text-slate-400 hover:text-white'
                                         }`}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
                                 ))}
                             </div>

@@ -25,7 +25,7 @@ class WorldPlanSeeder extends Seeder
                 'address' => 'Ouagadougou, Burkina Faso',
                 'package_type' => 'exec-diamond',
                 'payment_date' => '2026-01-15',
-                'payment_proof' => 'sample_proof_diamond.jpg',
+                'payment_proof' => '1788434057_6756f5f2cb.jpg',
                 'status' => 'Approved',
             ],
             [
@@ -39,7 +39,7 @@ class WorldPlanSeeder extends Seeder
                 'address' => 'Abidjan, Côte d\'Ivoire',
                 'package_type' => 'exec-sapphire',
                 'payment_date' => '2026-02-10',
-                'payment_proof' => 'sample_proof_sapphire.jpg',
+                'payment_proof' => '1792665754_30b7ef2a22f6.png',
                 'status' => 'Approved',
             ],
             [
@@ -53,7 +53,7 @@ class WorldPlanSeeder extends Seeder
                 'address' => 'Douala, Cameroon',
                 'package_type' => 'exec-ruby',
                 'payment_date' => '2026-03-01',
-                'payment_proof' => 'sample_proof_ruby.jpg',
+                'payment_proof' => '1788434057_6756f5f2cb.jpg',
                 'status' => 'Approved',
             ],
             [
@@ -67,7 +67,7 @@ class WorldPlanSeeder extends Seeder
                 'address' => 'Port Moresby, Papua New Guinea',
                 'package_type' => 'exec-pearl',
                 'payment_date' => '2026-03-20',
-                'payment_proof' => 'sample_proof_pearl.jpg',
+                'payment_proof' => '1792665754_30b7ef2a22f6.png',
                 'status' => 'Approved',
             ],
             [
