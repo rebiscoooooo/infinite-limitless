@@ -1,0 +1,2954 @@
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important; 
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+            ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate, #0f172a);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light, #f8fafc);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate, #0f172a);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important; 
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+            ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+:root {
+            --ch-teal: #14b8a6;
+            --ch-dark-slate: #0f172a;
+            --ch-slate-muted: #64748b;
+            --ch-bg-light: #f8fafc;
+        }
+
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important; 
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+            ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important; 
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important; 
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px;
+            overflow: visible !important;
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important;
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* FIX: Prevents badges from getting cut off */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important; 
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px; 
+            overflow: visible !important;
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+.option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+        .option-card.active-exec .active-check { display: block; color: var(--ch-teal); }
+        .option-card.active-reg .active-check  { display: block; color: var(--ch-dark-slate); }
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px;
+            overflow: visible !important;
+        }
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+        .tiers-container { display: none; animation: fadeIn 0.5s ease; }
+        .tiers-container.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+/* Your existing styles... */
+        .option-card {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible !important;
+            margin-top: 15px;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .option-card.active-exec {
+            border: 3px solid var(--ch-teal);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(20, 184, 166, 0.08) 100%);
+            box-shadow: 0 1rem 3rem rgba(20, 184, 166, 0.2) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .option-card.active-reg {
+            border: 3px solid var(--ch-dark-slate);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(15, 23, 42, 0.05) 100%);
+            box-shadow: 0 1rem 3rem rgba(15, 23, 42, 0.15) !important;
+            transform: scale(1.02);
+            z-index: 2;
+        }
+
+        .active-check {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
+        }
+
+        .option-card.active-exec .active-check {
+            display: block;
+            color: var(--ch-teal);
+        }
+
+        .option-card.active-reg .active-check {
+            display: block;
+            color: var(--ch-dark-slate);
+        }
+
+        /* Package Tier Card Styles */
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            margin-top: 20px;
+            overflow: visible !important;
+        }
+
+        .package-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--ch-teal) !important;
+        }
+
+        .modal-package-details {
+            background: var(--ch-bg-light);
+            border-radius: 1rem;
+            border: 1px solid rgba(20, 184, 166, 0.2);
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            border-radius: 1.5rem;
+        }
+
+        .glass-accordion .accordion-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            margin-bottom: 1rem;
+            border-radius: 1rem !important;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-accordion .accordion-button {
+            background: transparent;
+            font-weight: 600;
+            color: var(--ch-dark-slate);
+            box-shadow: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .glass-accordion .accordion-button:not(.collapsed) {
+            color: var(--ch-teal);
+            background: rgba(20, 184, 166, 0.05);
+        }
+
+        /* Smooth transitions for sections */
+        .tiers-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tiers-container.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* =========================================
+           ADDED CSS FOR FOOTER & OWNER MODAL
+        ========================================= */
+        .owner-link {
+            color: var(--ch-teal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        .owner-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        .owner-modal-content {
+            border-radius: 1.5rem;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .owner-img-col {
+            background: linear-gradient(135deg, #0f172a 0%, #14b8a6 100%);
+            position: relative;
+            height: 280px; 
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 992px) {
+            .owner-img-col { 
+                height: auto;
+                min-height: 550px; 
+            }
+        }
+
+        .glow-effect {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.15);
+            filter: blur(60px);
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #ownerModalImg {
+            width: 85%;
+            max-height: 95%;
+            object-fit: contain;
+            object-position: bottom;
+            position: absolute;
+            bottom: 0;
+            z-index: 2;
+            filter: drop-shadow(0 -10px 25px rgba(0,0,0,0.3));
+            transition: transform 0.4s ease;
+        }
+
+        #ownerModalImg:hover {
+            transform: scale(1.03);
+        }
+        
+        .owner-text-col {
+            background: #ffffff;
+            padding: 2rem 1.5rem; 
+        }
+        
+        @media (min-width: 992px) {
+            .owner-text-col { 
+                padding: 4rem 3.5rem; 
+            }
+        }
+        
+        #ownerModalName {
+            color: var(--ch-dark-slate);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            word-wrap: break-word; 
+        }
+        
+        #ownerModalTitle {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 700;
+            color: var(--ch-teal);
+            letter-spacing: 1.5px;
+            font-size: clamp(0.8rem, 3.5vw, 1rem);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .owner-bio-box {
+            position: relative;
+            background: var(--ch-bg-light);
+            padding: 1.5rem 1.25rem 1.5rem 2.5rem;
+            border-radius: 1rem;
+            border-left: 4px solid var(--ch-teal);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .owner-bio-box .fa-quote-left {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2rem;
+            color: var(--ch-teal);
+            opacity: 0.2;
+            background: #fff;
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+        
+        #ownerModalBio {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--ch-dark-slate);
+            margin: 0;
+        }
+        
+        .owner-linkedin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 14px 24px;
+            background-color: #0077b5; 
+            color: #fff !important;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Barlow', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.25);
+            width: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .owner-linkedin {
+                width: auto;
+            }
+        }
+        
+        .owner-linkedin:hover {
+            background-color: #005885;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 119, 181, 0.35);
+        }
+
+        .btn-close-custom {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1050;
+            background-color: #ffffff;
+            border-radius: 50%;
+            padding: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close-custom:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
