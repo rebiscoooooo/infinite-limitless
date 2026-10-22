@@ -202,7 +202,10 @@ export default function Home({ siteStats, products = [], partners = [], testimon
 
     return (
         <AppLayout>
-            <Head title="Infinite | Live Limitless" />
+            <Head>
+                <title>Infinite | Live Limitless</title>
+                <link rel="stylesheet" href="/assets/css/index.css" />
+            </Head>
 
             {/* HERO SECTION */}
             <section id="hero" style={{ position: 'relative', overflow: 'hidden', paddingTop: '160px', paddingBottom: '100px' }}>
