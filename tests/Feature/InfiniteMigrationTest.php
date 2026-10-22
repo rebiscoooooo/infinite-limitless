@@ -19,6 +19,7 @@ class InfiniteMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
         // Seed database if empty
         if (!AdminUser::where('username', 'admin')->exists()) {
             AdminUser::create([
