@@ -13,8 +13,8 @@
     <a href="#-quick-start"><strong>Quick Start</strong></a> &nbsp;&bull;&nbsp;
     <a href="#-system-architecture"><strong>Architecture</strong></a> &nbsp;&bull;&nbsp;
     <a href="#-core-modules"><strong>Features</strong></a> &nbsp;&bull;&nbsp;
-    <a href="#-compensation-engine"><strong>World Plan</strong></a> &nbsp;&bull;&nbsp;
-    <a href="#-admin-control-center"><strong>Admin Portal</strong></a> &nbsp;&bull;&nbsp;
+    <a href="https://infinite-limitless.com/world-plan"><strong>World Plan</strong></a> &nbsp;&bull;&nbsp;
+    <a href="https://infinite-limitless.com/admin/login"><strong>Admin Portal</strong></a> &nbsp;&bull;&nbsp;
     <a href="#-testing-suite"><strong>Testing</strong></a>
   </p>
 
@@ -300,20 +300,6 @@ Visit **`http://127.0.0.1:8000`** in your browser.
 
 ---
 
-## 🔑 Default Credentials
-
-The database seeder (`Database\Seeders\AdminUserSeeder`) provisions default administrative credentials:
-
-| Username | Password | Role | Access Scope |
-| :--- | :--- | :--- | :--- |
-| `admin` | `Infinite#1230` | Super Administrator | Full Dashboard, Inquiries, Registrations, Logs |
-| `infinite_admin` | `Infinite#1230` | Administrator | Full Administrative Access |
-
-> [!WARNING]
-> Change default administrator credentials immediately upon deploying to any public or production environment.
-
----
-
 ## 🧪 Testing Suite
 
 The application includes automated feature and integration tests covering public page rendering, form validation, payment proof processing, authentication flows, and administrative permissions.
@@ -382,10 +368,22 @@ npm run build
 
 <br>
 
+##  System Developers
+
+<div align="center">
+
+| **Jay-ar S. De Guzman** | **Reazel Keith Herbas** |
+| :---: | :---: |
+| *Backend Developer* | *Frontend Developer* |
+| 📍 Philippines | 📍 Philippines |
+
+<br>
+
+
 **INFINITE | LIVE LIMITLESS**<br>
 *Empowering Global Entrepreneurs Through Premium Skincare & Wellness*
 
-[Official Website](https://infinitelivelimitless.com) &bull; [Inquiries](http://127.0.0.1:8000/#contact) &bull; [World Plan](http://127.0.0.1:8000/world-plan)
+[Official Website](https://www.infinite-limitless.com) &bull; [Inquiries](https://www.infinite-limitless.com/#contact) &bull; [World Plan](https://www.infinite-limitless.com/world-plan)
 
 <br>
 
