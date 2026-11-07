@@ -9,7 +9,6 @@ use App\Models\WorldPlanRegistration;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\StatsSeeder;
-use Database\Seeders\WorldPlanSeeder;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -70,11 +69,6 @@ class AppServiceProvider extends ServiceProvider
             // Auto-seed site metrics and product stats
             if (Schema::hasTable('site_stats') && SiteStat::count() === 0) {
                 (new StatsSeeder())->run();
-            }
-
-            // Auto-seed baseline World Plan registrations and initial inquiries
-            if (Schema::hasTable('world_plan_registrations') && WorldPlanRegistration::count() === 0) {
-                (new WorldPlanSeeder())->run();
             }
         } catch (\Throwable $e) {
             // Gracefully catch during initial table creation or migrations
