@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorldPlanRequest;
+use App\Mail\WorldPlanReceivedAdminMail;
+use App\Mail\WorldPlanReceivedConfirmationMail;
 use App\Models\WorldPlanRegistration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -95,6 +99,16 @@ class WorldPlanController extends Controller
             'payment_proof' => $proofPath,
             'status' => 'Pending',
         ]);
+
+        // Send notifications to applicant and administrator
+        try {
+            $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
+            Mail::to($adminEmail)->queue(new WorldPlanReceivedAdminMail($registration));
+            Mail::to($registration->email)->queue(new WorldPlanReceivedConfirmationMail($registration));
+        } catch (\Throwable $e) {
+            Log::error("Failed to send World Plan registration emails for #{$registration->id}: " . $e->getMessage());
+            report($e);
+        }
 
         if ($request->wantsJson()) {
             return response()->json([

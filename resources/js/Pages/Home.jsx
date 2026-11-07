@@ -5,7 +5,7 @@ import CountryFlagMarquee from '../Components/CountryFlagMarquee';
 import PartnerCarousel from '../Components/PartnerCarousel';
 import TestimonialGrid from '../Components/TestimonialGrid';
 
-export default function Home({ siteStats, products = [], partners = [], testimonials = [], reviews = [] }) {
+export default function Home({ siteStats, products = [], catalogProducts = [], partners = [], testimonials = [], reviews = [] }) {
     // Typewriter Animation for "Live Limitless"
     const textToType = "Live Limitless";
     const [typedText, setTypedText] = useState("");
@@ -193,12 +193,44 @@ export default function Home({ siteStats, products = [], partners = [], testimon
         },
     ];
 
+    // Combine database products with fallback to original 18 products
+    const displayedProducts = (catalogProducts && catalogProducts.length > 0)
+        ? catalogProducts.map((p) => ({
+            id: p.id,
+            category: (p.category || 'wellness').toLowerCase(),
+            categoryName: p.category_name,
+            title: p.name,
+            img: p.image_url || p.image || '/assets/image/product/INFINITE_BARLEY_Pure_Organic_Barley_Powder.png',
+            desc: p.short_description || p.description,
+            fullDesc: p.description || p.short_description,
+            benefits: Array.isArray(p.benefits) ? p.benefits : [],
+            price: p.price_display || (p.price > 0 ? `$${Number(p.price).toFixed(2)}` : null),
+            badge: p.badge,
+            isComingSoon: Boolean(p.is_coming_soon),
+        }))
+        : originalProducts;
+
     const [activeFilter, setActiveFilter] = useState('all');
     const [modalData, setModalData] = useState(null);
 
+    // Compute dynamic categories from actual product list: All, Wellness, Skincare, O'Lamour
+    const availableCategories = React.useMemo(() => {
+        const catOrder = ['all', 'wellness', 'skincare', "o'lamour"];
+        const presentCats = new Set(displayedProducts.map((p) => (p.category || '').toLowerCase()));
+        return catOrder.filter((cat) => cat === 'all' || presentCats.has(cat));
+    }, [displayedProducts]);
+
+    const getCategoryLabel = (cat) => {
+        if (cat === 'all') return 'All';
+        if (cat === 'wellness') return 'Wellness';
+        if (cat === 'skincare') return 'Skincare';
+        if (cat === "o'lamour") return "O'Lamour";
+        return cat.charAt(0).toUpperCase() + cat.slice(1);
+    };
+
     const filteredList = activeFilter === 'all'
-        ? originalProducts
-        : originalProducts.filter((p) => p.category === activeFilter);
+        ? displayedProducts
+        : displayedProducts.filter((p) => (p.category || '').toLowerCase() === activeFilter.toLowerCase());
 
     return (
         <AppLayout>
@@ -426,31 +458,17 @@ export default function Home({ siteStats, products = [], partners = [], testimon
                             <h2 className="section-title">Our Products</h2>
                         </div>
                         <div className="col-md-6 reveal visible">
-                            <div className="menu-filters justify-content-center justify-content-md-end mt-3 mt-md-0">
-                                <button
-                                    className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-                                    onClick={() => setActiveFilter('all')}
-                                >
-                                    All
-                                </button>
-                                <button
-                                    className={`filter-btn ${activeFilter === 'wellness' ? 'active' : ''}`}
-                                    onClick={() => setActiveFilter('wellness')}
-                                >
-                                    Wellness
-                                </button>
-                                <button
-                                    className={`filter-btn ${activeFilter === 'skincare' ? 'active' : ''}`}
-                                    onClick={() => setActiveFilter('skincare')}
-                                >
-                                    Skincare
-                                </button>
-                                <button
-                                    className={`filter-btn ${activeFilter === "o'lamour" ? 'active' : ''}`}
-                                    onClick={() => setActiveFilter("o'lamour")}
-                                >
-                                    O'Lamour
-                                </button>
+                            <div className="menu-filters justify-content-center justify-content-md-end mt-3 mt-md-0 flex-wrap gap-2">
+                                {availableCategories.map((cat) => (
+                                    <button
+                                        key={cat}
+                                        type="button"
+                                        className={`filter-btn ${activeFilter === cat ? 'active' : ''}`}
+                                        onClick={() => setActiveFilter(cat)}
+                                    >
+                                        {getCategoryLabel(cat)}
+                                    </button>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -458,9 +476,9 @@ export default function Home({ siteStats, products = [], partners = [], testimon
                     {/* Products Grid */}
                     <div className="row g-4" id="menuGrid">
                         {filteredList.map((p, idx) => (
-                            <div key={idx} className="col-12 col-sm-6 col-md-4 col-xl-3 menu-item reveal visible" data-category={p.category}>
-                                <div className="product-card h-100 d-flex flex-column position-relative">
-                                    {p.isComingSoon && (
+                            <div key={p.id || idx} className="col-12 col-sm-6 col-md-4 col-xl-3 menu-item reveal visible" data-category={p.category}>
+                                <div className="product-card h-100 d-flex flex-column position-relative shadow-sm rounded-4 overflow-hidden border-0">
+                                    {p.isComingSoon ? (
                                         <div className="position-absolute top-0 end-0 m-3" style={{ zIndex: 3 }}>
                                             <span
                                                 className="badge rounded-pill"
@@ -478,7 +496,24 @@ export default function Home({ siteStats, products = [], partners = [], testimon
                                                 COMING SOON
                                             </span>
                                         </div>
-                                    )}
+                                    ) : p.badge ? (
+                                        <div className="position-absolute top-0 end-0 m-3" style={{ zIndex: 3 }}>
+                                            <span
+                                                className="badge rounded-pill text-white"
+                                                style={{
+                                                    backgroundColor: '#0f172a',
+                                                    border: '1px solid rgba(255,255,255,0.2)',
+                                                    fontFamily: "'Barlow', sans-serif",
+                                                    fontWeight: 700,
+                                                    letterSpacing: '0.5px',
+                                                    padding: '0.45em 0.9em',
+                                                    fontSize: '0.75rem',
+                                                }}
+                                            >
+                                                {p.badge}
+                                            </span>
+                                        </div>
+                                    ) : null}
 
                                     <div className="card-img-wrapper text-center">
                                         <img src={p.img} className="img-fluid" alt={p.title} />
@@ -683,12 +718,62 @@ export default function Home({ siteStats, products = [], partners = [], testimon
                                     />
                                 </div>
                                 <div className="col-md-7 p-4 p-md-5 d-flex flex-column justify-content-center">
+                                    <div className="d-flex items-center gap-2 mb-2 flex-wrap">
+                                        {modalData.badge && (
+                                            <span
+                                                className="badge rounded-pill"
+                                                style={{
+                                                    backgroundColor: 'var(--ch-teal)',
+                                                    color: '#fff',
+                                                    fontSize: '0.75rem',
+                                                    padding: '0.4em 0.8em',
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                                                {modalData.badge}
+                                            </span>
+                                        )}
+                                        {modalData.price && (
+                                            <span
+                                                className="badge rounded-pill"
+                                                style={{
+                                                    backgroundColor: '#0f172a',
+                                                    color: '#5eead4',
+                                                    border: '1px solid rgba(20,184,166,0.3)',
+                                                    fontSize: '0.75rem',
+                                                    padding: '0.4em 0.8em',
+                                                    fontWeight: 700,
+                                                }}
+                                            >
+                                                {modalData.price}
+                                            </span>
+                                        )}
+                                    </div>
+
                                     <h3 className="fw-bold mb-3" id="productModalLabel" style={{ color: 'var(--ch-dark-slate)' }}>
                                         {modalData.title}
                                     </h3>
-                                    <p id="modalDesc" className="text-muted mb-4" style={{ lineHeight: 1.6 }}>
+
+                                    <p id="modalDesc" className="text-muted mb-3" style={{ lineHeight: 1.6 }}>
                                         {modalData.fullDesc}
                                     </p>
+
+                                    {modalData.benefits && modalData.benefits.length > 0 && (
+                                        <div className="mb-4 p-3 rounded-3" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                            <div className="fw-bold text-dark mb-2" style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                                Product Highlights &amp; Benefits:
+                                            </div>
+                                            <ul className="list-unstyled mb-0 d-flex flex-column gap-1.5" style={{ fontSize: '0.82rem' }}>
+                                                {modalData.benefits.map((b, bIdx) => (
+                                                    <li key={bIdx} className="d-flex align-items-start text-secondary">
+                                                        <i className="bi bi-check-circle-fill me-2 mt-0.5" style={{ color: 'var(--ch-teal)', flexShrink: 0 }}></i>
+                                                        <span>{b}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
                                     <button
                                         type="button"
                                         className="btn w-100 fw-bold py-2 mt-auto text-white"

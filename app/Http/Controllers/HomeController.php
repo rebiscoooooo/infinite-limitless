@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\ProductStat;
 use App\Models\SiteStat;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,8 +16,17 @@ class HomeController extends Controller
      */
     public function index(): Response
     {
-        $siteStats = SiteStat::first();
-        $products = ProductStat::orderBy('clicks', 'desc')->get();
+        $siteStats = Cache::remember('public_site_stats', 300, function () {
+            return SiteStat::first();
+        });
+
+        $products = Cache::remember('public_product_stats', 300, function () {
+            return ProductStat::orderBy('clicks', 'desc')->get();
+        });
+
+        $catalogProducts = Cache::remember('public_catalog_products', 120, function () {
+            return Product::active()->orderBy('display_order', 'asc')->orderBy('id', 'asc')->get();
+        });
 
         $partners = [
             [
@@ -124,6 +135,7 @@ class HomeController extends Controller
         return Inertia::render('Home', [
             'siteStats' => $siteStats,
             'products' => $products,
+            'catalogProducts' => $catalogProducts,
             'partners' => $partners,
             'testimonials' => $testimonials,
             'reviews' => $reviews,

@@ -5,9 +5,17 @@ import AppFooter from '../Components/AppFooter';
 import Preloader from '../Components/Preloader';
 import BackToTop from '../Components/BackToTop';
 import FlashToast from '../Components/FlashToast';
+import useRealtimeSync from '../Hooks/useRealtimeSync';
 
 export default function AppLayout({ children, hideFooter = false }) {
     const { flash } = usePage().props;
+
+    // Realtime Catalog Synchronization (background sync for public users)
+    useRealtimeSync({
+        isAdmin: false,
+        intervalMs: 12000,
+        enableSoundByDefault: false,
+    });
 
     return (
         <div className="min-h-screen flex flex-col font-barlow selection:bg-ch-teal selection:text-ch-dark-slate">

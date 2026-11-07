@@ -324,12 +324,12 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                                         <i className="fa-solid fa-gem mb-3" style={{ fontSize: '2.5rem', color: 'var(--ch-teal)' }}></i>
                                         <h3 className="fw-bold" style={{ color: 'var(--ch-dark-slate)' }}>Executive Package</h3>
                                     </div>
-                                    <ul className="list-unstyled text-muted text-start mb-0 flex-grow-1" style={{ fontSize: '1rem', lineHeight: 1.6 }}>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span>Automatically receive an <strong>EXECUTIVE BADGE</strong>.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong>OLAMOUR Premium Skincare Set</strong> Options.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong>The Big Advantage:</strong> You can earn <strong>3%–19% rebates</strong> from all product and package purchases made by your entire team.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong>Additional income</strong> opportunity.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong>Full business</strong> benefits.</span></li>
+                                    <ul className="list-unstyled text-start mb-0 flex-grow-1" style={{ fontSize: '1rem', lineHeight: 1.6, color: '#334155' }}>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span>Automatically receive an <strong style={{ color: '#0f172a' }}>EXECUTIVE BADGE</strong>.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong style={{ color: '#0f172a' }}>OLAMOUR Premium Skincare Set</strong> Options.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong style={{ color: '#0f172a' }}>The Big Advantage:</strong> You can earn <strong style={{ color: '#0f172a' }}>3%–19% rebates</strong> from all product and package purchases made by your entire team.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong style={{ color: '#0f172a' }}>Additional income</strong> opportunity.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span><strong style={{ color: '#0f172a' }}>Full business</strong> benefits.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -351,11 +351,11 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                                         <i className="fa-solid fa-box mb-3" style={{ fontSize: '2.5rem', color: 'var(--ch-slate-muted)' }}></i>
                                         <h3 className="fw-bold" style={{ color: 'var(--ch-dark-slate)' }}>Regular Package</h3>
                                     </div>
-                                    <ul className="list-unstyled text-muted text-start mb-0 flex-grow-1" style={{ fontSize: '1rem', lineHeight: 1.6 }}>
+                                    <ul className="list-unstyled text-start mb-0 flex-grow-1" style={{ fontSize: '1rem', lineHeight: 1.6, color: '#334155' }}>
                                         <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span>The price is lower and comes with standard products.</span></li>
                                         <li className="mb-3 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1 fs-5"></i> <span>Same core earning opportunities.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-x-circle-fill text-danger me-3 mt-1 fs-5"></i> <span>Does <strong>not</strong> include the PREMIUM SKINCARE set.</span></li>
-                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-info-circle-fill text-primary me-3 mt-1 fs-5"></i> <span>All other earnings are the same, but you will <strong>not be eligible</strong> to earn the 3%–19% rebates from your team’s purchases unless you upgrade.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-x-circle-fill text-danger me-3 mt-1 fs-5"></i> <span>Does <strong style={{ color: '#0f172a' }}>not</strong> include the PREMIUM SKINCARE set.</span></li>
+                                        <li className="mb-3 d-flex align-items-start"><i className="bi bi-info-circle-fill text-primary me-3 mt-1 fs-5"></i> <span>All other earnings are the same, but you will <strong style={{ color: '#0f172a' }}>not be eligible</strong> to earn the 3%–19% rebates from your team’s purchases unless you upgrade.</span></li>
                                     </ul>
                                 </div>
                             </div>
@@ -423,14 +423,14 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
             </section>
 
             {/* BUSINESS PLAN / WAYS TO EARN */}
-            <section id="png-earnings" className="section-pad position-relative" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', overflow: 'hidden' }}>
+            <section id="png-earnings" className="section-pad position-relative" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', color: '#0f172a', overflow: 'hidden' }}>
                 <div className="container position-relative z-1">
                     <div className="text-center mb-5">
                         <span className="section-tag">A Business Platform for Aspiring Global Entrepreneurs</span>
                         <h2 className="section-title" style={{ color: 'var(--ch-dark-slate)' }}>
                             {countryName} <span className="highlight">Business Plan</span>
                         </h2>
-                        <p className="text-muted mt-3 mx-auto" style={{ maxWidth: '600px', fontSize: '1.1rem' }}>
+                        <p className="mt-3 mx-auto" style={{ maxWidth: '600px', fontSize: '1.1rem', color: '#475569' }}>
                             Discover tailored strategies, local compensation structures, and how you can establish a limitless business within {countryName}.
                         </p>
                     </div>
@@ -438,98 +438,98 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                     <div className="row g-5 align-items-start">
                         {/* LEFT: 7 ACCORDIONS */}
                         <div className="col-lg-6">
-                            <div className="glass-panel p-4 p-md-5 h-100 bg-white rounded-4 shadow-sm border">
+                            <div className="glass-panel p-4 p-md-5 h-100 bg-white rounded-4 shadow-sm border" style={{ color: '#0f172a' }}>
                                 <h4 className="fw-bold mb-4" style={{ color: 'var(--ch-dark-slate)' }}>
                                     <i className="fa-solid fa-chart-pie me-2" style={{ color: 'var(--ch-teal)' }}></i> Ways To Earn
                                 </h4>
-                                <div className="accordion" id="accordionBusinessPlan">
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                <div className="accordion glass-accordion" id="accordionBusinessPlan">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cOne">
                                                 <i className="fa-solid fa-cart-shopping me-3" style={{ color: 'var(--ch-teal)' }}></i> 1. Product Sales (30% Profit)
                                             </button>
                                         </h2>
                                         <div id="cOne" className="accordion-collapse collapse show" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 You earn a <strong>30% retail profit</strong> on every product you sell. There are no requirements and no monthly quotas.
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cTwo">
                                                 <i className="fa-solid fa-users-rays me-3" style={{ color: 'var(--ch-teal)' }}></i> 2. Enroller Bonus
                                             </button>
                                         </h2>
                                         <div id="cTwo" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 You earn an Enroller Commission every time someone you personally introduce purchases a Wholesale Package.
                                                 When they register, the company provides them with a FREE INFINITE Online Account.
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cThree">
                                                 <i className="fa-solid fa-layer-group me-3" style={{ color: 'var(--ch-teal)' }}></i> 3. Sales Match Bonus
                                             </button>
                                         </h2>
                                         <div id="cThree" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 You will build two sales teams — a Left Team and a Right Team. Whenever points match on both sides, the company rewards you with an additional Sales Match Bonus on top of your direct commissions.
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cFour">
                                                 <i className="fa-solid fa-calendar-week me-3" style={{ color: 'var(--ch-teal)' }}></i> 4. Potential Weekly Income
                                             </button>
                                         </h2>
                                         <div id="cFour" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 Your potential weekly income depends on the package level you choose and the growth of your sales organization. As you continue guiding your members, your earning potential increases weekly.
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cFive">
                                                 <i className="fa-solid fa-money-bill-wave me-3" style={{ color: 'var(--ch-teal)' }}></i> 5. Cash Bonus Incentives
                                             </button>
                                         </h2>
                                         <div id="cFive" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 Earn extra cash bonuses with INFINITE twice a month (1st-15th and 16th-31st cut-offs) based on verified production milestones.
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden">
+                                    <div className="accordion-item mb-2 border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cSix">
                                                 <i className="fa-solid fa-crown me-3" style={{ color: 'var(--ch-teal)' }}></i> 6. INFINITE Bonus
                                             </button>
                                         </h2>
                                         <div id="cSix" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 Earn every time your direct leaders earn. The INFINITE Bonus rewards you with 10% to 30% of your direct leaders’ monthly matching check!
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="accordion-item border rounded-3 overflow-hidden">
+                                    <div className="accordion-item border rounded-3 overflow-hidden shadow-sm">
                                         <h2 className="accordion-header">
                                             <button className="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#cSeven">
                                                 <i className="fa-solid fa-calendar-week me-3" style={{ color: 'var(--ch-teal)' }}></i> 7. Executive Level Bonus
                                             </button>
                                         </h2>
                                         <div id="cSeven" className="accordion-collapse collapse" data-bs-parent="#accordionBusinessPlan">
-                                            <div className="accordion-body text-muted">
+                                            <div className="accordion-body">
                                                 Earn rebates ranging from 3% to 19% based on your Executive Rank. This bonus is generated through your team's combined product and package sales.
                                             </div>
                                         </div>
@@ -540,47 +540,47 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
 
                         {/* RIGHT: REGISTRATION PROCESS & BENEFITS */}
                         <div className="col-lg-6">
-                            <div className="glass-panel p-4 p-md-5 mb-4 shadow-sm bg-white rounded-4 border">
+                            <div className="glass-panel p-4 p-md-5 mb-4 shadow-sm bg-white rounded-4 border" style={{ color: '#0f172a' }}>
                                 <h4 className="fw-bold mb-3" style={{ color: 'var(--ch-dark-slate)' }}>
                                     <i className="fa-solid fa-list-check me-2" style={{ color: 'var(--ch-teal)' }}></i> Process of Registration
                                 </h4>
-                                <ol className="text-muted mb-0 ps-3" style={{ fontSize: '0.95rem', lineHeight: 1.7 }}>
-                                    <li className="mb-2"><strong>Choose Your Package:</strong> Select the option that fits your budget. Includes products and a free lifetime INFINITE account.</li>
-                                    <li className="mb-2"><strong>Submit Your Information:</strong> Register your official details.</li>
-                                    <li className="mb-2"><strong>Make Your Payment:</strong> Pay through our gateway using Bank Deposit, Wise, Debit/Credit Card, or Authorized Dealer.</li>
-                                    <li className="mb-0"><strong>Receive Products via DHL:</strong> Delivery typically takes 3 to 7 business days with air waybill tracking.</li>
+                                <ol className="mb-0 ps-3" style={{ fontSize: '0.95rem', lineHeight: 1.7, color: '#334155' }}>
+                                    <li className="mb-2"><strong style={{ color: '#0f172a' }}>Choose Your Package:</strong> Select the option that fits your budget. Includes products and a free lifetime INFINITE account.</li>
+                                    <li className="mb-2"><strong style={{ color: '#0f172a' }}>Submit Your Information:</strong> Register your official details.</li>
+                                    <li className="mb-2"><strong style={{ color: '#0f172a' }}>Make Your Payment:</strong> Pay through our gateway using Bank Deposit, Wise, Debit/Credit Card, or Authorized Dealer.</li>
+                                    <li className="mb-0"><strong style={{ color: '#0f172a' }}>Receive Products via DHL:</strong> Delivery typically takes 3 to 7 business days with air waybill tracking.</li>
                                 </ol>
                             </div>
 
-                            <div className="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                            <div className="bg-white p-4 rounded-4 shadow-sm border mb-4" style={{ color: '#0f172a' }}>
                                 <h5 className="fw-bold mb-3" style={{ color: 'var(--ch-dark-slate)' }}>⭐ Member Benefits</h5>
-                                <ul className="list-unstyled text-muted mb-0" style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>
-                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong>30% Discount</strong> on all INFINITE Products.</span></li>
-                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong>Instant Value:</strong> Product package value is higher than your investment.</span></li>
-                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong>Personal Online Dashboard:</strong> Monitor sales, team growth, and commissions in real time.</span></li>
-                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong>Travel &amp; Rewards:</strong> Qualify for local/international travel and leadership incentives.</span></li>
-                                    <li className="mb-0 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong>Mentorship:</strong> Access online trainings, webinars, and coaching.</span></li>
+                                <ul className="list-unstyled mb-0" style={{ fontSize: '0.95rem', lineHeight: 1.6, color: '#334155' }}>
+                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong style={{ color: '#0f172a' }}>30% Discount</strong> on all INFINITE Products.</span></li>
+                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong style={{ color: '#0f172a' }}>Instant Value:</strong> Product package value is higher than your investment.</span></li>
+                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong style={{ color: '#0f172a' }}>Personal Online Dashboard:</strong> Monitor sales, team growth, and commissions in real time.</span></li>
+                                    <li className="mb-2 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong style={{ color: '#0f172a' }}>Travel &amp; Rewards:</strong> Qualify for local/international travel and leadership incentives.</span></li>
+                                    <li className="mb-0 d-flex align-items-start"><i className="bi bi-check-circle-fill text-success me-3 mt-1"></i> <span><strong style={{ color: '#0f172a' }}>Mentorship:</strong> Access online trainings, webinars, and coaching.</span></li>
                                 </ul>
                             </div>
 
                             <div className="row g-3">
                                 <div className="col-md-6">
-                                    <div className="bg-white p-4 rounded-4 shadow-sm border h-100">
-                                        <h6 className="fw-bold" style={{ color: 'var(--ch-dark-slate)' }}>
+                                    <div className="bg-white p-4 rounded-4 shadow-sm border h-100" style={{ color: '#0f172a' }}>
+                                        <h6 className="fw-bold mb-2" style={{ color: 'var(--ch-dark-slate)' }}>
                                             <i className="fa-solid fa-graduation-cap text-primary me-2"></i> Training &amp; Support
                                         </h6>
-                                        <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
+                                        <p className="mb-0" style={{ fontSize: '0.85rem', color: '#475569' }}>
                                             Access WhatsApp groups, books, and modules for personal development and product info.
                                         </p>
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <div className="bg-white p-4 rounded-4 shadow-sm border h-100">
-                                        <h6 className="fw-bold" style={{ color: 'var(--ch-dark-slate)' }}>
+                                    <div className="bg-white p-4 rounded-4 shadow-sm border h-100" style={{ color: '#0f172a' }}>
+                                        <h6 className="fw-bold mb-2" style={{ color: 'var(--ch-dark-slate)' }}>
                                             <i className="fa-solid fa-building-columns text-success me-2"></i> Encashment &amp; Policy
                                         </h6>
-                                        <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-                                            Encashment can be done through <strong>Telegraphic Transfer (TT) or Wise</strong> directly into your personal bank account.
+                                        <p className="mb-0" style={{ fontSize: '0.85rem', color: '#475569' }}>
+                                            Encashment can be done through <strong style={{ color: '#0f172a' }}>Telegraphic Transfer (TT) or Wise</strong> directly into your personal bank account.
                                         </p>
                                     </div>
                                 </div>
@@ -610,8 +610,8 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                             <p className="text-muted mb-4" style={{ fontSize: '1.1rem' }}>
                                 Fill out our registration form to secure your package and position in our growing global community.
                             </p>
-                            <Link href="/world-plan#register-world-account" className="btn text-white px-5 py-3 shadow-sm fw-bold" style={{ backgroundColor: 'var(--ch-teal)', borderRadius: '2rem', fontSize: '1.1rem', textDecoration: 'none' }}>
-                                <i className="fa-solid fa-file-signature me-2"></i> Start Pre-Registration
+                            <Link href="/#contact" className="btn text-white px-5 py-3 shadow-sm fw-bold" style={{ backgroundColor: 'var(--ch-teal)', borderRadius: '2rem', fontSize: '1.1rem', textDecoration: 'none' }}>
+                                <i className="fa-solid fa-paper-plane me-2"></i> Connect With An Enroller
                             </Link>
                         </div>
                     </div>
@@ -646,19 +646,19 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                         ></button>
                         <img src={activePkgModal.badge} alt={activePkgModal.tier} style={{ height: '90px', objectFit: 'contain', margin: '0 auto 1rem' }} />
                         <h4 className="fw-bold mb-0 text-dark">{activePkgModal.name}</h4>
-                        <h5 className="text-muted mb-3">({activePkgModal.tier})</h5>
+                        <h5 className="mb-3" style={{ color: '#64748b' }}>({activePkgModal.tier})</h5>
                         <h2 className="fw-bold mb-2" style={{ color: 'var(--ch-teal)' }}>{activePkgModal.price}</h2>
                         <div className="badge mb-4 p-2 px-3 shadow-sm" style={{ backgroundColor: 'var(--ch-dark-slate)', color: '#fff', fontSize: '0.95rem', borderRadius: '0.5rem' }}>
                             Total Product Worth: <span style={{ color: 'var(--ch-teal)' }}>{activePkgModal.worth}</span>
                         </div>
-                        <div className="modal-package-details text-start p-4 mb-4 shadow-sm bg-light rounded-3">
+                        <div className="modal-package-details text-start p-4 mb-4 shadow-sm bg-light rounded-3" style={{ color: '#0f172a' }}>
                             <h6 className="fw-bold mb-3" style={{ color: 'var(--ch-dark-slate)' }}>
                                 <i className="bi bi-box-seam me-2" style={{ color: 'var(--ch-teal)' }}></i>Package Inclusions:
                             </h6>
-                            <ul className="list-unstyled text-muted mb-0" style={{ fontSize: '0.95rem' }}>
+                            <ul className="list-unstyled mb-0" style={{ fontSize: '0.95rem', color: '#334155' }}>
                                 {activePkgModal.inclusions?.map((inc, i) => (
-                                    <li key={i} className="mb-2 d-flex align-items-center">
-                                        <i className="bi bi-check-circle-fill text-success me-3"></i>{inc}
+                                    <li key={i} className="mb-2 d-flex align-items-center" style={{ color: '#334155' }}>
+                                        <i className="bi bi-check-circle-fill text-success me-3"></i><span>{inc}</span>
                                     </li>
                                 ))}
                             </ul>

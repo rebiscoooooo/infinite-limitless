@@ -19,13 +19,13 @@ class InquiryController extends Controller
     {
         $inquiry = Inquiry::create($request->validated());
 
-        // Queue notifications if mail driver is active
+        // Send notifications to admin and inquirer
         try {
-            $adminEmail = config('mail.from.address', 'admin@infinite-limitless.com');
+            $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
             Mail::to($adminEmail)->queue(new InquiryReceivedAdminMail($inquiry));
             Mail::to($inquiry->email)->queue(new InquiryConfirmationUserMail($inquiry));
         } catch (\Throwable $e) {
-            // Log mail dispatch exception without blocking response
+            \Illuminate\Support\Facades\Log::error("Failed to send inquiry emails for #{$inquiry->id}: " . $e->getMessage());
             report($e);
         }
 

@@ -24,4 +24,25 @@ export default defineConfig({
             '@': '/resources/js',
         },
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/scheduler')) {
+                        return 'vendor-react';
+                    }
+                    if (id.includes('node_modules/@inertiajs')) {
+                        return 'vendor-inertia';
+                    }
+                    if (id.includes('node_modules/lucide-react')) {
+                        return 'vendor-lucide';
+                    }
+                    if (id.includes('node_modules/axios')) {
+                        return 'vendor-axios';
+                    }
+                },
+            },
+        },
+        chunkSizeWarningLimit: 1000,
+    },
 });

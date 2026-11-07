@@ -96,8 +96,20 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'admin@infinite-limitless.com'),
+        'name' => env('MAIL_FROM_NAME', 'Infinite Support Team'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Administrator Notification Recipient
+    |--------------------------------------------------------------------------
+    |
+    | Destination email address for admin notifications such as new website
+    | inquiries, new World Plan registrations, and contact submissions.
+    |
+    */
+
+    'admin_address' => env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'),
 
 ];

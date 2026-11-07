@@ -497,6 +497,12 @@
         }
 
         /* FAQ Section Styling */
+        .collapse.show,
+        .collapsing,
+        .accordion-collapse {
+            visibility: visible !important;
+        }
+
         .accordion-item {
             background: #fff;
             border: 1px solid var(--ch-border);

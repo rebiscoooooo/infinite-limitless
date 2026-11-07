@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import AppNavbar from '../Components/AppNavbar';
 import AppFooter from '../Components/AppFooter';
 
@@ -24,39 +24,6 @@ export default function WorldPlan() {
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    // Registration Form (Inertia useForm)
-    const { data, setData, post, processing, errors, reset, recentlySuccessful } = useForm({
-        username: '',
-        email: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        birthdate: '',
-        contact: '',
-        address: '',
-        packageType: 'World Starter',
-        paymentDate: new Date().toISOString().split('T')[0],
-        paymentProof: null,
-    });
-
-    const [formStatus, setFormStatus] = useState(null);
-
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        setFormStatus('submitting');
-        post('/register-world-plan', {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setFormStatus('success');
-                reset();
-            },
-            onError: (errs) => {
-                setFormStatus('error');
-            }
-        });
     };
 
     const currencyData = {
@@ -1454,9 +1421,9 @@ export default function WorldPlan() {
                     <p className="fs-5 text-white-50 mx-auto mb-4" style={{ maxWidth: '650px' }}>
                         Secure your World Plan account today and capitalize on our global binary matrix, travel incentives, and multi-currency payout infrastructure.
                     </p>
-                    <button data-bs-toggle="modal" data-bs-target="#worldAccountModal" className="btn btn-lg shadow-lg fw-bold px-5 py-3" style={{ background: 'var(--ch-teal)', color: '#fff', borderRadius: '50px', border: 'none' }}>
-                        Register World Account <i className="bi bi-arrow-right ms-2"></i>
-                    </button>
+                    <Link href="/#contact" className="btn btn-lg shadow-lg fw-bold px-5 py-3 text-white d-inline-flex align-items-center" style={{ background: 'var(--ch-teal)', borderRadius: '50px', textDecoration: 'none' }}>
+                        Contact an Authorized Dealer <i className="bi bi-arrow-right ms-2"></i>
+                    </Link>
                 </div>
             </section>
 
@@ -1594,202 +1561,6 @@ export default function WorldPlan() {
                     />
                 </div>
             )}
-
-            {/* WORLD ACCOUNT REGISTRATION MODAL */}
-            <div className="modal fade" id="worldAccountModal" tabIndex="-1" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                    <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '1.5rem', backgroundColor: '#ffffff' }}>
-                        <div className="modal-header border-0 pb-0 pt-4 px-4 px-md-5">
-                            <h3 className="modal-title fw-bold" style={{ color: 'var(--ch-dark-slate)', fontFamily: "'Bebas Neue', sans-serif", letterSpacing: '1px' }}>
-                                <i className="bi bi-globe-americas me-2" style={{ color: 'var(--ch-teal)' }}></i> Register World Account
-                            </h3>
-                            <button type="button" className="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div className="modal-body p-4 p-md-5 pt-3">
-                            <p className="text-muted mb-4 small">Fill out the official application form with your details to register.</p>
-
-                            {formStatus === 'success' && (
-                                <div className="alert alert-success d-flex align-items-center rounded-3 shadow-sm mb-4">
-                                    <i className="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
-                                    <div><strong>Success!</strong><br />Your World Account registration has been successfully submitted. Our team will review your payment receipt.</div>
-                                </div>
-                            )}
-
-                            {formStatus === 'error' && (
-                                <div className="alert alert-danger d-flex align-items-center rounded-3 shadow-sm mb-4">
-                                    <i className="bi bi-exclamation-triangle-fill fs-4 me-3 text-danger"></i>
-                                    <div><strong>Submission Failed</strong><br />Please review all required fields and upload your receipt proof.</div>
-                                </div>
-                            )}
-
-                            <form onSubmit={handleFormSubmit} encType="multipart/form-data">
-                                <div className="row g-3">
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldUsername"
-                                            placeholder="Username"
-                                            value={data.username}
-                                            onChange={(e) => setData('username', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldUsername" className="text-black fw-medium ms-2">Username (used for login)</label>
-                                        {errors.username && <div className="text-danger small mt-1">{errors.username}</div>}
-                                    </div>
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <input
-                                            type="email"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldEmail"
-                                            placeholder="Email Address"
-                                            value={data.email}
-                                            onChange={(e) => setData('email', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldEmail" className="text-black fw-medium ms-2">Email Address</label>
-                                        {errors.email && <div className="text-danger small mt-1">{errors.email}</div>}
-                                    </div>
-
-                                    <div className="col-md-4 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldFirstName"
-                                            placeholder="First Name"
-                                            value={data.firstName}
-                                            onChange={(e) => setData('firstName', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldFirstName" className="text-black fw-medium ms-2">First Name</label>
-                                        {errors.firstName && <div className="text-danger small mt-1">{errors.firstName}</div>}
-                                    </div>
-                                    <div className="col-md-4 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldMiddleName"
-                                            placeholder="Middle Name (Optional)"
-                                            value={data.middleName}
-                                            onChange={(e) => setData('middleName', e.target.value)}
-                                        />
-                                        <label htmlFor="worldMiddleName" className="text-black fw-medium ms-2">Middle Name (Optional)</label>
-                                    </div>
-                                    <div className="col-md-4 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldLastName"
-                                            placeholder="Last Name"
-                                            value={data.lastName}
-                                            onChange={(e) => setData('lastName', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldLastName" className="text-black fw-medium ms-2">Last Name</label>
-                                        {errors.lastName && <div className="text-danger small mt-1">{errors.lastName}</div>}
-                                    </div>
-
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <input
-                                            type="date"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldBirthdate"
-                                            value={data.birthdate}
-                                            onChange={(e) => setData('birthdate', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldBirthdate" className="text-black fw-medium ms-2">Birthdate</label>
-                                        {errors.birthdate && <div className="text-danger small mt-1">{errors.birthdate}</div>}
-                                    </div>
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldContact"
-                                            placeholder="Contact #"
-                                            value={data.contact}
-                                            onChange={(e) => setData('contact', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldContact" className="text-black fw-medium ms-2">Contact #</label>
-                                        {errors.contact && <div className="text-danger small mt-1">{errors.contact}</div>}
-                                    </div>
-
-                                    <div className="col-12 form-floating mb-3">
-                                        <input
-                                            type="text"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldAddress"
-                                            placeholder="Complete Address"
-                                            value={data.address}
-                                            onChange={(e) => setData('address', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldAddress" className="text-black fw-medium ms-2">Complete Address</label>
-                                        {errors.address && <div className="text-danger small mt-1">{errors.address}</div>}
-                                    </div>
-
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <select
-                                            id="worldPackageType"
-                                            className="form-select bg-light border-0 shadow-none text-black fw-medium"
-                                            value={data.packageType}
-                                            onChange={(e) => setData('packageType', e.target.value)}
-                                            required
-                                        >
-                                            <option value="World Starter">World Starter</option>
-                                            <option value="World Basic">World Basic</option>
-                                            <option value="World Advance">World Advance</option>
-                                            <option value="World Pro">World Pro</option>
-                                            <option value="World Supreme">World Supreme</option>
-                                        </select>
-                                        <label htmlFor="worldPackageType" className="text-black fw-medium">Package Type</label>
-                                    </div>
-                                    <div className="col-md-6 form-floating mb-3">
-                                        <input
-                                            type="date"
-                                            className="form-control bg-light border-0 shadow-none text-black fw-medium"
-                                            id="worldPaymentDate"
-                                            value={data.paymentDate}
-                                            onChange={(e) => setData('paymentDate', e.target.value)}
-                                            required
-                                        />
-                                        <label htmlFor="worldPaymentDate" className="text-black fw-medium ms-2">Date of Payment</label>
-                                    </div>
-
-                                    <div className="col-12 mb-4">
-                                        <label htmlFor="worldPaymentProof" className="form-label text-black small fw-medium ms-1">Upload Payment Proof</label>
-                                        <input
-                                            type="file"
-                                            id="worldPaymentProof"
-                                            className="form-control bg-light border-0 shadow-none py-2 text-black fw-medium"
-                                            accept="image/*,.pdf"
-                                            onChange={(e) => setData('paymentProof', e.target.files[0])}
-                                            required
-                                        />
-                                        {errors.paymentProof && <div className="text-danger small mt-1">{errors.paymentProof}</div>}
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="btn w-100 fw-bold py-3 text-white rounded-3 shadow-sm"
-                                    style={{ backgroundColor: 'var(--ch-teal)' }}
-                                >
-                                    {processing ? (
-                                        <span>Submitting...</span>
-                                    ) : (
-                                        <>
-                                            <i className="bi bi-send me-2"></i> Submit Registration
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* BACK TO TOP BUTTON */}
             <button

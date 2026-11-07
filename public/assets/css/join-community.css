@@ -1,3 +1,31 @@
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
 /* Your existing styles... */
         .option-card {
             border: 2px solid rgba(0, 0, 0, 0.1);
@@ -297,6 +325,34 @@
             transform: rotate(90deg);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
+
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
 
 /* Your existing styles... */
         .option-card {
@@ -904,6 +960,34 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
 /* Your existing styles... */
         .option-card {
             border: 2px solid rgba(0, 0, 0, 0.1);
@@ -1204,6 +1288,34 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
 /* Your existing styles... */
         .option-card {
             border: 2px solid rgba(0, 0, 0, 0.1);
@@ -1497,6 +1609,34 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
+
 /* Your existing styles... */
         .option-card {
             border: 2px solid rgba(0, 0, 0, 0.1);
@@ -1789,6 +1929,34 @@
             transform: rotate(90deg);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
+
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
 
 /* Your existing styles... */
         .option-card {
@@ -2651,6 +2819,34 @@
             transform: rotate(90deg);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
+
+/* Bootstrap Collapse & Accordion Fixes for Join Community */
+.collapse.show,
+.collapsing,
+.accordion-collapse,
+.accordion-collapse.collapse.show,
+.accordion-collapse.collapsing {
+    visibility: visible !important;
+}
+
+.accordion-body,
+.glass-accordion .accordion-body {
+    visibility: visible !important;
+    display: block !important;
+    color: #334155 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.accordion-body strong,
+.accordion-body b,
+.glass-accordion .accordion-body strong,
+.glass-accordion .accordion-body b {
+    color: #0f172a !important;
+    font-weight: 700 !important;
+}
 
 /* Your existing styles... */
         .option-card {

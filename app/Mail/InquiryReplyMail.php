@@ -6,6 +6,7 @@ use App\Models\Inquiry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -31,6 +32,12 @@ class InquiryReplyMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: $this->replySubject,
+            replyTo: [
+                new Address(
+                    config('mail.from.address', 'admin@infinite-limitless.com'),
+                    config('mail.from.name', 'Infinite Support Team')
+                ),
+            ],
         );
     }
 

@@ -30,9 +30,15 @@ class StoreWorldPlanRequest extends FormRequest
             'birthdate' => ['required', 'date'],
             'contact' => ['required', 'string', 'max:50'],
             'address' => ['required', 'string', 'max:1000'],
+            'country' => ['nullable', 'string', 'max:100'],
+            'sponsor' => ['nullable', 'string', 'max:100'],
             'packageType' => ['required', 'string', 'max:100'],
+            'productSet' => ['nullable', 'string', 'max:255'],
+            'paymentMethod' => ['nullable', 'string', 'max:100'],
+            'amountPaid' => ['nullable', 'string', 'max:100'],
             'paymentDate' => ['required', 'date'],
             'paymentProof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'], // up to 10MB
+            'agreedTerms' => ['nullable'],
         ];
     }
 
@@ -47,6 +53,7 @@ class StoreWorldPlanRequest extends FormRequest
             'paymentProof.required' => 'Payment proof file (JPG, PNG, PDF) is required.',
             'paymentProof.mimes' => 'Invalid file type. Only JPG, PNG, and PDF files are allowed.',
             'paymentProof.max' => 'The payment proof file size cannot exceed 10MB.',
+            'agreedTerms.accepted' => 'You must agree to the Privacy Policy and Terms & Conditions to proceed with registration.',
         ];
     }
 }
