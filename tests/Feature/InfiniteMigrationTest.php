@@ -56,6 +56,9 @@ class InfiniteMigrationTest extends TestCase
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page->component('SelectCountry'));
 
+        $this->get('/SelectCountry')
+            ->assertRedirect('/select-country');
+
         $this->get('/join-community/burkina-faso')
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page
