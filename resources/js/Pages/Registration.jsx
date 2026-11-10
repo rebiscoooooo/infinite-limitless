@@ -4,26 +4,46 @@ import { Head, Link, useForm } from '@inertiajs/react';
 // Official World Plan pricing and inclusions transcribed from the three supplied screenshots.
 // These are fixed market prices, not exchange-rate conversions.
 const WORLD_PACKAGES = [
-    { name: 'World Starter', prices: { PHP: 3000, USD: 60, PGK: 299 }, worth: { PHP: 3200, USD: 75, PGK: 360 },
-      inclusions: { PHP: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
-                    USD: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
-                    PGK: ['3 Robustus Coffee', '1 Infinite Barley'] } },
-    { name: 'World Basic', prices: { PHP: 8880, USD: 189, PGK: 880 }, worth: { PHP: 9400, USD: 210, PGK: 1150 },
-      inclusions: { PHP: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
-                    USD: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
-                    PGK: ['5 Robustus Coffee', '2 Whiteplus Glutathione', '2 Infinite Barley'] } },
-    { name: 'World Advance', prices: { PHP: 18880, USD: 359, PGK: 1599 }, worth: { PHP: 20400, USD: 410, PGK: 2550 }, rank: 'Executive Rank Status',
-      inclusions: { PHP: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
-                    USD: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
-                    PGK: ['15 Robustus Coffee', '10 Infinite Barley'] } },
-    { name: 'World Pro', prices: { PHP: 49800, USD: 929, PGK: 5199 }, worth: { PHP: 58500, USD: 1080, PGK: 7140 }, rank: '1 Star Executive Rank Status',
-      inclusions: { PHP: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
-                    USD: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
-                    PGK: ['22 INFINITE Robustus', '14 INFINITE Barley', '14 WHITEPLUS Glutathione'] } },
-    { name: 'World Supreme', prices: { PHP: 125000, USD: 2229, PGK: 12599 }, worth: { PHP: 150900, USD: 2750, PGK: 18700 }, rank: '2 Star Executive Rank Status',
-      inclusions: { PHP: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
-                    USD: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
-                    PGK: ['60 INFINITE Robustus', '40 INFINITE Barley', '34 WHITEPLUS Glutathione'] } },
+    {
+        name: 'World Starter', prices: { PHP: 3000, USD: 60, PGK: 299 }, worth: { PHP: 3200, USD: 75, PGK: 360 },
+        inclusions: {
+            PHP: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+            USD: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+            PGK: ['3 Robustus Coffee', '1 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Basic', prices: { PHP: 8880, USD: 189, PGK: 880 }, worth: { PHP: 9400, USD: 210, PGK: 1150 },
+        inclusions: {
+            PHP: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+            USD: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+            PGK: ['5 Robustus Coffee', '2 Whiteplus Glutathione', '2 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Advance', prices: { PHP: 18880, USD: 359, PGK: 1599 }, worth: { PHP: 20400, USD: 410, PGK: 2550 }, rank: 'Executive Rank Status',
+        inclusions: {
+            PHP: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+            USD: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['15 Robustus Coffee', '10 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Pro', prices: { PHP: 49800, USD: 929, PGK: 5199 }, worth: { PHP: 58500, USD: 1080, PGK: 7140 }, rank: '1 Star Executive Rank Status',
+        inclusions: {
+            PHP: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+            USD: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['22 INFINITE Robustus', '14 INFINITE Barley', '14 WHITEPLUS Glutathione']
+        }
+    },
+    {
+        name: 'World Supreme', prices: { PHP: 125000, USD: 2229, PGK: 12599 }, worth: { PHP: 150900, USD: 2750, PGK: 18700 }, rank: '2 Star Executive Rank Status',
+        inclusions: {
+            PHP: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+            USD: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['60 INFINITE Robustus', '40 INFINITE Barley', '34 WHITEPLUS Glutathione']
+        }
+    },
 ];
 const CURRENCY_SYMBOLS = { PHP: '₱', USD: '$', PGK: 'PGK ' };
 const formatWorldPrice = (amount, currency) => `${CURRENCY_SYMBOLS[currency]}${amount.toLocaleString('en-US')}`;
@@ -52,27 +72,28 @@ export default function Registration({
         lastName: '',
         birthdate: '',
         contact: '',
-        country: 'Philippines',
+        country: '',
         address: '',
-        packageType: WORLD_PACKAGES[0].name,
-        productSet: productSetFor(WORLD_PACKAGES[0].name, 'PHP'),
-        paymentMethod: paymentMethods[0] || 'Bank Deposit / Wire Transfer',
+        packageType: '',
+        productSet: '',
+        paymentMethod: '',
         amountPaid: '',
         paymentDate: new Date().toISOString().split('T')[0],
         paymentProof: null,
         agreedTerms: false,
     });
 
-    const selectedCurrency = countryCurrencies[data.country] || 'USD';
+    const selectedCurrency = countryCurrencies[data.country] || null;
 
-    const selectedPackage = WORLD_PACKAGES.find((pkg) => pkg.name === data.packageType) || WORLD_PACKAGES[0];
-    const selectedInclusions = selectedPackage.inclusions[selectedCurrency];
+    const selectedPackage = WORLD_PACKAGES.find((pkg) => pkg.name === data.packageType) || null;
+    const selectedInclusions = selectedPackage && selectedCurrency ? selectedPackage.inclusions[selectedCurrency] : [];
     const handleCountryChange = (country) => {
-        const currency = countryCurrencies[country] || 'USD';
         setData((previous) => ({
             ...previous,
             country,
-            productSet: productSetFor(previous.packageType, currency),
+            // Require an explicit package choice for the newly selected country.
+            packageType: '',
+            productSet: '',
             amountPaid: '',
         }));
     };
@@ -80,7 +101,7 @@ export default function Registration({
         setData((previous) => ({
             ...previous,
             packageType: packageName,
-            productSet: productSetFor(packageName, countryCurrencies[previous.country] || 'USD'),
+            productSet: packageName && countryCurrencies[previous.country] ? productSetFor(packageName, countryCurrencies[previous.country]) : '',
         }));
     };
 
@@ -120,7 +141,7 @@ export default function Registration({
         transform((formData) => ({
             ...formData,
             amountPaid: formData.amountPaid
-                ? `${formData.amountPaid} ${countryCurrencies[formData.country] || 'USD'}`
+                ? `${formData.amountPaid} ${countryCurrencies[formData.country] || ''}`
                 : '',
         }));
 
@@ -401,7 +422,7 @@ export default function Registration({
                                         <div className="registration-form-heading">
                                             <span className="registration-form-heading-icon"><i className="bi bi-card-list"></i></span>
                                             <div><h3 className="fw-bold mb-1" style={{ color: 'var(--ch-dark-slate)' }}>Official Application Form</h3>
-                                            <p className="text-muted small mb-0">Fill in your official details to enroll into the World Plan network.</p></div>
+                                                <p className="text-muted small mb-0">Fill in your official details to enroll into the World Plan network.</p></div>
                                         </div>
                                         <button
                                             type="button"
@@ -540,6 +561,7 @@ export default function Registration({
                                                     onChange={(e) => handleCountryChange(e.target.value)}
                                                     required
                                                 >
+                                                    <option value="" disabled>Choose your country</option>
                                                     <option value="Philippines">Philippines (PHP ₱)</option>
                                                     <option value="United States">United States (USD $)</option>
                                                     <option value="Papua New Guinea">Papua New Guinea (PGK K)</option>
@@ -574,8 +596,10 @@ export default function Registration({
                                                     value={data.packageType}
                                                     onChange={(e) => handlePackageChange(e.target.value)}
                                                     required
+                                                    disabled={!selectedCurrency}
                                                 >
-                                                    {WORLD_PACKAGES.map((pkg) => (
+                                                    <option value="" disabled>{selectedCurrency ? 'Choose your package' : 'Choose your country first'}</option>
+                                                    {selectedCurrency && WORLD_PACKAGES.map((pkg) => (
                                                         <option key={pkg.name} value={pkg.name}>
                                                             {pkg.name.toUpperCase()} — {formatWorldPrice(pkg.prices[selectedCurrency], selectedCurrency)}
                                                         </option>
@@ -585,40 +609,42 @@ export default function Registration({
                                                 {errors.packageType && <div className="invalid-feedback">{errors.packageType}</div>}
                                             </div>
                                         </div>
-                                        <div className="rounded-4 border p-3 p-md-4 mb-4" style={{ background: '#f8fbfd', borderColor: '#dce6f0' }}>
-                                            <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-                                                <div>
-                                                    <div className="small text-muted fw-bold">{selectedCurrency} WORLD PLAN PACKAGE</div>
-                                                    <h5 className="fw-bold mb-0" style={{ color: '#10233d' }}>{selectedPackage.name.toUpperCase()}</h5>
-                                                </div>
-                                                <div className="text-end">
-                                                    <div className="fw-bold" style={{ color: '#10233d', fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
-                                                        {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}
+                                        {selectedCurrency && selectedPackage && (
+                                            <div className="rounded-4 border p-3 p-md-4 mb-4" style={{ background: '#f8fbfd', borderColor: '#dce6f0' }}>
+                                                <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                                                    <div>
+                                                        <div className="small text-muted fw-bold">{selectedCurrency} WORLD PLAN PACKAGE</div>
+                                                        <h5 className="fw-bold mb-0" style={{ color: '#10233d' }}>{selectedPackage.name.toUpperCase()}</h5>
                                                     </div>
-                                                    <div className="small text-muted">Product Worth: <strong style={{ color: '#079e9d' }}>{formatWorldPrice(selectedPackage.worth[selectedCurrency], selectedCurrency)}</strong></div>
+                                                    <div className="text-end">
+                                                        <div className="fw-bold" style={{ color: '#10233d', fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
+                                                            {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}
+                                                        </div>
+                                                        <div className="small text-muted">Product Worth: <strong style={{ color: '#079e9d' }}>{formatWorldPrice(selectedPackage.worth[selectedCurrency], selectedCurrency)}</strong></div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {selectedPackage.rank && (
-                                                <div className="mb-3">
-                                                    <span className="rounded-pill px-3 py-2 d-inline-block fw-bold" style={{ background: '#17243b', color: '#fbbf24', fontSize: 12 }}>
-                                                        ★ {selectedPackage.rank.toUpperCase()}
-                                                    </span>
+                                                {selectedPackage.rank && (
+                                                    <div className="mb-3">
+                                                        <span className="rounded-pill px-3 py-2 d-inline-block fw-bold" style={{ background: '#17243b', color: '#fbbf24', fontSize: 12 }}>
+                                                            ★ {selectedPackage.rank.toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="small fw-bold mb-2" style={{ color: '#64748b' }}>PACKAGE INCLUSIONS:</div>
+                                                <ul className="list-unstyled mb-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 18px' }}>
+                                                    {selectedInclusions.map((item, index) => (
+                                                        <li key={`${selectedCurrency}-${selectedPackage.name}-${index}`} style={{ color: '#334155', fontSize: 14 }}>
+                                                            <span style={{ color: '#10b981', marginRight: 8 }}>✓</span>{item}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <div className="small text-muted mt-3">
+                                                    Product set is automatically matched to your selected package and currency. These are fixed market prices, not currency conversions.
                                                 </div>
-                                            )}
-                                            <div className="small fw-bold mb-2" style={{ color: '#64748b' }}>PACKAGE INCLUSIONS:</div>
-                                            <ul className="list-unstyled mb-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 18px' }}>
-                                                {selectedInclusions.map((item, index) => (
-                                                    <li key={`${selectedCurrency}-${selectedPackage.name}-${index}`} style={{ color: '#334155', fontSize: 14 }}>
-                                                        <span style={{ color: '#10b981', marginRight: 8 }}>✓</span>{item}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <div className="small text-muted mt-3">
-                                                Product set is automatically matched to your selected package and currency. These are fixed market prices, not currency conversions.
+                                                <input type="hidden" name="productSet" value={data.productSet} readOnly />
+                                                {errors.productSet && <div className="text-danger small mt-2">{errors.productSet}</div>}
                                             </div>
-                                            <input type="hidden" name="productSet" value={data.productSet} readOnly />
-                                            {errors.productSet && <div className="text-danger small mt-2">{errors.productSet}</div>}
-                                        </div>
+                                        )}
 
                                         {/* SECTION 4: PAYMENT DETAILS & PROOF */}
                                         <h5 className="fw-bold mb-3" style={{ color: 'var(--ch-teal)' }}>
@@ -633,6 +659,7 @@ export default function Registration({
                                                     onChange={(e) => setData('paymentMethod', e.target.value)}
                                                     required
                                                 >
+                                                    <option value="" disabled>Choose your payment channel</option>
                                                     {paymentMethods.map((pm, i) => (
                                                         <option key={i} value={pm}>{pm}</option>
                                                     ))}
@@ -651,7 +678,7 @@ export default function Registration({
                                                     value={data.amountPaid}
                                                     onChange={(e) => setData('amountPaid', e.target.value)}
                                                 />
-                                                <label htmlFor="amountPaid" className="ms-2">Amount Paid ({selectedCurrency})</label>
+                                                <label htmlFor="amountPaid" className="ms-2">Amount Paid ({selectedCurrency || 'Select country'})</label>
                                             </div>
 
                                             <div className="col-md-4 form-floating">
@@ -836,7 +863,7 @@ export default function Registration({
                                         <dl className="confirmation-details">
                                             <div><dt>Username</dt><dd>{data.username}</dd></div>
                                             <div><dt>Email Address</dt><dd>{data.email}</dd></div>
-                                            <div><dt>World Plan Package</dt><dd>{data.packageType} — {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}</dd></div>
+                                            <div><dt>World Plan Package</dt><dd>{selectedPackage && selectedCurrency ? `${data.packageType} — ${formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}` : 'Not selected'}</dd></div>
                                             <div><dt>Product Set</dt><dd>{data.productSet}</dd></div>
                                             <div><dt>Country / Region</dt><dd>{data.country}</dd></div>
                                             <div><dt>Amount Paid</dt><dd>{data.amountPaid ? `${data.amountPaid} ${selectedCurrency}` : 'Not provided'}</dd></div>

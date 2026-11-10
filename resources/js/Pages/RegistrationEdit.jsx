@@ -1,6 +1,57 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+// Official World Plan pricing and inclusions transcribed from the three supplied screenshots.
+// These are fixed market prices, not exchange-rate conversions.
+const WORLD_PACKAGES = [
+    {
+        name: 'World Starter', prices: { PHP: 3000, USD: 60, PGK: 299 }, worth: { PHP: 3200, USD: 75, PGK: 360 },
+        inclusions: {
+            PHP: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+            USD: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+            PGK: ['3 Robustus Coffee', '1 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Basic', prices: { PHP: 8880, USD: 189, PGK: 880 }, worth: { PHP: 9400, USD: 210, PGK: 1150 },
+        inclusions: {
+            PHP: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+            USD: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+            PGK: ['5 Robustus Coffee', '2 Whiteplus Glutathione', '2 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Advance', prices: { PHP: 18880, USD: 359, PGK: 1599 }, worth: { PHP: 20400, USD: 410, PGK: 2550 }, rank: 'Executive Rank Status',
+        inclusions: {
+            PHP: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+            USD: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['15 Robustus Coffee', '10 Infinite Barley']
+        }
+    },
+    {
+        name: 'World Pro', prices: { PHP: 49800, USD: 929, PGK: 5199 }, worth: { PHP: 58500, USD: 1080, PGK: 7140 }, rank: '1 Star Executive Rank Status',
+        inclusions: {
+            PHP: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+            USD: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['22 INFINITE Robustus', '14 INFINITE Barley', '14 WHITEPLUS Glutathione']
+        }
+    },
+    {
+        name: 'World Supreme', prices: { PHP: 125000, USD: 2229, PGK: 12599 }, worth: { PHP: 150900, USD: 2750, PGK: 18700 }, rank: '2 Star Executive Rank Status',
+        inclusions: {
+            PHP: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+            USD: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+            PGK: ['60 INFINITE Robustus', '40 INFINITE Barley', '34 WHITEPLUS Glutathione']
+        }
+    },
+];
+const CURRENCY_SYMBOLS = { PHP: '₱', USD: '$', PGK: 'PGK ' };
+const formatWorldPrice = (amount, currency) => `${CURRENCY_SYMBOLS[currency]}${amount.toLocaleString('en-US')}`;
+const productSetFor = (packageName, currency) => {
+    const pkg = WORLD_PACKAGES.find((item) => item.name === packageName);
+    return pkg ? `${pkg.name} (${currency}) — ${pkg.inclusions[currency].join(', ')}` : '';
+};
+
 export default function RegistrationEdit({
     registration = {},
     packageOptions = [],
@@ -18,13 +69,35 @@ export default function RegistrationEdit({
         country: registration.country || 'Philippines',
         address: registration.address || '',
         sponsor: registration.sponsor || '',
-        packageType: registration.package_type || packageOptions[0] || 'Ruby Executive Global Plan',
-        productSet: registration.product_set || productSets[0] || '',
+        packageType: registration.package_type || WORLD_PACKAGES[0].name,
+        productSet: registration.product_set || productSetFor(registration.package_type || WORLD_PACKAGES[0].name, ({ Philippines: 'PHP', 'United States': 'USD', 'Papua New Guinea': 'PGK' }[registration.country || 'Philippines'] || 'USD')),
         paymentMethod: registration.payment_method || paymentMethods[0] || '',
         amountPaid: registration.amount_paid || '',
         paymentDate: registration.payment_date ? registration.payment_date.split('T')[0] : '',
         paymentProof: null,
     });
+
+    const countryCurrencies = { Philippines: 'PHP', 'United States': 'USD', 'Papua New Guinea': 'PGK' };
+    const selectedCurrency = countryCurrencies[data.country] || 'USD';
+    const selectedPackage = WORLD_PACKAGES.find((pkg) => pkg.name === data.packageType);
+    const selectedInclusions = selectedPackage?.inclusions[selectedCurrency] || [];
+    const handleCountryChange = (country) => {
+        const currency = countryCurrencies[country] || 'USD';
+        setData((previous) => ({
+            ...previous,
+            country,
+            productSet: WORLD_PACKAGES.some((pkg) => pkg.name === previous.packageType)
+                ? productSetFor(previous.packageType, currency)
+                : previous.productSet,
+        }));
+    };
+    const handlePackageChange = (packageName) => {
+        setData((previous) => ({
+            ...previous,
+            packageType: packageName,
+            productSet: productSetFor(packageName, countryCurrencies[previous.country] || 'USD'),
+        }));
+    };
 
     const isPending = registration.status === 'Pending';
     const isApproved = registration.status === 'Approved';
@@ -67,6 +140,20 @@ export default function RegistrationEdit({
                 <title>{`Edit Registration - ${registration.full_name || 'Member'} | Infinite`}</title>
             </Head>
 
+            <style>{`
+                .edit-registration-hero { overflow:hidden; isolation:isolate; min-height:240px; padding:22px 0 25px!important; background:radial-gradient(ellipse at 81% 93%,rgba(0,165,169,.28),transparent 37%),linear-gradient(115deg,#0a2b40 0%,#071b2c 49%,#073b48 100%); }
+                .edit-registration-hero::before { content:''; position:absolute; z-index:-1; left:-10%; bottom:-135px; width:55%; height:260px; border-radius:50%; background:linear-gradient(15deg,rgba(0,181,185,.46),rgba(0,97,117,.09)); transform:rotate(16deg); box-shadow:0 -24px 0 rgba(3,147,159,.08); }
+                .edit-registration-orbit { position:absolute; z-index:-1; right:-115px; bottom:-235px; width:490px; height:490px; border-radius:50%; border:2px solid rgba(119,245,245,.48); background:radial-gradient(circle at 29% 23%,rgba(158,255,251,.35),transparent 20%),radial-gradient(circle at 43% 45%,rgba(17,132,151,.78),transparent 49%),repeating-radial-gradient(ellipse at 43% 43%,transparent 0 27px,rgba(120,224,228,.12) 28px 30px),linear-gradient(130deg,#178997,#04354d 70%); box-shadow:0 0 40px rgba(16,206,206,.33),inset 22px 28px 65px rgba(122,241,245,.28),inset -80px -55px 70px rgba(0,15,36,.9); opacity:.86; }
+                .edit-registration-orbit::before {content:''; position:absolute; width:125%; height:55%; top:-16%; left:-17%; border-top:1px dashed rgba(36,217,223,.7); border-radius:50%; transform:rotate(-18deg);}
+                .edit-registration-star { position:absolute; right:7%; top:10px; font-size:35px; color:#5af4eb; text-shadow:0 0 24px #4ef1e8; }
+                .edit-registration-hero-inner {position:relative;z-index:1;}
+                .edit-registration-hero h1 {font-size:clamp(31px,4.1vw,51px)!important; line-height:1.1; text-shadow:0 3px 10px rgba(0,0,0,.24);}
+                .edit-registration-hero h1 span {color:#16c2c0!important;}
+                .edit-registration-hero p {color:#c9d6e2!important;}
+                @media(max-width:767px) { .edit-registration-orbit {width:270px;height:270px;right:-135px;bottom:-145px;opacity:.55;} .edit-registration-star {right:4%;} }
+                @media(max-width:420px) { .edit-registration-hero h1 {font-size:29px!important;} }
+            `}</style>
+
             {/* BRAND HEADER BAR */}
             <header className="py-3 px-4 border-bottom" style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'rgba(15, 23, 42, 0.98)' }}>
                 <div className="container d-flex align-items-center justify-content-center">
@@ -101,15 +188,17 @@ export default function RegistrationEdit({
             </header>
 
             {/* HEADER */}
-            <section className="position-relative pt-4 pb-4" style={{ background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 118, 110, 0.2) 100%)' }}>
-                <div className="container pt-4 text-center">
+            <section className="edit-registration-hero position-relative pt-4 pb-4">
+                <div className="edit-registration-orbit" aria-hidden="true"></div>
+                <div className="edit-registration-star" aria-hidden="true">✦</div>
+                <div className="container pt-4 text-center edit-registration-hero-inner">
                     <span className="badge px-3 py-2 rounded-pill mb-3" style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)', color: '#5eead4', border: '1px solid rgba(20, 184, 166, 0.3)', letterSpacing: '2px', fontSize: '0.8rem' }}>
                         <i className="bi bi-pencil-square me-2"></i> REGISTRATION MANAGEMENT PORTAL
                     </span>
-                    <h1 className="fw-bold display-6 text-white mb-2" style={{ fontFamily: "'Bebas Neue', 'Barlow', sans-serif", letterSpacing: '1.5px' }}>
+                    <h1 className="fw-bold display-5 text-white mb-3" style={{ fontFamily: "'Bebas Neue', 'Barlow', sans-serif", letterSpacing: '1.5px' }}>
                         UPDATE YOUR <span style={{ color: 'var(--ch-teal)' }}>REGISTRATION DETAILS</span>
                     </h1>
-                    <p className="text-white-50 mx-auto" style={{ maxWidth: '640px', fontSize: '0.95rem' }}>
+                    <p className="text-white-50 mx-auto" style={{ maxWidth: '680px', fontSize: '1.05rem', lineHeight: 1.6 }}>
                         Modify your contact details, shipping address, or product set selection before final administrator verification.
                     </p>
                 </div>
@@ -235,7 +324,7 @@ export default function RegistrationEdit({
                                                     id="country"
                                                     className="form-control bg-light"
                                                     value={data.country}
-                                                    onChange={(e) => setData('country', e.target.value)}
+                                                    onChange={(e) => handleCountryChange(e.target.value)}
                                                 />
                                                 <label htmlFor="country" className="ms-2">Country / Region</label>
                                             </div>
@@ -265,41 +354,68 @@ export default function RegistrationEdit({
                                             </div>
                                         </div>
 
-                                        {/* PACKAGE & PRODUCT SET */}
+                                        {/* PACKAGE & PRODUCT SET — WORLD PLAN */}
                                         <h5 className="fw-bold mb-3" style={{ color: 'var(--ch-teal)' }}>
-                                            <i className="fa-solid fa-gem me-2"></i> Package &amp; Product Selection
+                                            <i className="fa-solid fa-gem me-2"></i> 3. Package &amp; Product Set Selection (Price)
                                         </h5>
-                                        <div className="row g-3 mb-4">
-                                            <div className="col-md-6 form-floating">
+                                        <div className="row g-3 mb-3">
+                                            <div className="col-12 form-floating">
                                                 <select
                                                     id="packageType"
-                                                    className="form-select bg-light"
+                                                    className={`form-select bg-light ${errors.packageType ? 'is-invalid' : ''}`}
                                                     value={data.packageType}
-                                                    onChange={(e) => setData('packageType', e.target.value)}
+                                                    onChange={(e) => handlePackageChange(e.target.value)}
                                                     required
                                                 >
-                                                    {packageOptions.map((pkg, i) => (
-                                                        <option key={i} value={pkg}>{pkg}</option>
+                                                    {data.packageType && !selectedPackage && (
+                                                        <option value={data.packageType}>{data.packageType} (Previously Saved Package)</option>
+                                                    )}
+                                                    {WORLD_PACKAGES.map((pkg) => (
+                                                        <option key={pkg.name} value={pkg.name}>
+                                                            {pkg.name.toUpperCase()} — {formatWorldPrice(pkg.prices[selectedCurrency], selectedCurrency)}
+                                                        </option>
                                                     ))}
                                                 </select>
-                                                <label htmlFor="packageType" className="ms-2">Package Level *</label>
-                                            </div>
-
-                                            <div className="col-md-6 form-floating">
-                                                <select
-                                                    id="productSet"
-                                                    className="form-select bg-light"
-                                                    value={data.productSet}
-                                                    onChange={(e) => setData('productSet', e.target.value)}
-                                                    required
-                                                >
-                                                    {productSets.map((ps, i) => (
-                                                        <option key={i} value={ps}>{ps}</option>
-                                                    ))}
-                                                </select>
-                                                <label htmlFor="productSet" className="ms-2">Product Set Inclusions *</label>
+                                                <label htmlFor="packageType" className="ms-2">Select World Plan Package *</label>
+                                                {errors.packageType && <div className="invalid-feedback">{errors.packageType}</div>}
                                             </div>
                                         </div>
+                                        {selectedPackage && (
+                                            <div className="rounded-4 border p-3 p-md-4 mb-4" style={{ background: '#f8fbfd', borderColor: '#dce6f0' }}>
+                                                <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                                                    <div>
+                                                        <div className="small text-muted fw-bold">{selectedCurrency} WORLD PLAN PACKAGE</div>
+                                                        <h5 className="fw-bold mb-0" style={{ color: '#10233d' }}>{selectedPackage.name.toUpperCase()}</h5>
+                                                    </div>
+                                                    <div className="text-end">
+                                                        <div className="fw-bold" style={{ color: '#10233d', fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
+                                                            {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}
+                                                        </div>
+                                                        <div className="small text-muted">Product Worth: <strong style={{ color: '#079e9d' }}>{formatWorldPrice(selectedPackage.worth[selectedCurrency], selectedCurrency)}</strong></div>
+                                                    </div>
+                                                </div>
+                                                {selectedPackage.rank && (
+                                                    <div className="mb-3">
+                                                        <span className="rounded-pill px-3 py-2 d-inline-block fw-bold" style={{ background: '#17243b', color: '#fbbf24', fontSize: 12 }}>
+                                                            ★ {selectedPackage.rank.toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="small fw-bold mb-2" style={{ color: '#64748b' }}>PACKAGE INCLUSIONS:</div>
+                                                <ul className="list-unstyled mb-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 18px' }}>
+                                                    {selectedInclusions.map((item, index) => (
+                                                        <li key={`${selectedCurrency}-${selectedPackage.name}-${index}`} style={{ color: '#334155', fontSize: 14 }}>
+                                                            <span style={{ color: '#10b981', marginRight: 8 }}>✓</span>{item}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                                <div className="small text-muted mt-3">
+                                                    Product set is automatically matched to your selected package and currency. These are fixed market prices, not currency conversions.
+                                                </div>
+                                                <input type="hidden" name="productSet" value={data.productSet} readOnly />
+                                                {errors.productSet && <div className="text-danger small mt-2">{errors.productSet}</div>}
+                                            </div>
+                                        )}
 
                                         {/* PAYMENT & RECEIPT */}
                                         <h5 className="fw-bold mb-3" style={{ color: 'var(--ch-teal)' }}>

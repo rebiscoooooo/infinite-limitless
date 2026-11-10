@@ -17,79 +17,87 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4 relative overflow-hidden bg-dot-matrix font-barlow">
+        <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-5 py-10 sm:py-12 text-slate-100" style={{ background: 'radial-gradient(ellipse at 50% 44%, #071c2c 0%, #031323 49%, #020d1b 100%)', fontFamily: "'Barlow', 'Inter', sans-serif" }}>
             <Head title="Admin Executive Portal Sign In | INFINITE" />
 
-            {/* Ambient Backlight Glows */}
-            <div className="absolute top-1/4 -left-20 w-96 h-96 bg-teal-500/15 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+            {/* Decorative corner ribbons — purely visual */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute -top-52 -left-56 h-[420px] w-[650px] rotate-[-31deg] rounded-[48%] border-b border-teal-400/70" style={{ background: 'linear-gradient(155deg, #073b42 10%, #008c89 51%, #012532 72%, transparent 90%)', boxShadow: '0 0 75px rgba(15,217,195,.18)' }} />
+                <div className="absolute -top-60 -left-28 h-[340px] w-[570px] rotate-[-33deg] rounded-[48%] border-b border-teal-300/25" style={{ background: 'linear-gradient(165deg, #02232e, #07525a 52%, #032536 83%)' }} />
+                <div className="absolute -bottom-56 -right-56 h-[430px] w-[720px] rotate-[-30deg] rounded-[48%] border-t border-teal-400/80" style={{ background: 'linear-gradient(155deg, transparent 8%, #033e48 38%, #006b6c 65%, #01202c 95%)', boxShadow: '0 0 90px rgba(15,217,195,.13)' }} />
+                <div className="absolute -bottom-64 -right-32 h-[370px] w-[650px] rotate-[-31deg] rounded-[48%] border-t border-teal-300/20" style={{ background: 'linear-gradient(150deg, transparent, #053c48 52%, #04202d)' }} />
+            </div>
 
-            <div className="w-full max-w-md relative z-10">
-                {/* Brand Header */}
-                <div className="text-center mb-8">
-                    <Link href="/" className="inline-flex flex-col items-center text-decoration-none group">
-                        <span className="font-bebas text-5xl font-black text-white tracking-widest leading-none drop-shadow-sm group-hover:scale-105 transition-transform">
-                            INFINITE<span className="text-teal-400">.</span>
+            <div className="relative z-10 w-full max-w-[672px]">
+                {/* Brand header */}
+                <div className="mb-9 text-center">
+                    <Link href="/" className="group inline-flex flex-col items-center no-underline">
+                        <svg aria-hidden="true" viewBox="0 0 120 55" className="mb-2 h-[48px] w-[105px] drop-shadow-[0_0_12px_rgba(39,220,192,.15)]">
+                            <defs>
+                                <linearGradient id="infiniteMark" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stopColor="#42efce" />
+                                    <stop offset="55%" stopColor="#15cbb7" />
+                                    <stop offset="100%" stopColor="#068b9e" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M60 27 C43 7 28 4 16 13 C1 24 11 44 27 43 C40 42 49 29 60 27 C72 24 81 12 94 12 C113 12 116 43 95 43 C82 43 72 31 60 27" fill="none" stroke="url(#infiniteMark)" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <span className="text-[clamp(44px,7vw,62px)] font-black tracking-[.045em] leading-none text-white" style={{ fontFamily: "'Barlow', 'Arial', sans-serif" }}>
+                            INFINITE<span className="text-[#25dec0]">.</span>
                         </span>
-                        <div className="flex items-center gap-2 mt-2">
-                            <span className="w-6 h-px bg-teal-500/50" />
-                            <span className="text-[10px] uppercase font-black tracking-[0.35em] text-teal-400">
+                        <div className="mt-4 flex items-center justify-center gap-5">
+                            <span className="h-px w-12 sm:w-16 bg-[#18cdbb]/70" />
+                            <span className="text-[11px] sm:text-[15px] tracking-[.32em] sm:tracking-[.42em] font-bold text-[#27dec9] whitespace-nowrap">
                                 EXECUTIVE PORTAL
                             </span>
-                            <span className="w-6 h-px bg-teal-500/50" />
+                            <span className="h-px w-12 sm:w-16 bg-[#18cdbb]/70" />
                         </div>
                     </Link>
                 </div>
 
-                {/* Login Card */}
-                <div className="rounded-3xl p-6 sm:p-8 bg-slate-900/90 border border-slate-800 shadow-2xl backdrop-blur-xl relative overflow-hidden">
-                    {/* Top Accent Strip */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500" />
-
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shrink-0">
-                            <Shield className="w-6 h-6" />
+                {/* Sign-in card */}
+                <div className="relative overflow-hidden rounded-[32px] border border-[#2c6973]/75 bg-[#061726]/85 px-6 py-7 shadow-[0_22px_75px_rgba(0,0,0,.3)] backdrop-blur-xl sm:px-[58px] sm:py-[32px]">
+                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                    <div className="mb-7 flex items-center gap-5">
+                        <div className="flex h-[78px] w-[78px] shrink-0 items-center justify-center rounded-[20px] border border-[#1b7079]/75 bg-[#082334] text-[#2ce3ce] shadow-[inset_0_0_18px_rgba(16,212,196,.05)]">
+                            <Shield className="h-11 w-11 stroke-[1.8]" />
                         </div>
                         <div>
-                            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">System Sign In</h2>
-                            <p className="text-xs text-slate-400">Authorized personnel credentials required.</p>
+                            <h2 className="text-[24px] sm:text-[30px] font-extrabold leading-tight tracking-tight text-white">System Sign In</h2>
+                            <p className="mt-1 text-sm sm:text-[17px] leading-snug text-slate-300">Authorized personnel credentials required.</p>
                         </div>
                     </div>
 
                     {errors.username && (
-                        <div className="mb-5 p-3.5 rounded-xl bg-rose-950/80 border border-rose-500/30 text-rose-200 text-xs flex items-center gap-3">
-                            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                        <div className="mb-5 flex items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-950/80 p-3.5 text-sm text-rose-200">
+                            <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
                             <span>{errors.username}</span>
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                Username
-                            </label>
+                            <label className="mb-2 block text-sm font-bold uppercase tracking-[.04em] text-slate-300">Username</label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                                    <User className="w-4 h-4" />
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5 text-slate-300">
+                                    <User className="h-6 w-6 stroke-[1.7]" />
                                 </div>
                                 <input
                                     type="text"
                                     required
                                     value={data.username}
                                     onChange={(e) => setData('username', e.target.value)}
-                                    placeholder="Enter username (e.g. admin)"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs sm:text-sm placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 transition-all"
+                                    placeholder="Enter username"
+                                    className="w-full rounded-2xl border border-[#597587] bg-[#10293a]/80 py-[15px] pl-[70px] pr-4 text-[17px] text-white placeholder-slate-400 outline-none transition-all focus:border-[#29e3cb] focus:ring-2 focus:ring-[#29e3cb]/20"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                Password
-                            </label>
+                            <label className="mb-2 block text-sm font-bold uppercase tracking-[.04em] text-slate-300">Password</label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                                    <Lock className="w-4 h-4" />
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5 text-slate-300">
+                                    <Lock className="h-6 w-6 stroke-[1.7]" />
                                 </div>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
@@ -97,54 +105,55 @@ export default function Login() {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full pl-10 pr-10 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs sm:text-sm placeholder-slate-500 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 transition-all"
+                                    className="w-full rounded-2xl border border-[#597587] bg-[#10293a]/80 py-[15px] pl-[70px] pr-14 text-[17px] text-white placeholder-slate-400 outline-none transition-all focus:border-[#29e3cb] focus:ring-2 focus:ring-[#29e3cb]/20"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 bg-transparent border-0"
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                    className="absolute inset-y-0 right-0 flex items-center border-0 bg-transparent pr-5 text-slate-300 transition-colors hover:text-[#2ce3ce]"
                                 >
-                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-xs pt-1">
-                            <label className="flex items-center gap-2 cursor-pointer text-slate-400 hover:text-slate-300 mb-0">
-                                <input
-                                    type="checkbox"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="rounded border-slate-700 bg-slate-950 text-teal-400 focus:ring-teal-400"
-                                />
-                                <span>Remember session</span>
-                            </label>
-                        </div>
+                        <label className="flex cursor-pointer items-center gap-3 pt-1 text-[15px] text-slate-100">
+                            <input
+                                type="checkbox"
+                                checked={data.remember}
+                                onChange={(e) => setData('remember', e.target.checked)}
+                                className="h-5 w-5 cursor-pointer rounded border-slate-500 bg-[#10293a] accent-[#2ce3c5] focus:ring-[#2ce3c5]"
+                            />
+                            <span>Remember session</span>
+                        </label>
 
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full mt-3 py-3 px-6 rounded-xl bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-300 hover:to-emerald-300 text-slate-950 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-teal-500/20 transition-all duration-200 disabled:opacity-60 border-0 active:scale-98"
+                            className="mt-2 flex w-full items-center justify-center gap-3 rounded-[17px] border-0 bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] px-6 py-[17px] text-base sm:text-[18px] font-extrabold uppercase text-[#031927] shadow-[0_10px_30px_rgba(23,210,183,.12)] transition-all hover:brightness-110 active:scale-[.99] disabled:cursor-wait disabled:opacity-60"
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <Loader2 className="h-5 w-5 animate-spin" />
                                     <span>Authenticating...</span>
                                 </>
                             ) : (
                                 <>
                                     <span>Enter Console</span>
-                                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                                    <ArrowRight className="h-6 w-6 stroke-[2.5]" />
                                 </>
                             )}
                         </button>
                     </form>
-                </div>
 
-                <div className="mt-8 text-center text-xs text-slate-500">
-                    <Link href="/" className="hover:text-teal-400 transition-colors text-decoration-none text-slate-400 inline-flex items-center gap-1.5 font-medium">
-                        &larr; Return to Public Website
-                    </Link>
+                    <div className="mt-7 flex items-center justify-center gap-4">
+                        <span className="h-px flex-1 bg-[#307381]/80" />
+                        <Link href="/" className="inline-flex shrink-0 items-center gap-2 text-[13px] sm:text-[15px] text-slate-200 no-underline transition-colors hover:text-[#27e0c7]">
+                            <span className="text-[#27e0c7]">←</span> Return to Public Website
+                        </Link>
+                        <span className="h-px flex-1 bg-[#307381]/80" />
+                    </div>
                 </div>
             </div>
         </div>
