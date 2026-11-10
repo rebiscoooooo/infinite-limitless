@@ -29,6 +29,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/barley', [ProductController::class, 'barley'])->name('products.barley');
 Route::get('/olamour', [ProductController::class, 'olamour'])->name('products.olamour');
 Route::get('/info', [CompanyController::class, 'legitimacy'])->name('company.info');
+Route::get('/company-profile', [CompanyController::class, 'profile'])->name('company.profile');
 Route::get('/select-country', [CountryController::class, 'index'])->name('country.select');
 Route::redirect('/SelectCountry', '/select-country');
 Route::get('/join-community/{country?}', [RegistrationController::class, 'showCommunity'])->name('community.show');

@@ -52,6 +52,15 @@ class InfiniteMigrationTest extends TestCase
                 ->has('proofs.certifications')
             );
 
+        $this->get('/company-profile')
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('CompanyProfile')
+                ->has('executiveTiers', 4)
+                ->has('proofs.receipts')
+                ->has('proofs.certifications')
+            );
+
         $this->get('/select-country')
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page->component('SelectCountry'));

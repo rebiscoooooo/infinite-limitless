@@ -1,23 +1,41 @@
 import React, { useEffect, useState } from 'react';
 
 export default function Preloader() {
-    const [hidden, setHidden] = useState(false);
+    // If already preloaded during this browser session, skip completely for instant navigation
+    const [hidden, setHidden] = useState(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                return !!sessionStorage.getItem('infinite_preloaded');
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    });
     const [fadeOut, setFadeOut] = useState(false);
 
     useEffect(() => {
+        if (hidden) return;
+
+        // Snappy initial cold-load intro: brief 250ms branded flash, then fade out smoothly
         const fadeTimer = setTimeout(() => {
             setFadeOut(true);
-        }, 1200);
+        }, 250);
 
         const removeTimer = setTimeout(() => {
             setHidden(true);
-        }, 1800);
+            try {
+                sessionStorage.setItem('infinite_preloaded', 'true');
+            } catch (e) {
+                // ignore
+            }
+        }, 600);
 
         return () => {
             clearTimeout(fadeTimer);
             clearTimeout(removeTimer);
         };
-    }, []);
+    }, [hidden]);
 
     if (hidden) return null;
 

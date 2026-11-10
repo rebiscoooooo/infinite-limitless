@@ -13,7 +13,6 @@ const toTitleCase = (str = '') =>
 
 export default function JoinCommunity({ country = {}, packages = {}, earningWays = [] }) {
     const [selectedPackageType, setSelectedPackageType] = useState('executive'); // 'executive' or 'regular'
-    const [selectedLeader, setSelectedLeader] = useState(null);
     const [activePkgModal, setActivePkgModal] = useState(null);
 
     const countryName = country?.name || 'Philippines';
@@ -51,27 +50,6 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
 
         return () => clearTimeout(timer);
     }, [currentPhrase, isDeleting, typewriterIndex, countryName]);
-
-    const leaderData = {
-        willy: {
-            name: 'Willy Q. Tee Ten',
-            role: 'Chairman WQT',
-            text: "Mr. Tee Ten, also known as WQT, is a respected Filipino business leader and President of AUTOHUB GROUP. With over 40 years of experience, he built one of the country's leading automotive empires, managing 22 multinational brands, more than 85 dealer branches, and over 2,000 employees nationwide. He also plays a major role in the automotive industry as President of the Philippine Automotive Dealers Association and the Electric Vehicle Association of the Philippines. Known for his achievements and leadership, he earned Top 2 in the 1985 Chemical Engineering Board Exams and received several prestigious awards and recognitions in the motoring and business industries.",
-            image: '/assets/image/Willy.png',
-        },
-        owee: {
-            name: 'Norwejann “Owee” Cruz',
-            role: 'President',
-            text: "Ms. Cruz is a skilled business leader and creative executive known for driving the success of INFINITE Group through her strong leadership and extensive industry experience. She currently serves as the Chief Marketing Officer and Head of Fleet Sales of AUTOHUB GROUP, General Manager of GAC's flagship store in BGC, Managing Director of ODV Creative Media Inc., and President of Two Scents International Corporation. With over 20 years of experience in marketing and public relations, she is recognized for her innovation, strategic leadership, and business growth expertise. She is also an alumna of the University of the Philippines, an internationally certified Color Analyst, and a respected BNI Elite Network Leader and Gold Club Member.",
-            image: '/assets/image/owee.png',
-        },
-        anne: {
-            name: 'Joanne Reyes',
-            role: 'Founder and Director',
-            text: 'Ms. Reyes is the youngest partner of INFINITE Group, recognized for her creative mindset, people-centered leadership, and passion for collaboration and innovation. She currently serves as the Treasurer of Cimplex Solutions, Inc. while pursuing her entrepreneurial and creative interests. With more than ten years of experience in network marketing and five years as a professional performer under the Viva Artist Agency, she has developed strong communication and leadership skills. She is also an alumna of the Philippine School of Interior Design and Mapúa University.',
-            image: '/assets/image/anne.png',
-        },
-    };
 
     const currentPackageList = packages[selectedPackageType] || [];
 
@@ -379,132 +357,6 @@ export default function JoinCommunity({ country = {}, packages = {}, earningWays
                                             <img src={f.img} alt={f.name} loading="lazy" />
                                         </div>
                                     ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* PILLARS OF LEADERSHIP */}
-            <section className="leadership-section">
-                <div className="leadership-wrapper">
-                    <div className="section-tag">LEADERSHIP</div>
-                    <h2 className="section-name" style={{ fontSize: 'clamp(1.85rem, 4.5vw, 3rem)' }}>
-                        OUR PILLARS OF LEADERSHIP.
-                    </h2>
-                    <p className="section-desc">
-                        INFINITE Group is guided by a formidable management team, blending decades of corporate executive expertise,
-                        entrepreneurial excellence, and long-term business vision.
-                    </p>
-
-                    <div className="leader-grid">
-                        <div className="leader-card">
-                            <div className="leader-image">
-                                <img src="/assets/image/Willy.png" alt="Willy Q. Tee Ten" loading="lazy" />
-                            </div>
-                            <div className="leader-content">
-                                <h3 className="leader-name">Willy Q. Tee Ten</h3>
-                                <div className="leader-role">Chairman WQT</div>
-                                <button type="button" className="learn-btn" onClick={() => setSelectedLeader('willy')}>
-                                    Learn More <i className="fas fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="leader-card">
-                            <div className="leader-image">
-                                <img src="/assets/image/owee.png" alt="Norwejann Owee Cruz" loading="lazy" />
-                            </div>
-                            <div className="leader-content">
-                                <h3 className="leader-name">Norwejann “Owee” Cruz</h3>
-                                <div className="leader-role">President</div>
-                                <button type="button" className="learn-btn" onClick={() => setSelectedLeader('owee')}>
-                                    Learn More <i className="fas fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="leader-card">
-                            <div className="leader-image">
-                                <img src="/assets/image/anne.png" alt="Joanne Reyes" loading="lazy" />
-                            </div>
-                            <div className="leader-content">
-                                <h3 className="leader-name">Joanne Reyes</h3>
-                                <div className="leader-role">Founder and Director</div>
-                                <button type="button" className="learn-btn" onClick={() => setSelectedLeader('anne')}>
-                                    Learn More <i className="fas fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* LEADER MODAL */}
-            {selectedLeader && (
-                <div
-                    className="custom-leader-modal active"
-                    id="leaderModal"
-                    onClick={(e) => {
-                        if (e.target.id === 'leaderModal') setSelectedLeader(null);
-                    }}
-                >
-                    <button type="button" className="close-btn" onClick={() => setSelectedLeader(null)} aria-label="Close modal">
-                        &times;
-                    </button>
-                    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-left">
-                            <h2>{leaderData[selectedLeader].name}</h2>
-                            <h4>{leaderData[selectedLeader].role}</h4>
-                            <p>{leaderData[selectedLeader].text}</p>
-                        </div>
-                        <div className="modal-right">
-                            <img src={leaderData[selectedLeader].image} alt={leaderData[selectedLeader].name} />
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* LEGAL & GOVERNMENT REGISTRATIONS */}
-            <section
-                className="section-pad bg-light"
-                id="registrations"
-                style={{ paddingTop: '80px', paddingBottom: '80px', background: 'var(--ch-bg-light)' }}
-            >
-                <div className="container">
-                    <div className="row justify-content-center mb-4 text-center px-2 px-sm-3">
-                        <div className="col-12 col-lg-8">
-                            <span className="section-tag" style={{ color: 'var(--ch-teal)' }}>
-                                REGISTRATIONS
-                            </span>
-                            <h2 className="section-title mb-3" style={{ color: 'var(--ch-dark-slate)' }}>
-                                Our Legal and Government{' '}
-                                <span className="highlight" style={{ color: 'var(--ch-teal)' }}>
-                                    Registrations
-                                </span>
-                            </h2>
-                            <p className="text-muted mt-3 mb-0" style={{ color: 'var(--ch-slate-muted)' }}>
-                                <i className="fas fa-shield-alt me-2" style={{ color: 'var(--ch-teal)' }}></i> Streamline taxes and legal
-                                readiness — Forward-thinking founders staying ahead of government regulations.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="row justify-content-center mb-4 mb-md-5 px-2 px-sm-3">
-                        <div className="col-12 col-lg-10 col-xl-8">
-                            <div className="position-relative">
-                                <img
-                                    src="/assets/image/30.png"
-                                    alt="Legal and Government Registrations"
-                                    className="img-fluid rounded-4 shadow-lg w-100"
-                                    style={{ objectFit: 'cover', maxHeight: '450px', border: '4px solid #fff' }}
-                                />
-                                <div
-                                    className="position-absolute top-0 start-0 translate-middle p-3 rounded-circle shadow-sm d-none d-md-flex align-items-center justify-content-center"
-                                    style={{ background: '#fff', border: '2px solid var(--ch-bg-light)', width: '60px', height: '60px' }}
-                                >
-                                    <i className="fas fa-certificate fs-3" style={{ color: 'var(--ch-teal)' }}></i>
                                 </div>
                             </div>
                         </div>

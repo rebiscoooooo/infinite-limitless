@@ -240,4 +240,59 @@
   color: #0f172a;
 }
 
+/* =========================================================
+   EXECUTIVE ADMIN PORTAL THEME & PALETTE SYSTEM
+   Transforms all admin views to match the system palette
+========================================================= */
+.admin-console .bg-slate-900\/90,
+.admin-console .bg-slate-900\/95,
+.admin-console .bg-slate-900 {
+  background-color: rgba(6, 23, 38, 0.92) !important;
+  border-color: rgba(27, 83, 97, 0.6) !important;
+}
+
+.admin-console .bg-slate-950,
+.admin-console .bg-slate-950\/60,
+.admin-console .bg-slate-950\/70,
+.admin-console .bg-slate-950\/80 {
+  background-color: rgba(8, 32, 51, 0.85) !important;
+  border-color: rgba(30, 78, 91, 0.65) !important;
+}
+
+.admin-console .border-slate-800,
+.admin-console .border-slate-800\/80 {
+  border-color: rgba(27, 83, 97, 0.55) !important;
+}
+
+.admin-console .border-slate-700,
+.admin-console .border-slate-700\/60 {
+  border-color: rgba(39, 100, 114, 0.65) !important;
+}
+
+.admin-console .bg-slate-800,
+.admin-console .bg-slate-800\/70,
+.admin-console .bg-slate-800\/80 {
+  background-color: rgba(12, 38, 56, 0.85) !important;
+}
+
+.admin-console .bg-slate-800:hover,
+.admin-console .hover\:bg-slate-700:hover {
+  background-color: rgba(18, 54, 78, 0.95) !important;
+}
+
+.admin-console .text-ch-teal {
+  color: #24dbc3 !important;
+}
+
+.admin-console .bg-ch-teal {
+  background-color: #24dbc3 !important;
+  color: #031927 !important;
+}
+
+.admin-console .focus\:border-ch-teal:focus {
+  border-color: #24dbc3 !important;
+  box-shadow: 0 0 0 2px rgba(36, 219, 195, 0.2) !important;
+}
+
+
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WorldPlanRegistration;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,102 +14,133 @@ class CompanyController extends Controller
      */
     public function legitimacy(): Response
     {
-        $approvedUsers = WorldPlanRegistration::where('status', 'Approved')
-            ->orderBy('id', 'asc')
-            ->get();
+        return Inertia::render('Info', [
+            'executiveTiers' => $this->getExecutiveTiers(),
+            'proofs' => $this->getProofs(),
+        ]);
+    }
 
-        $tierMembers = [
-            'diamond' => [],
-            'sapphire' => [],
-            'ruby' => [],
-            'pearl' => []
-        ];
+    /**
+     * Display the official company profile, pillars of leadership,
+     * legal government registrations, and global proof of legitimacy.
+     */
+    public function profile(): Response
+    {
+        return Inertia::render('CompanyProfile', [
+            'executiveTiers' => $this->getExecutiveTiers(),
+            'proofs' => $this->getProofs(),
+        ]);
+    }
 
-        foreach ($approvedUsers as $user) {
-            $fullName = strtoupper(trim($user->first_name . ' ' . $user->last_name));
-            $country = strtoupper(trim(explode(',', $user->address)[count(explode(',', $user->address)) - 1] ?? 'GLOBAL'));
-            $pkg = strtolower(trim($user->package_type));
+    /**
+     * Cached retrieval of verified executive council tiers.
+     */
+    protected function getExecutiveTiers(): array
+    {
+        return Cache::remember('public_executive_tiers_v2', 300, function () {
+            $approvedUsers = WorldPlanRegistration::where('status', 'Approved')
+                ->orderBy('id', 'asc')
+                ->get();
 
-            $memberData = [
-                'name' => $fullName,
-                'country' => $country,
-                'flag' => strtolower($country),
-                'img' => '/assets/image/placeholder-user.jpg',
-                'coming_soon' => false,
+            $tierMembers = [
+                'diamond' => [],
+                'sapphire' => [],
+                'ruby' => [],
+                'pearl' => []
             ];
 
-            if (str_contains($pkg, 'supreme') || str_contains($pkg, 'diamond')) {
-                $tierMembers['diamond'][] = $memberData;
-            } elseif (str_contains($pkg, 'pro') || str_contains($pkg, 'sapphire')) {
-                $tierMembers['sapphire'][] = $memberData;
-            } elseif (str_contains($pkg, 'advance') || str_contains($pkg, 'ruby')) {
-                $tierMembers['ruby'][] = $memberData;
-            } else {
-                $tierMembers['pearl'][] = $memberData;
-            }
-        }
+            foreach ($approvedUsers as $user) {
+                $fullName = strtoupper(trim($user->first_name . ' ' . $user->last_name));
+                $country = strtoupper(trim(explode(',', $user->address)[count(explode(',', $user->address)) - 1] ?? 'GLOBAL'));
+                $pkg = strtolower(trim($user->package_type));
 
-        $fillSlots = function ($members, $maxSlots) {
-            $filled = $members;
-            $currentCount = count($filled);
-            if ($currentCount < $maxSlots) {
-                for ($i = $currentCount; $i < $maxSlots; $i++) {
-                    $filled[] = [
-                        'name' => 'RESERVED SLOT',
-                        'country' => 'AVAILABLE',
-                        'flag' => '',
-                        'img' => '',
-                        'coming_soon' => true,
-                    ];
+                $memberData = [
+                    'name' => $fullName,
+                    'country' => $country,
+                    'flag' => strtolower($country),
+                    'img' => '/assets/image/placeholder-user.jpg',
+                    'coming_soon' => false,
+                ];
+
+                if (str_contains($pkg, 'supreme') || str_contains($pkg, 'diamond')) {
+                    $tierMembers['diamond'][] = $memberData;
+                } elseif (str_contains($pkg, 'pro') || str_contains($pkg, 'sapphire')) {
+                    $tierMembers['sapphire'][] = $memberData;
+                } elseif (str_contains($pkg, 'advance') || str_contains($pkg, 'ruby')) {
+                    $tierMembers['ruby'][] = $memberData;
+                } else {
+                    $tierMembers['pearl'][] = $memberData;
                 }
             }
-            return $filled;
-        };
 
-        $executiveTiers = [
-            [
-                'id' => 'diamond',
-                'theme_class' => 'diamond-theme',
-                'gem_img' => '/assets/image/diamond.png',
-                'rank_name' => 'DIAMOND EXECUTIVES',
-                'rank_sub' => 'HIGHEST LEADERSHIP COUNCIL',
-                'is_diamond_layout' => true,
-                'max_slots' => 3,
-                'leaders' => $fillSlots($tierMembers['diamond'], 3),
-            ],
-            [
-                'id' => 'sapphire',
-                'theme_class' => 'sapphire-theme',
-                'gem_img' => '/assets/image/sapphire.png',
-                'rank_name' => 'SAPPHIRE',
-                'rank_sub' => 'SENIOR EXECUTIVES',
-                'is_diamond_layout' => false,
-                'max_slots' => 4,
-                'leaders' => $fillSlots($tierMembers['sapphire'], 4),
-            ],
-            [
-                'id' => 'ruby',
-                'theme_class' => 'ruby-theme',
-                'gem_img' => '/assets/image/ruby.png',
-                'rank_name' => 'RUBY',
-                'rank_sub' => 'ADVANCED DIRECTORS',
-                'is_diamond_layout' => false,
-                'max_slots' => 4,
-                'leaders' => $fillSlots($tierMembers['ruby'], 4),
-            ],
-            [
-                'id' => 'pearl',
-                'theme_class' => 'pearl-theme',
-                'gem_img' => '/assets/image/pearl.png',
-                'rank_name' => 'PEARL',
-                'rank_sub' => 'REGIONAL LEADERS',
-                'is_diamond_layout' => false,
-                'max_slots' => 4,
-                'leaders' => $fillSlots($tierMembers['pearl'], 4),
-            ],
-        ];
+            $fillSlots = function ($members, $maxSlots) {
+                $filled = $members;
+                $currentCount = count($filled);
+                if ($currentCount < $maxSlots) {
+                    for ($i = $currentCount; $i < $maxSlots; $i++) {
+                        $filled[] = [
+                            'name' => 'RESERVED SLOT',
+                            'country' => 'AVAILABLE',
+                            'flag' => '',
+                            'img' => '',
+                            'coming_soon' => true,
+                        ];
+                    }
+                }
+                return $filled;
+            };
 
-        $proofs = [
+            return [
+                [
+                    'id' => 'diamond',
+                    'theme_class' => 'diamond-theme',
+                    'gem_img' => '/assets/image/diamond.png',
+                    'rank_name' => 'DIAMOND EXECUTIVES',
+                    'rank_sub' => 'HIGHEST LEADERSHIP COUNCIL',
+                    'is_diamond_layout' => true,
+                    'max_slots' => 3,
+                    'leaders' => $fillSlots($tierMembers['diamond'], 3),
+                ],
+                [
+                    'id' => 'sapphire',
+                    'theme_class' => 'sapphire-theme',
+                    'gem_img' => '/assets/image/sapphire.png',
+                    'rank_name' => 'SAPPHIRE',
+                    'rank_sub' => 'SENIOR EXECUTIVES',
+                    'is_diamond_layout' => false,
+                    'max_slots' => 4,
+                    'leaders' => $fillSlots($tierMembers['sapphire'], 4),
+                ],
+                [
+                    'id' => 'ruby',
+                    'theme_class' => 'ruby-theme',
+                    'gem_img' => '/assets/image/ruby.png',
+                    'rank_name' => 'RUBY',
+                    'rank_sub' => 'ADVANCED DIRECTORS',
+                    'is_diamond_layout' => false,
+                    'max_slots' => 4,
+                    'leaders' => $fillSlots($tierMembers['ruby'], 4),
+                ],
+                [
+                    'id' => 'pearl',
+                    'theme_class' => 'pearl-theme',
+                    'gem_img' => '/assets/image/pearl.png',
+                    'rank_name' => 'PEARL',
+                    'rank_sub' => 'REGIONAL LEADERS',
+                    'is_diamond_layout' => false,
+                    'max_slots' => 4,
+                    'leaders' => $fillSlots($tierMembers['pearl'], 4),
+                ],
+            ];
+        });
+    }
+
+    /**
+     * Static proof assets catalogue.
+     */
+    protected function getProofs(): array
+    {
+        return [
             'receipts' => [
                 ['title' => 'Bulk Customs Clearance Batch #A-489', 'img' => '/assets/image/product-received/1.jpg', 'date' => '2026-08'],
                 ['title' => 'West Africa Central Hub Inflow', 'img' => '/assets/image/product-received/2.jpg', 'date' => '2026-07'],
@@ -132,10 +164,5 @@ class CompanyController extends Controller
                 '/assets/image/gallery/4.jpg',
             ]
         ];
-
-        return Inertia::render('Info', [
-            'executiveTiers' => $executiveTiers,
-            'proofs' => $proofs,
-        ]);
     }
 }

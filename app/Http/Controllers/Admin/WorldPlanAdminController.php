@@ -9,6 +9,7 @@ use App\Models\WorldPlanRegistration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
@@ -88,6 +89,7 @@ class WorldPlanAdminController extends Controller
         }
 
         $registration->update($updateData);
+        Cache::forget('public_executive_tiers_v2');
 
         $mailSent = false;
         $mailError = null;
@@ -131,6 +133,7 @@ class WorldPlanAdminController extends Controller
     {
         $name = $registration->full_name;
         $registration->delete();
+        Cache::forget('public_executive_tiers_v2');
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',

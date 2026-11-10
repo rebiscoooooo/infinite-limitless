@@ -273,7 +273,7 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                             <p className="hero-desc mx-auto text-white mt-4" style={{ maxWidth: '800px', opacity: 0.9 }}>
                                 Building limitless opportunities through leadership, premium products, and global expansion.
                             </p>
-                            <Link href="/join-ph" className="btn btn-outline-light mt-4 fw-bold px-4 py-2" style={{ borderRadius: '50px' }}>
+                            <Link href="/select-country" className="btn btn-outline-light mt-4 fw-bold px-4 py-2" style={{ borderRadius: '50px' }}>
                                 <i className="bi bi-play-circle me-2"></i>
                                 <b>Learn More</b>
                             </Link>
@@ -516,7 +516,7 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                                     ) : null}
 
                                     <div className="card-img-wrapper text-center">
-                                        <img src={p.img} className="img-fluid" alt={p.title} />
+                                        <img src={p.img} className="img-fluid" alt={p.title} loading="lazy" decoding="async" />
                                     </div>
                                     <div className="card-body p-4 d-flex flex-column flex-grow-1">
                                         <h5 className="product-title">{p.title}</h5>
@@ -589,7 +589,7 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                         <p className="corporate-desc">
                             Discover the foundation of our success. Learn about our mission, explore our blogs, and verify our legitimacy as a globally recognized brand.
                         </p>
-                        <Link href="/info" className="corporate-btn">
+                        <Link href="/company-profile" className="corporate-btn">
                             Read Our Story <i className="fa-solid fa-arrow-right"></i>
                         </Link>
                     </div>
@@ -601,6 +601,8 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                             alt="Company Profile and Legitimacy"
                             className="corporate-img"
                             style={{ objectFit: 'cover', aspectRatio: '4/3' }}
+                            loading="lazy"
+                            decoding="async"
                         />
                     </div>
                 </div>
@@ -612,7 +614,7 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                     <div className="olamour-image-wrapper">
                         <div className="olamour-glow-orb"></div>
                         <div className="olamour-glass-panel"></div>
-                        <img src="/assets/image/banner(1).png" alt="Olamour Premium Skincare" className="olamour-img" />
+                        <img src="/assets/image/banner(1).png" alt="Olamour Premium Skincare" className="olamour-img" loading="lazy" decoding="async" />
                     </div>
                     <div className="olamour-content">
                         <span className="olamour-badge">
@@ -654,7 +656,7 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                     </div>
                     <div className="barley-image-wrapper">
                         <div className="barley-blob"></div>
-                        <img src="/assets/image/Barley.png" alt="Infinite Wellness" className="barley-img" />
+                        <img src="/assets/image/Barley.png" alt="Infinite Wellness" className="barley-img" loading="lazy" decoding="async" />
                     </div>
                 </div>
             </section>
