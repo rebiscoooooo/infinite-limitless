@@ -19,6 +19,11 @@ import {
     Archive,
     RotateCcw,
     ChevronRight,
+    ZoomIn,
+    ZoomOut,
+    RotateCw,
+    ExternalLink,
+    Image as ImageIcon,
 } from 'lucide-react';
 
 export default function WorldPlanRegistrations({
@@ -35,12 +40,22 @@ export default function WorldPlanRegistrations({
 
     // Modal States
     const [proofModalItem, setProofModalItem] = useState(null);
+    const [proofZoom, setProofZoom] = useState(1);
+    const [proofRotation, setProofRotation] = useState(0);
+    const [proofImgError, setProofImgError] = useState(false);
     const [detailsModalItem, setDetailsModalItem] = useState(null);
     const [approveModalItem, setApproveModalItem] = useState(null);
     const [rejectModalItem, setRejectModalItem] = useState(null);
     const [adminNotes, setAdminNotes] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
     const [processingAction, setProcessingAction] = useState(false);
+
+    const openProofModal = (item) => {
+        setProofZoom(1);
+        setProofRotation(0);
+        setProofImgError(false);
+        setProofModalItem(item);
+    };
 
     const regList = registrations.data || [];
 
@@ -568,15 +583,19 @@ export default function WorldPlanRegistrations({
                                                     <div className="text-[11px] text-slate-400">
                                                         {reg.payment_method} • {reg.payment_date}
                                                     </div>
-                                                    <div className="mt-1.5">
+                                                    <div className="mt-1.5 flex items-center gap-1.5">
                                                         {(reg.payment_proof_url || reg.payment_proof || reg.payment_receipt) ? (
                                                             <button
                                                                 type="button"
-                                                                onClick={() => setProofModalItem(reg)}
+                                                                onClick={() => openProofModal(reg)}
                                                                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-[11px] font-bold text-ch-teal border border-teal-500/30 transition-colors cursor-pointer"
                                                             >
-                                                                <Eye className="w-3 h-3" />
-                                                                <span>View Proof</span>
+                                                                {reg.is_pdf_receipt || reg.payment_proof?.toLowerCase().endsWith('.pdf') ? (
+                                                                    <FileText className="w-3 h-3 text-rose-400" />
+                                                                ) : (
+                                                                    <Eye className="w-3 h-3 text-ch-teal" />
+                                                                )}
+                                                                <span>{reg.is_pdf_receipt || reg.payment_proof?.toLowerCase().endsWith('.pdf') ? 'View PDF' : 'View Proof'}</span>
                                                             </button>
                                                         ) : (
                                                             <span className="text-slate-500 italic text-[11px]">No receipt file</span>
@@ -890,13 +909,58 @@ export default function WorldPlanRegistrations({
                             {/* Payment Receipt Preview */}
                             {(detailsModalItem.payment_proof_url || detailsModalItem.payment_proof) && (
                                 <div>
-                                    <div className="text-slate-400 font-semibold uppercase tracking-wider text-[10px] mb-2">Uploaded Bank Remittance Receipt</div>
-                                    <div className="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center">
-                                        <img
-                                            src={detailsModalItem.payment_proof_url}
-                                            alt="Proof of Payment"
-                                            className="max-h-60 mx-auto rounded-lg object-contain"
-                                        />
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                                            Uploaded Bank Remittance Receipt
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => openProofModal(detailsModalItem)}
+                                            className="text-teal-400 hover:text-teal-300 text-xs font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                        >
+                                            <Eye className="w-3.5 h-3.5" /> Expand &amp; Inspect
+                                        </button>
+                                    </div>
+                                    <div
+                                        onClick={() => openProofModal(detailsModalItem)}
+                                        className="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center cursor-pointer group hover:border-teal-500/50 transition-all relative overflow-hidden"
+                                    >
+                                        {detailsModalItem.is_pdf_receipt || detailsModalItem.payment_proof?.toLowerCase().endsWith('.pdf') ? (
+                                            <div className="p-6 flex flex-col items-center justify-center gap-2">
+                                                <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
+                                                    <FileText className="w-6 h-6" />
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-200">PDF Remittance Document</span>
+                                                <span className="text-[11px] text-slate-400 font-mono">{detailsModalItem.payment_proof}</span>
+                                                <span className="text-[11px] text-teal-400 font-semibold group-hover:underline mt-1">
+                                                    Click to view / open PDF in viewer &rarr;
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <img
+                                                    src={detailsModalItem.payment_proof_url}
+                                                    alt="Proof of Payment"
+                                                    className="max-h-60 mx-auto rounded-lg object-contain group-hover:opacity-85 transition-opacity"
+                                                />
+                                                <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">
+                                                    <span className="px-3 py-1.5 rounded-lg bg-teal-500 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg">
+                                                        <Eye className="w-3.5 h-3.5" /> Click to Zoom &amp; Inspect
+                                                    </span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between mt-1 text-[11px] text-slate-500">
+                                        <span>File: {detailsModalItem.payment_proof}</span>
+                                        <a
+                                            href={`/storage/payment_proofs/${detailsModalItem.payment_proof}/download`}
+                                            download
+                                            className="text-teal-400 hover:text-teal-300 font-medium inline-flex items-center gap-1 no-underline"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <Download className="w-3 h-3" /> Download File
+                                        </a>
                                     </div>
                                 </div>
                             )}
@@ -1051,52 +1115,189 @@ export default function WorldPlanRegistrations({
                 </div>
             )}
 
-            {/* MODAL 4: PROOF VIEWER */}
-            {proofModalItem && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in">
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl space-y-4">
-                        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                            <div>
-                                <span className="text-xs uppercase font-extrabold text-ch-teal tracking-wider block">Remittance Proof Preview</span>
-                                <span className="text-[11px] text-slate-400">Applicant: {proofModalItem.full_name} (@{proofModalItem.username})</span>
+            {/* MODAL 4: INTERACTIVE FUNCTIONAL PROOF VIEWER */}
+            {proofModalItem && (() => {
+                const isPdf = proofModalItem.is_pdf_receipt || proofModalItem.payment_proof?.toLowerCase().endsWith('.pdf');
+                const downloadUrl = `/storage/payment_proofs/${proofModalItem.payment_proof}/download`;
+                const directViewUrl = proofModalItem.payment_proof_url;
+
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in">
+                        <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[95vh] flex flex-col">
+                            {/* Header */}
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
+                                <div className="space-y-0.5">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs uppercase font-extrabold text-ch-teal tracking-wider">
+                                            Remittance Receipt Inspector
+                                        </span>
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                            isPdf ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-teal-500/20 text-teal-300 border border-teal-500/30'
+                                        }`}>
+                                            {isPdf ? 'PDF Document' : 'Image Photo'}
+                                        </span>
+                                    </div>
+                                    <div className="text-[12px] text-slate-300">
+                                        <span className="font-semibold">{proofModalItem.full_name}</span>
+                                        <span className="text-slate-500"> (@{proofModalItem.username})</span>
+                                        <span className="text-slate-600 mx-1.5">•</span>
+                                        <span className="text-teal-400 font-mono">{proofModalItem.amount_paid || 'Remittance'}</span>
+                                        {proofModalItem.payment_method && (
+                                            <>
+                                                <span className="text-slate-600 mx-1.5">•</span>
+                                                <span className="text-slate-400">{proofModalItem.payment_method}</span>
+                                            </>
+                                        )}
+                                        {proofModalItem.payment_date && (
+                                            <>
+                                                <span className="text-slate-600 mx-1.5">•</span>
+                                                <span className="text-slate-400">{proofModalItem.payment_date}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setProofModalItem(null)}
+                                    className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-xl border border-slate-700 cursor-pointer transition-colors"
+                                    title="Close viewer"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setProofModalItem(null)}
-                                className="text-slate-400 hover:text-white bg-slate-800 p-1.5 rounded-lg border border-slate-700 cursor-pointer"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
 
-                        <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <img
-                                src={proofModalItem.payment_proof_url}
-                                alt="Proof Preview"
-                                className="max-h-[60vh] mx-auto rounded-lg object-contain shadow-md"
-                            />
-                        </div>
+                            {/* Viewer Stage */}
+                            <div className="bg-slate-950 p-2 sm:p-4 rounded-xl border border-slate-800 text-center relative overflow-hidden flex-1 min-h-[350px] max-h-[65vh] flex items-center justify-center">
+                                {isPdf ? (
+                                    <div className="w-full h-full min-h-[500px] flex flex-col">
+                                        <iframe
+                                            src={directViewUrl}
+                                            title="Receipt PDF"
+                                            className="w-full h-full min-h-[480px] rounded-lg border-0 bg-white"
+                                        />
+                                    </div>
+                                ) : proofImgError ? (
+                                    <div className="p-8 text-center space-y-3">
+                                        <div className="w-12 h-12 mx-auto rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center">
+                                            <FileText className="w-6 h-6" />
+                                        </div>
+                                        <p className="text-sm font-semibold text-slate-300">Receipt Image Unavailable for Preview</p>
+                                        <p className="text-xs text-slate-500 font-mono">File: {proofModalItem.payment_proof}</p>
+                                        <div className="pt-2 flex justify-center gap-2">
+                                            <a
+                                                href={directViewUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/20 text-ch-teal text-xs font-bold hover:bg-teal-500/30 transition-colors no-underline"
+                                            >
+                                                <ExternalLink className="w-3.5 h-3.5" /> Try Direct Link
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onClick={() => setProofImgError(false)}
+                                                className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 border border-slate-700 cursor-pointer"
+                                            >
+                                                Retry Load
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="relative overflow-auto w-full h-full flex items-center justify-center max-h-[60vh] select-none">
+                                        <img
+                                            src={directViewUrl}
+                                            alt="Proof Preview"
+                                            onError={() => setProofImgError(true)}
+                                            style={{
+                                                transform: `scale(${proofZoom}) rotate(${proofRotation}deg)`,
+                                                transition: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
+                                            }}
+                                            className="max-h-[55vh] max-w-full rounded-lg object-contain shadow-2xl cursor-zoom-in"
+                                            onClick={() => setProofZoom((z) => (z >= 2.5 ? 1 : +(z + 0.5).toFixed(1)))}
+                                            title="Click to zoom in / reset"
+                                        />
+                                    </div>
+                                )}
+                            </div>
 
-                        <div className="flex items-center justify-between pt-2">
-                            <a
-                                href={proofModalItem.payment_proof_url}
-                                download
-                                target="_blank"
-                                rel="noreferrer"
-                                className="px-4 py-2 rounded-xl bg-ch-teal text-slate-950 font-bold text-xs flex items-center gap-1.5 text-decoration-none shadow"
-                            >
-                                <Download className="w-4 h-4" />
-                                <span>Download Original Receipt</span>
-                            </a>
-                            <button
-                                onClick={() => setProofModalItem(null)}
-                                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 cursor-pointer"
-                            >
-                                Close
-                            </button>
+                            {/* Functional Toolbar */}
+                            <div className="flex flex-wrap items-center justify-between gap-3 pt-2 shrink-0">
+                                {/* Left Controls (Zoom, Rotate, Reset, New Tab) */}
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    {!isPdf && !proofImgError && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                title="Zoom In"
+                                                onClick={() => setProofZoom((z) => Math.min(3, +(z + 0.25).toFixed(2)))}
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                            >
+                                                <ZoomIn className="w-3.5 h-3.5" />
+                                                <span className="text-[11px] font-mono">{Math.round(proofZoom * 100)}%</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                title="Zoom Out"
+                                                onClick={() => setProofZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))}
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                            >
+                                                <ZoomOut className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                title="Rotate 90 degrees clockwise"
+                                                onClick={() => setProofRotation((r) => (r + 90) % 360)}
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                            >
+                                                <RotateCw className="w-3.5 h-3.5" />
+                                                <span className="hidden sm:inline text-[11px]">Rotate {proofRotation ? `(${proofRotation}°)` : ''}</span>
+                                            </button>
+                                            {(proofZoom !== 1 || proofRotation !== 0) && (
+                                                <button
+                                                    type="button"
+                                                    title="Reset Zoom & Rotation"
+                                                    onClick={() => { setProofZoom(1); setProofRotation(0); }}
+                                                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-[11px] font-semibold cursor-pointer transition-colors"
+                                                >
+                                                    Reset
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
+                                    <a
+                                        href={directViewUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        title="Open file in separate browser tab"
+                                        className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1 cursor-pointer transition-colors no-underline"
+                                    >
+                                        <ExternalLink className="w-3.5 h-3.5" />
+                                        <span className="text-[11px]">Open New Tab</span>
+                                    </a>
+                                </div>
+
+                                {/* Right Actions (Download & Close) */}
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        href={downloadUrl}
+                                        download
+                                        className="px-4 py-2 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 no-underline shadow transition-colors cursor-pointer"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        <span>Download Receipt</span>
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => setProofModalItem(null)}
+                                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold border border-slate-700 cursor-pointer transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
         </AdminLayout>
     );
 }

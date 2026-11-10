@@ -60,7 +60,19 @@
 
             <!-- PRODUCT HERO IMAGE -->
             <div style="text-align: center; background: radial-gradient(circle, #f0fdfa 0%, #ffffff 80%); border-radius: 16px; padding: 25px 15px; margin: 15px 0 25px 0; border: 1px solid #ccfbf1;">
-                <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="max-width: 100%; height: auto; max-height: 280px; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.12));">
+                @php
+                    $displayImageSrc = $productImageUrl ?? $product->image_url;
+                    if (isset($message) && !empty($localImagePath) && file_exists($localImagePath)) {
+                        try {
+                            $displayImageSrc = $message->embed($localImagePath);
+                        } catch (\Throwable $e) {
+                            $displayImageSrc = $productImageUrl ?? $product->image_url;
+                        }
+                    }
+                @endphp
+                <a href="{{ $productUrl }}" target="_blank" style="text-decoration: none; display: inline-block;">
+                    <img src="{{ $displayImageSrc }}" alt="{{ $product->name }}" style="max-width: 100%; height: auto; max-height: 280px; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.12)); border: 0;">
+                </a>
                 @if($product->price_display)
                 <div style="margin-top: 15px;">
                     <span style="background-color: #0f172a; color: #5eead4; font-size: 16px; font-weight: 800; padding: 6px 20px; border-radius: 50px; display: inline-block;">
@@ -68,6 +80,11 @@
                     </span>
                 </div>
                 @endif
+                <div style="margin-top: 10px;">
+                    <span style="font-size: 11px; color: #0f766e; font-weight: 600; display: inline-block;">
+                        📎 Official High-Resolution Product Photo attached to this email
+                    </span>
+                </div>
             </div>
 
             <!-- SHORT DESCRIPTION -->

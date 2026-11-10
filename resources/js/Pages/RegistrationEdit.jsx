@@ -30,11 +30,26 @@ export default function RegistrationEdit({
     const isApproved = registration.status === 'Approved';
     const isRejected = registration.status === 'Rejected';
 
+    const [selectedFileInfo, setSelectedFileInfo] = useState(null);
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setData('paymentProof', file);
-        if (file && file.type.startsWith('image/')) {
-            setPreviewUrl(URL.createObjectURL(file));
+        if (file) {
+            setSelectedFileInfo({
+                name: file.name,
+                size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                isImage: file.type.startsWith('image/'),
+                isPdf: file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+            });
+            if (file.type.startsWith('image/')) {
+                setPreviewUrl(URL.createObjectURL(file));
+            } else {
+                setPreviewUrl(null);
+            }
+        } else {
+            setSelectedFileInfo(null);
+            setPreviewUrl(registration.payment_proof_url || null);
         }
     };
 
@@ -344,14 +359,76 @@ export default function RegistrationEdit({
                                                 </div>
                                                 {errors.paymentProof && <div className="invalid-feedback d-block">{errors.paymentProof}</div>}
 
-                                                {previewUrl && (
-                                                    <div className="mt-3 p-3 bg-light rounded-3 border text-center">
-                                                        <p className="small text-muted mb-2">Current / New Receipt Preview:</p>
-                                                        <img
-                                                            src={previewUrl}
-                                                            alt="Payment proof preview"
-                                                            style={{ maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
-                                                        />
+                                                {/* Newly Selected File Preview */}
+                                                {selectedFileInfo && (
+                                                    <div className="mt-3 p-3 bg-light text-dark rounded-3 border">
+                                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                                            <span className="small fw-bold text-success">✓ New Receipt Selected</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-link text-danger p-0 text-decoration-none"
+                                                                onClick={() => {
+                                                                    setData('paymentProof', null);
+                                                                    setSelectedFileInfo(null);
+                                                                    setPreviewUrl(registration.payment_proof_url || null);
+                                                                    const el = document.getElementById('paymentProof');
+                                                                    if (el) el.value = '';
+                                                                }}
+                                                            >
+                                                                ✕ Clear Selection
+                                                            </button>
+                                                        </div>
+                                                        {selectedFileInfo.isImage && previewUrl && (
+                                                            <div className="text-center p-2 bg-white rounded border my-2">
+                                                                <img
+                                                                    src={previewUrl}
+                                                                    alt="New Payment proof preview"
+                                                                    style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {selectedFileInfo.isPdf && (
+                                                            <div className="d-flex align-items-center gap-2 p-2 bg-white rounded border my-2">
+                                                                <span style={{ fontSize: '24px' }}>📄</span>
+                                                                <div className="small">
+                                                                    <strong>{selectedFileInfo.name}</strong> ({selectedFileInfo.size})
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Existing Uploaded Receipt */}
+                                                {!selectedFileInfo && registration.payment_proof && (
+                                                    <div className="mt-3 p-3 bg-light text-dark rounded-3 border">
+                                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                                            <span className="small fw-bold text-muted">Currently Uploaded Receipt:</span>
+                                                            <a
+                                                                href={registration.payment_proof_url}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="small fw-bold text-teal text-decoration-none"
+                                                            >
+                                                                Open in New Tab &rarr;
+                                                            </a>
+                                                        </div>
+                                                        {registration.is_pdf_receipt || registration.payment_proof?.toLowerCase().endsWith('.pdf') ? (
+                                                            <div className="d-flex align-items-center gap-3 p-3 bg-white rounded border text-start">
+                                                                <div style={{ fontSize: '28px', color: '#dc2626' }}>📄</div>
+                                                                <div>
+                                                                    <div className="fw-bold small">{registration.payment_proof}</div>
+                                                                    <div className="text-muted" style={{ fontSize: '11px' }}>PDF Document Receipt</div>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-center p-2 bg-white rounded border">
+                                                                <img
+                                                                    src={registration.payment_proof_url}
+                                                                    alt="Current Payment Proof"
+                                                                    style={{ maxHeight: '220px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                                                                />
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

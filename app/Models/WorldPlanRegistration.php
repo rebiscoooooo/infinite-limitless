@@ -54,6 +54,8 @@ class WorldPlanRegistration extends Model
         'full_name',
         'payment_proof_url',
         'payment_receipt',
+        'is_pdf_receipt',
+        'receipt_exists',
         'edit_url',
         'is_archived',
     ];
@@ -117,11 +119,39 @@ class WorldPlanRegistration extends Model
             return $this->payment_proof;
         }
 
-        if (str_starts_with($this->payment_proof, 'payment_proofs/')) {
-            return '/storage/' . $this->payment_proof;
+        $clean = basename($this->payment_proof);
+
+        return '/storage/payment_proofs/' . $clean;
+    }
+
+    /**
+     * Determine if the uploaded receipt is a PDF document.
+     */
+    public function getIsPdfReceiptAttribute(): bool
+    {
+        if (empty($this->payment_proof)) {
+            return false;
         }
 
-        return '/storage/payment_proofs/' . $this->payment_proof;
+        $clean = strtolower(basename($this->payment_proof));
+        return str_ends_with($clean, '.pdf');
+    }
+
+    /**
+     * Determine if the receipt file actually exists on the filesystem.
+     */
+    public function getReceiptExistsAttribute(): bool
+    {
+        if (empty($this->payment_proof)) {
+            return false;
+        }
+
+        $clean = basename($this->payment_proof);
+
+        return file_exists(storage_path('app/public/payment_proofs/' . $clean))
+            || file_exists(public_path('storage/payment_proofs/' . $clean))
+            || file_exists(public_path('uploads/payments/' . $clean))
+            || file_exists(base_path('uploads/payments/' . $clean));
     }
 
     /**

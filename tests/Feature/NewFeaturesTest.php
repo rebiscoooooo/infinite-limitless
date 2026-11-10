@@ -343,4 +343,106 @@ class NewFeaturesTest extends TestCase
         $this->from('/admin/activity-logs')->post('/admin/activity-logs/bulk-delete', ['ids' => [$log->id]])->assertRedirect('/admin/activity-logs');
         $this->assertDatabaseMissing('activity_logs', ['id' => $log->id]);
     }
+
+    /**
+     * Test receipt serving, streaming, and download routes.
+     */
+    public function test_receipt_serving_and_download_endpoints(): void
+    {
+        $dir = storage_path('app/public/payment_proofs');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $testFile = 'unit_test_receipt_' . uniqid() . '.jpg';
+        $testPath = $dir . '/' . $testFile;
+        file_put_contents($testPath, 'fake_image_binary_content');
+
+        try {
+            // View endpoint
+            $viewResp = $this->get('/storage/payment_proofs/' . $testFile);
+            $viewResp->assertStatus(200);
+            $viewResp->assertHeader('Content-Disposition', 'inline; filename="' . $testFile . '"');
+
+            // Download endpoint
+            $dlResp = $this->get('/storage/payment_proofs/' . $testFile . '/download');
+            $dlResp->assertStatus(200);
+
+            // Alternate alias endpoint
+            $aliasResp = $this->get('/receipts/' . $testFile);
+            $aliasResp->assertStatus(200);
+
+            // Missing file fallback
+            $missingResp = $this->get('/storage/payment_proofs/missing_receipt_12345.jpg');
+            $missingResp->assertStatus(404);
+            $missingResp->assertHeader('Content-Type', 'image/svg+xml');
+        } finally {
+            if (file_exists($testPath)) {
+                unlink($testPath);
+            }
+        }
+    }
+
+    /**
+     * Test product marketing mail includes photo attachment and viewable public image.
+     */
+    public function test_product_marketing_mail_includes_photo_attachment_and_public_image(): void
+    {
+        $product = Product::updateOrCreate(
+            ['slug' => 'test-barley-spotlight'],
+            [
+                'name' => 'INFINITE Barley Spotlight',
+                'category' => 'barley',
+                'short_description' => 'Spotlight test item',
+                'description' => 'Rich organic nutrients.',
+                'image' => '/assets/image/product/INFINITE_BARLEY_Pure_Organic_Barley_Powder.png',
+                'is_active' => true,
+            ]
+        );
+
+        $this->assertNotNull($product->local_image_path);
+        $this->assertFileExists($product->local_image_path);
+        $this->assertStringStartsWith('https://infinite-limitless.com', $product->public_image_url);
+
+        $mail = new ProductMarketingMail(
+            $product,
+            'recipient@example.com',
+            'https://infinite-limitless.com/unsubscribe?token=abc'
+        );
+
+        // Verify attachment
+        $attachments = $mail->attachments();
+        $this->assertNotEmpty($attachments);
+
+        // Verify content definition
+        $content = $mail->content();
+        $this->assertEquals('emails.product_marketing', $content->view);
+        $this->assertNotNull($content->with['localImagePath']);
+        $this->assertNotNull($content->with['productImageUrl']);
+
+        // Verify Blade renders with photo
+        $rendered = $mail->render();
+        $this->assertStringContainsString('INFINITE Barley Spotlight', $rendered);
+        $this->assertStringContainsString('Official High-Resolution Product Photo attached', $rendered);
+    }
+
+    /**
+     * Test WorldPlanRegistration receipt attributes and PDF detection.
+     */
+    public function test_world_plan_registration_receipt_attributes(): void
+    {
+        $pdfReg = new WorldPlanRegistration([
+            'payment_proof' => 'sample_remittance.pdf',
+        ]);
+
+        $this->assertTrue($pdfReg->is_pdf_receipt);
+        $this->assertEquals('/storage/payment_proofs/sample_remittance.pdf', $pdfReg->payment_proof_url);
+
+        $imgReg = new WorldPlanRegistration([
+            'payment_proof' => 'payment_proofs/nested_receipt.png',
+        ]);
+
+        $this->assertFalse($imgReg->is_pdf_receipt);
+        $this->assertEquals('/storage/payment_proofs/nested_receipt.png', $imgReg->payment_proof_url);
+    }
 }

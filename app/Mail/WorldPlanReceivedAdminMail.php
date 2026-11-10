@@ -38,12 +38,52 @@ class WorldPlanReceivedAdminMail extends Mailable implements ShouldQueue
     }
 
     /**
+     * Get candidate path on filesystem for payment proof.
+     */
+    protected function resolveReceiptPath(): ?string
+    {
+        if (empty($this->registration->payment_proof)) {
+            return null;
+        }
+
+        $clean = basename($this->registration->payment_proof);
+        $candidates = [
+            storage_path('app/public/payment_proofs/' . $clean),
+            public_path('storage/payment_proofs/' . $clean),
+            public_path('uploads/payments/' . $clean),
+            base_path('uploads/payments/' . $clean),
+            storage_path('app/public/' . $clean),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (file_exists($candidate) && is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get the message content definition.
      */
     public function content(): Content
     {
+        $receiptPath = $this->resolveReceiptPath();
+        $isImageReceipt = false;
+        if ($receiptPath) {
+            $ext = strtolower(pathinfo($receiptPath, PATHINFO_EXTENSION));
+            $isImageReceipt = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+        }
+
         return new Content(
             view: 'emails.world_plan_admin',
+            with: [
+                'registration' => $this->registration,
+                'receiptPath' => $receiptPath,
+                'isImageReceipt' => $isImageReceipt,
+                'receiptViewUrl' => $this->registration->payment_proof_url,
+            ]
         );
     }
 
@@ -55,12 +95,17 @@ class WorldPlanReceivedAdminMail extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         $attachments = [];
-        if (!empty($this->registration->payment_proof)) {
-            $path = storage_path('app/public/payment_proofs/' . $this->registration->payment_proof);
-            if (file_exists($path)) {
-                $attachments[] = Attachment::fromPath($path);
-            }
+        $receiptPath = $this->resolveReceiptPath();
+
+        if ($receiptPath) {
+            $clean = basename($this->registration->payment_proof);
+            $ext = pathinfo($receiptPath, PATHINFO_EXTENSION);
+            $filename = 'receipt-' . ($this->registration->username ?: 'applicant') . '.' . $ext;
+
+            $attachments[] = Attachment::fromPath($receiptPath)
+                ->as($filename);
         }
+
         return $attachments;
     }
 }

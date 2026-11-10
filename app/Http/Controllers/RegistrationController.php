@@ -137,11 +137,19 @@ class RegistrationController extends Controller
         $proofPath = '';
         if ($request->hasFile('paymentProof')) {
             $file = $request->file('paymentProof');
-            $extension = $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
             $fileName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
             
             // Store directly in storage/app/public/payment_proofs
             $file->storeAs('payment_proofs', $fileName, 'public');
+
+            // Mirror to public/storage/payment_proofs for direct web server access
+            $publicDir = public_path('storage/payment_proofs');
+            if (!is_dir($publicDir)) {
+                @mkdir($publicDir, 0755, true);
+            }
+            @copy(storage_path('app/public/payment_proofs/' . $fileName), $publicDir . '/' . $fileName);
+
             $proofPath = $fileName;
         }
 
@@ -287,9 +295,16 @@ class RegistrationController extends Controller
 
         if ($request->hasFile('paymentProof')) {
             $file = $request->file('paymentProof');
-            $extension = $file->getClientOriginalExtension();
+            $extension = strtolower($file->getClientOriginalExtension());
             $fileName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
             $file->storeAs('payment_proofs', $fileName, 'public');
+
+            $publicDir = public_path('storage/payment_proofs');
+            if (!is_dir($publicDir)) {
+                @mkdir($publicDir, 0755, true);
+            }
+            @copy(storage_path('app/public/payment_proofs/' . $fileName), $publicDir . '/' . $fileName);
+
             $updateData['payment_proof'] = $fileName;
         }
 

@@ -42,9 +42,14 @@
 
             @if ($registration->payment_proof)
                 <div style="background-color: #f0fdfa; border-left: 4px solid #14b8a6; padding: 15px 20px; margin-bottom: 25px; border-radius: 0 8px 8px 0;">
-                    <p style="margin: 0; font-size: 14px; color: #0f766e;">
-                        <strong>Payment Proof Attached:</strong> The applicant's receipt file ({{ $registration->payment_proof }}) is attached to this email and available in the admin portal.
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #0f766e;">
+                        <strong>Payment Proof Attached:</strong> The applicant's receipt file ({{ $registration->payment_proof }}) is attached to this email and accessible in the admin portal.
                     </p>
+                    @if(!empty($receiptPath) && !empty($isImageReceipt) && isset($message))
+                        <div style="text-align: center; margin: 15px 0 10px 0; background: #ffffff; padding: 12px; border-radius: 8px; border: 1px solid #ccfbf1;">
+                            <img src="{{ $message->embed($receiptPath) }}" alt="Payment Receipt" style="max-width: 100%; max-height: 320px; border-radius: 6px; object-fit: contain;">
+                        </div>
+                    @endif
                 </div>
             @endif
             

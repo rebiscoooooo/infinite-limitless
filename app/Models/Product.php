@@ -56,13 +56,15 @@ class Product extends Model
 
     protected $appends = [
         'image_url',
+        'public_image_url',
+        'local_image_path',
         'is_archived',
     ];
 
     public function getImageUrlAttribute(): string
     {
         if (empty($this->image)) {
-            return asset('assets/image/products/barley.png');
+            return asset('assets/image/Barley.png');
         }
 
         if (Str::startsWith($this->image, ['http://', 'https://'])) {
@@ -77,19 +79,87 @@ class Product extends Model
             return asset(ltrim($this->image, '/'));
         }
 
-        if (file_exists(public_path('storage/products/' . $this->image))) {
-            return asset('storage/products/' . $this->image);
+        $clean = ltrim($this->image, '/');
+
+        if (file_exists(public_path('assets/image/product/' . $clean))) {
+            return asset('assets/image/product/' . $clean);
         }
 
-        if (file_exists(public_path('assets/image/products/' . $this->image))) {
-            return asset('assets/image/products/' . $this->image);
+        if (file_exists(public_path('assets/image/' . $clean))) {
+            return asset('assets/image/' . $clean);
         }
 
-        if (file_exists(public_path('assets/image/' . $this->image))) {
-            return asset('assets/image/' . $this->image);
+        if (file_exists(public_path('storage/products/' . $clean))) {
+            return asset('storage/products/' . $clean);
         }
 
-        return asset('assets/image/products/' . ltrim($this->image, '/'));
+        if (file_exists(public_path('assets/image/products/' . $clean))) {
+            return asset('assets/image/products/' . $clean);
+        }
+
+        return asset('assets/image/product/' . $clean);
+    }
+
+    /**
+     * Get the absolute local filesystem path for the product image (used for attachments & CID embedding).
+     */
+    public function getLocalImagePathAttribute(): ?string
+    {
+        if (empty($this->image)) {
+            $default = public_path('assets/image/Barley.png');
+            return file_exists($default) ? $default : null;
+        }
+
+        if (Str::startsWith($this->image, ['http://', 'https://'])) {
+            return null;
+        }
+
+        $clean = ltrim($this->image, '/');
+
+        if (file_exists(public_path($clean))) {
+            return public_path($clean);
+        }
+
+        $basename = basename($clean);
+
+        if (file_exists(public_path('assets/image/product/' . $basename))) {
+            return public_path('assets/image/product/' . $basename);
+        }
+
+        if (file_exists(public_path('assets/image/' . $basename))) {
+            return public_path('assets/image/' . $basename);
+        }
+
+        if (file_exists(public_path('storage/products/' . $basename))) {
+            return public_path('storage/products/' . $basename);
+        }
+
+        if (file_exists(storage_path('app/public/products/' . $basename))) {
+            return storage_path('app/public/products/' . $basename);
+        }
+
+        $default = public_path('assets/image/Barley.png');
+        return file_exists($default) ? $default : null;
+    }
+
+    /**
+     * Get guaranteed publicly accessible external URL for emails / marketing.
+     */
+    public function getPublicImageUrlAttribute(): string
+    {
+        $url = $this->image_url;
+
+        // Convert localhost / 127.0.0.1 to production live domain
+        if (preg_match('#^https?://(127\.0\.0\.1|localhost)(:\d+)?(/.*)?$#i', $url, $m)) {
+            $path = $m[3] ?? '';
+            return 'https://infinite-limitless.com' . $path;
+        }
+
+        if (Str::startsWith($url, '/')) {
+            return 'https://infinite-limitless.com' . $url;
+        }
+
+        return $url;
     }
 
     public function getIsArchivedAttribute(): bool

@@ -4,11 +4,13 @@ namespace App\Mail;
 
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class ProductMarketingMail extends Mailable
 {
@@ -51,23 +53,46 @@ class ProductMarketingMail extends Mailable
      */
     public function content(): Content
     {
+        $productUrl = 'https://infinite-limitless.com/#menu';
+        $appUrl = config('app.url');
+        if (!empty($appUrl) && !str_contains($appUrl, '127.0.0.1') && !str_contains($appUrl, 'localhost')) {
+            $productUrl = url('/#menu');
+        }
+
         return new Content(
             view: 'emails.product_marketing',
             with: [
                 'product' => $this->product,
                 'recipientEmail' => $this->recipientEmail,
                 'unsubscribeUrl' => $this->unsubscribeUrl,
-                'productUrl' => url('/#menu'),
+                'productUrl' => $productUrl,
+                'productImageUrl' => $this->product->public_image_url,
+                'localImagePath' => $this->product->local_image_path,
             ]
         );
     }
 
     /**
      * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Attachment>
      */
     public function attachments(): array
     {
-        return [];
+        $attachments = [];
+        $localPath = $this->product->local_image_path;
+
+        if ($localPath && file_exists($localPath)) {
+            $ext = pathinfo($localPath, PATHINFO_EXTENSION) ?: 'png';
+            $filename = Str::slug($this->product->name) . '.' . $ext;
+            $mime = mime_content_type($localPath) ?: 'image/png';
+
+            $attachments[] = Attachment::fromPath($localPath)
+                ->as($filename)
+                ->withMime($mime);
+        }
+
+        return $attachments;
     }
 }
 

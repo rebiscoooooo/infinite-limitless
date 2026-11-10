@@ -84,12 +84,25 @@ export default function Registration({
         }));
     };
 
+    const [selectedFileInfo, setSelectedFileInfo] = useState(null);
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         setData('paymentProof', file);
-        if (file && file.type.startsWith('image/')) {
-            setPreviewUrl(URL.createObjectURL(file));
+        if (file) {
+            setSelectedFileInfo({
+                name: file.name,
+                size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+                isImage: file.type.startsWith('image/'),
+                isPdf: file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'),
+            });
+            if (file.type.startsWith('image/')) {
+                setPreviewUrl(URL.createObjectURL(file));
+            } else {
+                setPreviewUrl(null);
+            }
         } else {
+            setSelectedFileInfo(null);
             setPreviewUrl(null);
         }
     };
@@ -671,15 +684,52 @@ export default function Registration({
                                                 </div>
                                                 {errors.paymentProof && <div className="invalid-feedback d-block">{errors.paymentProof}</div>}
 
-                                                {/* Live Image Preview */}
-                                                {previewUrl && (
-                                                    <div className="mt-3 p-3 bg-light rounded-3 border text-center">
-                                                        <p className="small text-muted mb-2">Receipt Preview:</p>
-                                                        <img
-                                                            src={previewUrl}
-                                                            alt="Receipt preview"
-                                                            style={{ maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
-                                                        />
+                                                {/* Live Receipt Preview */}
+                                                {selectedFileInfo && (
+                                                    <div className="mt-3 p-3 bg-light rounded-3 border">
+                                                        <div className="d-flex align-items-center justify-content-between mb-2">
+                                                            <span className="small fw-bold text-muted">Receipt Document Attached:</span>
+                                                            <span className="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                                ✓ Ready for upload
+                                                            </span>
+                                                        </div>
+
+                                                        {selectedFileInfo.isImage && previewUrl && (
+                                                            <div className="text-center my-2 p-2 bg-white rounded-3 border">
+                                                                <img
+                                                                    src={previewUrl}
+                                                                    alt="Receipt preview"
+                                                                    style={{ maxHeight: '240px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        {selectedFileInfo.isPdf && (
+                                                            <div className="d-flex align-items-center gap-3 p-3 bg-white rounded-3 border my-2">
+                                                                <div style={{ fontSize: '26px' }}>📄</div>
+                                                                <div>
+                                                                    <div className="fw-bold text-dark small">{selectedFileInfo.name}</div>
+                                                                    <div className="text-muted" style={{ fontSize: '11px' }}>PDF Document • {selectedFileInfo.size}</div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style={{ fontSize: '11.5px', color: '#64748b' }}>
+                                                            <span>{selectedFileInfo.name} ({selectedFileInfo.size})</span>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm btn-link text-danger p-0 text-decoration-none"
+                                                                onClick={() => {
+                                                                    setData('paymentProof', null);
+                                                                    setSelectedFileInfo(null);
+                                                                    setPreviewUrl(null);
+                                                                    const el = document.getElementById('paymentProof');
+                                                                    if (el) el.value = '';
+                                                                }}
+                                                            >
+                                                                ✕ Remove
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>

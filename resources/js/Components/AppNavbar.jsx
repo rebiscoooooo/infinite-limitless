@@ -255,7 +255,7 @@ export default function AppNavbar() {
                         <li className="nav-item d-lg-none mt-3 pt-3 border-top border-secondary border-opacity-25">
                             <Link
                                 className="nav-link py-2.5 px-4 text-center rounded-pill text-white text-decoration-none shadow-sm"
-                                href="/join-ph"
+                                href="/SelectCountry"
                                 onClick={closeMenu}
                                 style={{ background: 'var(--ch-teal, #14b8a6)', fontWeight: 700 }}
                             >

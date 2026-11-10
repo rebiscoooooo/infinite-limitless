@@ -46,6 +46,12 @@ Route::post('/register-world-plan', [RegistrationController::class, 'store'])->n
 // Marketing Unsubscribe
 Route::get('/unsubscribe', [MarketingController::class, 'unsubscribe'])->name('marketing.unsubscribe');
 
+// Payment Receipt / Proof Serving & Download Routes
+Route::get('/storage/payment_proofs/{filename}', [WorldPlanAdminController::class, 'viewReceipt'])->name('receipt.view');
+Route::get('/storage/payment_proofs/{filename}/download', [WorldPlanAdminController::class, 'downloadReceipt'])->name('receipt.download');
+Route::get('/receipts/{filename}', [WorldPlanAdminController::class, 'viewReceipt']);
+Route::get('/receipts/{filename}/download', [WorldPlanAdminController::class, 'downloadReceipt']);
+
 // Realtime Engine Routes
 Route::get('/realtime/pulse', [RealtimeController::class, 'pulse'])->name('realtime.pulse');
 Route::get('/realtime/stream', [RealtimeController::class, 'stream'])->name('realtime.stream');

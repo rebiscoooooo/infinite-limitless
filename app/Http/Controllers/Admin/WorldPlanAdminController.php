@@ -209,4 +209,73 @@ class WorldPlanAdminController extends Controller
 
         return back()->with('success', "Permanently deleted {$count} registration(s) from database.");
     }
+
+    /**
+     * Safely view an uploaded receipt/payment proof document or image.
+     */
+    public function viewReceipt(string $filename)
+    {
+        $clean = basename($filename);
+
+        $candidates = [
+            storage_path('app/public/payment_proofs/' . $clean),
+            public_path('storage/payment_proofs/' . $clean),
+            public_path('uploads/payments/' . $clean),
+            base_path('uploads/payments/' . $clean),
+            storage_path('app/public/' . $clean),
+        ];
+
+        $filePath = null;
+        foreach ($candidates as $candidate) {
+            if (file_exists($candidate) && is_file($candidate)) {
+                $filePath = $candidate;
+                break;
+            }
+        }
+
+        if (!$filePath) {
+            $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="350" viewBox="0 0 600 350" fill="none">
+                <rect width="600" height="350" fill="#0b1120"/>
+                <rect x="20" y="20" width="560" height="310" rx="16" fill="#0f172a" stroke="#1e293b" stroke-width="2"/>
+                <circle cx="300" cy="130" r="40" fill="#1e293b"/>
+                <path d="M285 115l30 30m0-30l-30 30" stroke="#f43f5e" stroke-width="3.5" stroke-linecap="round"/>
+                <text x="300" y="210" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="17" font-weight="700" text-anchor="middle">Receipt File Not Found On Server</text>
+                <text x="300" y="240" fill="#64748b" font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">Missing: ' . htmlspecialchars($clean, ENT_QUOTES, 'UTF-8') . '</text>
+                <text x="300" y="270" fill="#14b8a6" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Please request the applicant to re-upload via their edit link</text>
+            </svg>';
+            return response($svg, 404, ['Content-Type' => 'image/svg+xml']);
+        }
+
+        $mime = mime_content_type($filePath) ?: 'application/octet-stream';
+
+        return response()->file($filePath, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => 'inline; filename="' . $clean . '"',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
+    /**
+     * Download the receipt file directly.
+     */
+    public function downloadReceipt(string $filename)
+    {
+        $clean = basename($filename);
+
+        $candidates = [
+            storage_path('app/public/payment_proofs/' . $clean),
+            public_path('storage/payment_proofs/' . $clean),
+            public_path('uploads/payments/' . $clean),
+            base_path('uploads/payments/' . $clean),
+            storage_path('app/public/' . $clean),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (file_exists($candidate) && is_file($candidate)) {
+                return response()->download($candidate, $clean);
+            }
+        }
+
+        abort(404, 'Receipt file not found.');
+    }
 }
