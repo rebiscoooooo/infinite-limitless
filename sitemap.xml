@@ -13,32 +13,22 @@
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://infinite-limitless.com/login.php</loc>
+  <loc>https://infinite-limitless.com/login</loc>
   <lastmod>2026-05-10T13:44:50+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://infinite-limitless.com/user_login.php</loc>
+  <loc>https://infinite-limitless.com/join-ph</loc>
   <lastmod>2026-05-10T13:44:50+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://infinite-limitless.com/join-ph.php</loc>
+  <loc>https://infinite-limitless.com/select-country</loc>
   <lastmod>2026-05-10T13:44:50+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://infinite-limitless.com/select-country.php</loc>
-  <lastmod>2026-05-10T13:44:50+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://infinite-limitless.com/index.php</loc>
-  <lastmod>2026-05-10T13:44:50+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://infinite-limitless.com/user_forgot_password.php</loc>
+  <loc>https://infinite-limitless.com/index</loc>
   <lastmod>2026-05-10T13:44:50+00:00</lastmod>
   <priority>0.64</priority>
 </url>

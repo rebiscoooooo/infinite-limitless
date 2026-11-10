@@ -95,6 +95,9 @@
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
 
+    # Advertise the agent-readable site summary.
+    Header always set Link "<https://infinite-limitless.com/llms.txt>; rel=describedby; type=text/plain"
+
     # Security & Performance Header Hints
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-XSS-Protection "1; mode=block"

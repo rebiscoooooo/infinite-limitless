@@ -4,6 +4,37 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
     <title inertia>{{ config('app.name', 'Infinite | Live Limitless') }}</title>
+    <meta name="description" content="Infinite builds limitless opportunities through leadership, premium skincare and wellness products, and global expansion.">
+    <link rel="canonical" href="https://infinite-limitless.com/">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://infinite-limitless.com/#organization",
+          "name": "Infinite",
+          "url": "https://infinite-limitless.com/",
+          "description": "Infinite builds limitless opportunities through leadership, premium skincare and wellness products, and global expansion."
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://infinite-limitless.com/#website",
+          "name": "Infinite | Live Limitless",
+          "url": "https://infinite-limitless.com/",
+          "publisher": {"@id": "https://infinite-limitless.com/#organization"}
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://infinite-limitless.com/#webpage",
+          "url": "https://infinite-limitless.com/",
+          "name": "Infinite | Live Limitless",
+          "isPartOf": {"@id": "https://infinite-limitless.com/#website"}
+        }
+      ]
+    }
+    </script>
+    <noscript><h1>Infinite | Live Limitless</h1><p>Building limitless opportunities through leadership, premium products, and global expansion.</p></noscript>
 
     <!-- Favicon -->
     <link rel="icon" type="image/webp" href="/assets/image/logo-infinite.webp">

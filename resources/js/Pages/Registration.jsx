@@ -1,6 +1,37 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+// Official World Plan pricing and inclusions transcribed from the three supplied screenshots.
+// These are fixed market prices, not exchange-rate conversions.
+const WORLD_PACKAGES = [
+    { name: 'World Starter', prices: { PHP: 3000, USD: 60, PGK: 299 }, worth: { PHP: 3200, USD: 75, PGK: 360 },
+      inclusions: { PHP: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+                    USD: ['2 Infinite Glow Up Soap', '2 Infinite Deowhite Soap', '1 Infinite Botox Serum', '2 Infinite Brightening Serum', '1 Infinite White Body Lotion'],
+                    PGK: ['3 Robustus Coffee', '1 Infinite Barley'] } },
+    { name: 'World Basic', prices: { PHP: 8880, USD: 189, PGK: 880 }, worth: { PHP: 9400, USD: 210, PGK: 1150 },
+      inclusions: { PHP: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+                    USD: ['2 Whiteplus Glutathione', '3 Infinite Glow Up Soap', '3 Infinite Deowhite Soap', '2 Infinite Botox Serum', '3 Infinite Brightening Serum', '2 Infinite White Body Lotion'],
+                    PGK: ['5 Robustus Coffee', '2 Whiteplus Glutathione', '2 Infinite Barley'] } },
+    { name: 'World Advance', prices: { PHP: 18880, USD: 359, PGK: 1599 }, worth: { PHP: 20400, USD: 410, PGK: 2550 }, rank: 'Executive Rank Status',
+      inclusions: { PHP: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+                    USD: ["2 O’Lamour Facial Essence", "1 O’Lamour CoreLaCreme", "2 O’Lamour Quintessence Ampoule", "2 O’Lamour PrimeRenew BB Cream"],
+                    PGK: ['15 Robustus Coffee', '10 Infinite Barley'] } },
+    { name: 'World Pro', prices: { PHP: 49800, USD: 929, PGK: 5199 }, worth: { PHP: 58500, USD: 1080, PGK: 7140 }, rank: '1 Star Executive Rank Status',
+      inclusions: { PHP: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+                    USD: ["4 O’Lamour Facial Essence", "4 O’Lamour CoreLaCreme", "4 O’Lamour Quintessence Ampoule", "9 O’Lamour PrimeRenew BB Cream"],
+                    PGK: ['22 INFINITE Robustus', '14 INFINITE Barley', '14 WHITEPLUS Glutathione'] } },
+    { name: 'World Supreme', prices: { PHP: 125000, USD: 2229, PGK: 12599 }, worth: { PHP: 150900, USD: 2750, PGK: 18700 }, rank: '2 Star Executive Rank Status',
+      inclusions: { PHP: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+                    USD: ["11 O’Lamour Facial Essence", "11 O’Lamour CoreLaCreme", "11 O’Lamour Quintessence Ampoule", "20 O’Lamour PrimeRenew BB Cream"],
+                    PGK: ['60 INFINITE Robustus', '40 INFINITE Barley', '34 WHITEPLUS Glutathione'] } },
+];
+const CURRENCY_SYMBOLS = { PHP: '₱', USD: '$', PGK: 'PGK ' };
+const formatWorldPrice = (amount, currency) => `${CURRENCY_SYMBOLS[currency]}${amount.toLocaleString('en-US')}`;
+const productSetFor = (packageName, currency) => {
+    const pkg = WORLD_PACKAGES.find((item) => item.name === packageName);
+    return pkg ? `${pkg.name} (${currency}) — ${pkg.inclusions[currency].join(', ')}` : '';
+};
+
 export default function Registration({
     packageOptions = [],
     productSets = [],
@@ -10,8 +41,9 @@ export default function Registration({
     // Current step in the registration wizard: 1 = Terms & Privacy, 2 = Application Form, 3 = Completed
     const [currentStep, setCurrentStep] = useState(1);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const countryCurrencies = { Philippines: 'PHP', 'United States': 'USD', 'Papua New Guinea': 'PGK' };
 
-    const { data, setData, post, processing, errors, reset, recentlySuccessful } = useForm({
+    const { data, setData, post, transform, processing, errors, reset, recentlySuccessful } = useForm({
         sponsor: '',
         username: '',
         email: '',
@@ -22,14 +54,35 @@ export default function Registration({
         contact: '',
         country: 'Philippines',
         address: '',
-        packageType: packageOptions[2]?.name || 'Ruby Executive Global Plan',
-        productSet: productSets[0] || 'Set A - Complete O\'Lamour Luxury Skincare + Infinite Barley Pack',
+        packageType: WORLD_PACKAGES[0].name,
+        productSet: productSetFor(WORLD_PACKAGES[0].name, 'PHP'),
         paymentMethod: paymentMethods[0] || 'Bank Deposit / Wire Transfer',
         amountPaid: '',
         paymentDate: new Date().toISOString().split('T')[0],
         paymentProof: null,
         agreedTerms: false,
     });
+
+    const selectedCurrency = countryCurrencies[data.country] || 'USD';
+
+    const selectedPackage = WORLD_PACKAGES.find((pkg) => pkg.name === data.packageType) || WORLD_PACKAGES[0];
+    const selectedInclusions = selectedPackage.inclusions[selectedCurrency];
+    const handleCountryChange = (country) => {
+        const currency = countryCurrencies[country] || 'USD';
+        setData((previous) => ({
+            ...previous,
+            country,
+            productSet: productSetFor(previous.packageType, currency),
+            amountPaid: '',
+        }));
+    };
+    const handlePackageChange = (packageName) => {
+        setData((previous) => ({
+            ...previous,
+            packageType: packageName,
+            productSet: productSetFor(packageName, countryCurrencies[previous.country] || 'USD'),
+        }));
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -43,30 +96,118 @@ export default function Registration({
 
     const handleContinueToForm = () => {
         setCurrentStep(2);
-        window.scrollTo({ top: 380, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // In this Inertia version, transform() does not return the form object.
+        // Configure the payload first, then call post() separately.
+        transform((formData) => ({
+            ...formData,
+            amountPaid: formData.amountPaid
+                ? `${formData.amountPaid} ${countryCurrencies[formData.country] || 'USD'}`
+                : '',
+        }));
+
         post('/registration', {
             forceFormData: true,
             preserveScroll: true,
             onSuccess: () => {
                 setCurrentStep(3);
-                window.scrollTo({ top: 200, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            onError: (validationErrors) => {
+                console.error('Registration validation errors:', validationErrors);
+                const firstError = Object.values(validationErrors)[0];
+                if (firstError) alert(firstError);
             },
         });
     };
 
     return (
-        <div style={{ backgroundColor: 'var(--ch-dark-slate, #0f172a)', minHeight: '100vh', color: '#ffffff', fontFamily: "'Barlow', sans-serif" }}>
+        <div className="registration-portal" style={{ backgroundColor: 'var(--ch-dark-slate, #0f172a)', minHeight: '100vh', color: '#ffffff', fontFamily: "'Barlow', sans-serif" }}>
             <Head>
                 <title>Official World Plan Registration | Infinite Live Limitless</title>
                 <meta name="description" content="Register your official Infinite World Plan account. Complete international distributor onboarding, product set selection, and payment verification." />
             </Head>
 
+            <style>{`
+/* All registration styles live in this component. No separate CSS file is required. */
+.registration-portal { --reg-navy:#0b2236; --reg-deep:#071c2d; --reg-teal:#079e9d; --reg-ink:#10233d; --reg-muted:#54657c; font-family:'Barlow',Arial,sans-serif; }
+.registration-portal .registration-brandbar { position:relative; z-index:2; padding-top:12px!important; padding-bottom:12px!important; background:#081e30!important; border-bottom:1px solid rgba(184,223,229,.28)!important; }
+.registration-portal .registration-hero { overflow:hidden; isolation:isolate; min-height:240px; padding:22px 0 25px!important; background:radial-gradient(ellipse at 81% 93%,rgba(0,165,169,.28),transparent 37%),linear-gradient(115deg,#0a2b40 0%,#071b2c 49%,#073b48 100%); }
+.registration-portal .registration-hero::before { content:''; position:absolute; z-index:-1; left:-10%; bottom:-135px; width:55%; height:260px; border-radius:50%; background:linear-gradient(15deg,rgba(0,181,185,.46),rgba(0,97,117,.09)); transform:rotate(16deg); box-shadow:0 -24px 0 rgba(3,147,159,.08); }
+.registration-portal .registration-orbit { position:absolute; z-index:-1; right:-115px; bottom:-235px; width:490px; height:490px; border-radius:50%; border:2px solid rgba(119,245,245,.48); background:radial-gradient(circle at 29% 23%,rgba(158,255,251,.35),transparent 20%),radial-gradient(circle at 43% 45%,rgba(17,132,151,.78),transparent 49%),repeating-radial-gradient(ellipse at 43% 43%,transparent 0 27px,rgba(120,224,228,.12) 28px 30px),linear-gradient(130deg,#178997,#04354d 70%); box-shadow:0 0 40px rgba(16,206,206,.33),inset 22px 28px 65px rgba(122,241,245,.28),inset -80px -55px 70px rgba(0,15,36,.9); opacity:.86; }
+.registration-portal .registration-orbit::before {content:''; position:absolute; width:125%; height:55%; top:-16%; left:-17%; border-top:1px dashed rgba(36,217,223,.7); border-radius:50%; transform:rotate(-18deg);}
+.registration-portal .registration-star { position:absolute; right:7%; top:10px; font-size:35px; color:#5af4eb; text-shadow:0 0 24px #4ef1e8; }
+.registration-portal .registration-hero-inner {position:relative;z-index:1;}
+.registration-portal .registration-hero h1 {font-size:clamp(31px,4.1vw,51px)!important; line-height:1.1; text-shadow:0 3px 10px rgba(0,0,0,.24);}
+.registration-portal .registration-hero h1 span {color:#16c2c0!important;}
+.registration-portal .registration-hero p {color:#c9d6e2!important;}
+.registration-portal .registration-steps {display:flex; align-items:center; justify-content:center; gap:17px; margin:20px auto 0; flex-wrap:wrap;}
+.registration-portal .registration-step {display:flex; align-items:center; gap:10px; color:#d6e4ec; padding:8px 14px; border-radius:100px; background:rgba(255,255,255,.055); font-size:13px; font-weight:600; white-space:nowrap;}
+.registration-portal .registration-step-number {display:grid; place-items:center; width:23px; height:23px; border:1px solid #b3d5df; border-radius:50%; font-size:12px; font-weight:700;}
+.registration-portal .registration-step.is-active {background:linear-gradient(100deg,#77f1e9,#1cbdbb);color:#06283b;box-shadow:0 5px 20px rgba(0,194,188,.16);}
+.registration-portal .registration-step.is-active .registration-step-number {background:#08677a;border-color:transparent;color:#fff;}
+.registration-portal .registration-step.is-complete {color:#a9f4ee;}
+.registration-portal .registration-step-arrow {color:#a6c2cf;}
+.registration-portal .registration-content {background:radial-gradient(ellipse at 50% 10%,#f9fcff,#edf3f8 78%)!important; min-height:58vh; padding:30px 0!important;}
+.registration-portal .registration-content .col-xl-9 {width:100%;max-width:970px;}
+.registration-portal .registration-card {border:1px solid #e1e9f2!important;border-radius:20px!important;box-shadow:0 12px 38px rgba(15,39,64,.10)!important;padding:30px!important;}
+.registration-portal .registration-card h2,.registration-portal .registration-card h3 {color:var(--reg-ink)!important;}
+.registration-portal .registration-card h5 {font-size:16px;color:#006b70!important;}
+.registration-portal .registration-card p {color:#3c4e67;}
+.registration-portal .registration-card .row.g-4.my-2 > div > div {background:linear-gradient(135deg,#fbfdff,#f4f8fc);border:1px solid #dce6f0!important;border-radius:15px!important;padding:20px!important;}
+.registration-portal .registration-card .row.g-4.my-2 > div > div > .d-flex > .p-3 {width:58px;height:58px;display:grid;place-items:center;background:#d7f7f4!important;color:#008e91!important;border-radius:50%!important;box-shadow:none!important;flex-shrink:0;}
+.registration-portal .registration-card .row.g-4.my-2 > div > div > .d-flex > .p-3 i {color:#008e91!important;}
+.registration-portal .registration-card .row.g-4.my-2 h5 {color:#12213e!important;text-transform:uppercase;font-weight:800!important;}
+.registration-portal .registration-card .row.g-4.my-2 p {color:#334660!important;}
+.registration-portal .registration-card .row.g-4.my-2 + .p-4 {background:linear-gradient(100deg,#e2f7f7,#e9f8f7);border:1px solid #c4e9e9!important;border-radius:14px!important;}
+.registration-portal .registration-card .row.g-4.my-2 + .p-4 i {color:#008b91!important;}
+.registration-portal .registration-card .row.g-4.my-2 + .p-4 li {margin-bottom:5px;}
+.registration-portal .registration-card .btn-lg.text-white,.registration-portal .confirmation-primary {background:linear-gradient(100deg,#12bcb9,#00656f)!important;border:0!important;border-radius:100px!important;color:white!important;box-shadow:0 8px 20px rgba(1,118,125,.15)!important;}
+.registration-portal .registration-card .btn-outline-secondary {border:1px solid #0a858a!important;color:#006d75!important;background:#fff!important;}
+.registration-portal .registration-card .btn-outline-secondary:hover {background:#e8f9f7!important;}
+.registration-portal .registration-form-heading {display:flex;align-items:center;gap:17px;}
+.registration-portal .registration-form-heading-icon {display:grid;place-items:center;width:62px;height:62px;border-radius:50%;background:#def6f4;color:#008f92;font-size:28px;flex-shrink:0;}
+.registration-portal .registration-card .form-control,.registration-portal .registration-card .form-select {background-color:#f6f9fc!important;border:1px solid #d8e2ec!important;border-radius:9px!important;color:#172c46!important;min-height:54px;}
+.registration-portal .registration-card .form-control:focus,.registration-portal .registration-card .form-select:focus {border-color:#14b8a6!important;box-shadow:0 0 0 3px rgba(20,184,166,.12)!important;}
+.registration-portal .registration-card .form-floating>label {color:#51617a;font-size:13px;max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.registration-portal .registration-card form h5 {margin-top:12px;}
+.registration-portal .registration-card form > .p-4.mb-4.border {background:linear-gradient(100deg,#e4f7f7,#ecfaf9);border:1px solid #b9e6e4!important;border-radius:11px!important;}
+.registration-portal .registration-card form > .p-4.mb-4.border label {color:#24435a!important;}
+.registration-portal .registration-card input[type=file] {border:1px dashed #addbdc!important;padding:13px!important;}
+.registration-portal .registration-confirmation {max-width:970px;margin:auto;}
+.registration-portal .confirmation-success-icon {display:grid;place-items:center;width:80px;height:80px;border-radius:50%;background:#d9f8f3;color:#008d90;font-size:46px;}
+.registration-portal .confirmation-eyebrow {font-size:12px;font-weight:800;letter-spacing:2px;color:#008e91;}
+.registration-portal .confirmation-intro {max-width:650px;line-height:1.7;}
+.registration-portal .confirmation-status,.registration-portal .confirmation-summary,.registration-portal .confirmation-next {max-width:750px;border-radius:15px;padding:20px;border:1px solid #d9e6ef;background:#f8fbfd;}
+.registration-portal .confirmation-status {display:flex;gap:16px;align-items:center;background:#e9f8f6;border-color:#c0e9e5;}
+.registration-portal .confirmation-status > i {font-size:28px;color:#008e91;}
+.registration-portal .confirmation-status strong,.registration-portal .confirmation-status span {display:block;color:#17354c;}
+.registration-portal .confirmation-status span {font-size:14px;margin-top:4px;}
+.registration-portal .confirmation-section-title {display:flex;align-items:center;gap:10px;margin-bottom:14px;color:#008c90;}
+.registration-portal .confirmation-section-title h3 {font-size:18px;margin:0;}
+.registration-portal .confirmation-details {margin:0;}
+.registration-portal .confirmation-details > div {display:grid;grid-template-columns:40% 60%;gap:12px;padding:11px 0;border-bottom:1px solid #e2eaf1;}
+.registration-portal .confirmation-details > div:last-child {border:0;}
+.registration-portal .confirmation-details dt {color:#607088;font-weight:600;}
+.registration-portal .confirmation-details dd {color:#142c43;font-weight:700;margin:0;overflow-wrap:anywhere;}
+.registration-portal .confirmation-accepted {color:#008b80!important;}
+.registration-portal .confirmation-next {display:flex;gap:16px;align-items:flex-start;background:#eaf8f8;border-color:#c8e9e8;}
+.registration-portal .confirmation-next-icon {font-size:26px;color:#008b90;}
+.registration-portal .confirmation-next h3 {font-size:18px;margin:0 0 7px;}
+.registration-portal .confirmation-next p {margin:0;font-size:14px;}
+.registration-portal .registration-footer {position:relative;overflow:hidden;background:linear-gradient(115deg,#09283a,#071c2d 60%,#0a3b47)!important;}
+.registration-portal .registration-footer::before {content:'';position:absolute;left:-10%;bottom:-120px;width:48%;height:150px;border-radius:50%;background:rgba(3,176,177,.2);transform:rotate(12deg);}
+@media(max-width:767px) { .registration-portal .registration-orbit {width:270px;height:270px;right:-135px;bottom:-145px;opacity:.55;} .registration-portal .registration-star {right:4%;} .registration-portal .registration-steps {gap:6px;} .registration-portal .registration-step {padding:7px 8px;font-size:11px;gap:5px;} .registration-portal .registration-step-number {width:19px;height:19px;font-size:10px;} .registration-portal .registration-step-arrow {font-size:10px;} .registration-portal .registration-card {padding:20px!important;} .registration-portal .registration-card .row.g-4.my-2 > div > div {padding:16px!important;} .registration-portal .confirmation-details > div {grid-template-columns:1fr;gap:3px;} }
+@media(max-width:420px) { .registration-portal .registration-step {font-size:10px;padding:6px;} .registration-portal .registration-step-arrow {display:none;} .registration-portal .registration-hero h1 {font-size:29px!important;} }
+`}</style>
+
             {/* BRAND HEADER BAR */}
-            <header className="py-3 px-4 border-bottom" style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'rgba(15, 23, 42, 0.98)' }}>
+            <header className="registration-brandbar py-3 px-4 border-bottom" style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'rgba(15, 23, 42, 0.98)' }}>
                 <div className="container d-flex align-items-center justify-content-center">
                     <div className="d-flex flex-column align-items-center">
                         <span
@@ -99,8 +240,10 @@ export default function Registration({
             </header>
 
             {/* HERO BANNER */}
-            <section className="position-relative pt-4 pb-4" style={{ background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 118, 110, 0.2) 100%)' }}>
-                <div className="container pt-4 text-center">
+            <section className="registration-hero position-relative pt-4 pb-4" >
+                <div className="registration-orbit" aria-hidden="true"></div>
+                <div className="registration-star" aria-hidden="true">✦</div>
+                <div className="container pt-4 text-center registration-hero-inner">
                     <span className="badge px-3 py-2 rounded-pill mb-3" style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)', color: '#5eead4', border: '1px solid rgba(20, 184, 166, 0.3)', letterSpacing: '2px', fontSize: '0.8rem' }}>
                         <i className="bi bi-globe-americas me-2"></i> GLOBAL ONBOARDING PORTAL
                     </span>
@@ -111,28 +254,23 @@ export default function Registration({
                         Launch your international venture. Secure your global genealogy node, select your wholesale product sets, and enjoy 24/7 automated backoffice management.
                     </p>
 
-                    {/* STEPPER PROGRESS */}
-                    <div className="d-flex justify-content-center align-items-center gap-2 gap-md-4 mt-4 mx-auto" style={{ maxWidth: '580px' }}>
-                        <div className={`d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${currentStep === 1 ? 'bg-ch-teal text-slate-900 font-bold' : 'bg-slate-800 text-slate-300'}`} style={{ fontSize: '0.85rem' }}>
-                            <span className="badge rounded-circle bg-dark text-white">1</span>
-                            <span>Terms &amp; Privacy</span>
-                        </div>
-                        <i className="bi bi-chevron-right text-slate-500"></i>
-                        <div className={`d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${currentStep === 2 ? 'bg-ch-teal text-slate-900 font-bold' : 'bg-slate-800 text-slate-300'}`} style={{ fontSize: '0.85rem' }}>
-                            <span className="badge rounded-circle bg-dark text-white">2</span>
-                            <span>Application Form</span>
-                        </div>
-                        <i className="bi bi-chevron-right text-slate-500"></i>
-                        <div className={`d-flex align-items-center gap-2 px-3 py-2 rounded-pill ${currentStep === 3 ? 'bg-emerald-500 text-white font-bold' : 'bg-slate-800 text-slate-400'}`} style={{ fontSize: '0.85rem' }}>
-                            <span className="badge rounded-circle bg-dark text-white">3</span>
-                            <span>Confirmation</span>
-                        </div>
-                    </div>
+                    {/* SHARED PROGRESS HEADER: same on all three steps */}
+                    <nav className="registration-steps" aria-label="Registration progress">
+                        {[['Terms & Privacy', 1], ['Application Form', 2], ['Confirmation', 3]].map(([label, number], index) => (
+                            <React.Fragment key={number}>
+                                {index > 0 && <i className="bi bi-chevron-right registration-step-arrow" aria-hidden="true"></i>}
+                                <div className={`registration-step ${currentStep === number ? 'is-active' : ''} ${currentStep > number ? 'is-complete' : ''}`} aria-current={currentStep === number ? 'step' : undefined}>
+                                    <span className="registration-step-number">{currentStep > number ? '✓' : number}</span>
+                                    <span>{label}</span>
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </nav>
                 </div>
             </section>
 
             {/* MAIN CONTENT AREA */}
-            <section className="py-5" style={{ background: '#f8fafc', color: '#0f172a' }}>
+            <section className="registration-content py-5" style={{ color: '#0f172a' }}>
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-lg-10 col-xl-9">
@@ -141,7 +279,7 @@ export default function Registration({
                                 STEP 1: TERMS & CONDITIONS & DATA PRIVACY
                             ======================================================== */}
                             {currentStep === 1 && (
-                                <div className="bg-white rounded-4 shadow-lg p-4 p-md-5 border" style={{ borderColor: '#e2e8f0' }}>
+                                <div className="registration-card bg-white rounded-4 shadow-lg p-4 p-md-5 border" style={{ borderColor: '#e2e8f0' }}>
                                     <div className="text-center mb-4">
                                         <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-3 shadow-sm" style={{ width: '70px', height: '70px', background: 'rgba(20, 184, 166, 0.12)', color: 'var(--ch-teal)' }}>
                                             <i className="bi bi-shield-check fs-1"></i>
@@ -156,14 +294,14 @@ export default function Registration({
                                     <div className="row g-4 my-2">
                                         {/* Card 1: Non-Refundable Policy */}
                                         <div className="col-md-6">
-                                            <div className="p-4 rounded-4 h-100 border transition-all" style={{ backgroundColor: '#fff7ed', borderColor: '#fdba74' }}>
+                                            <div className="p-4 rounded-4 h-100 border transition-all" >
                                                 <div className="d-flex align-items-center gap-3 mb-3">
                                                     <div className="p-3 rounded-3 bg-white text-warning shadow-sm">
                                                         <i className="fa-solid fa-file-invoice-dollar fs-4 text-warning"></i>
                                                     </div>
                                                     <h5 className="fw-bold mb-0 text-dark">Strict Non-Refundable Policy</h5>
                                                 </div>
-                                                <p className="mb-0" style={{ fontSize: '0.9rem', color: '#7c2d12', lineHeight: 1.6 }}>
+                                                <p className="mb-0" style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
                                                     As you have taken process this is strictly <strong>NON-REFUNDABLE</strong>. From now and your lifetime registration validity after we turn over your account, package allotments and system placement cannot be refunded or cancelled once processed.
                                                 </p>
                                             </div>
@@ -171,14 +309,14 @@ export default function Registration({
 
                                         {/* Card 2: Product Availability & Dispatch */}
                                         <div className="col-md-6">
-                                            <div className="p-4 rounded-4 h-100 border transition-all" style={{ backgroundColor: '#f0fdfa', borderColor: '#99f6e4' }}>
+                                            <div className="p-4 rounded-4 h-100 border transition-all" >
                                                 <div className="d-flex align-items-center gap-3 mb-3">
                                                     <div className="p-3 rounded-3 bg-white text-teal shadow-sm">
                                                         <i className="fa-solid fa-box-open fs-4" style={{ color: 'var(--ch-teal)' }}></i>
                                                     </div>
                                                     <h5 className="fw-bold mb-0 text-dark">Product Availability &amp; Dispatch</h5>
                                                 </div>
-                                                <p className="mb-0" style={{ fontSize: '0.9rem', color: '#134e4a', lineHeight: 1.6 }}>
+                                                <p className="mb-0" style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
                                                     We will keep you posted with your <strong>products availability</strong> once it is available in your destination area. International shipments are coordinated with DHL and authorized country stockists with official air waybill tracking.
                                                 </p>
                                             </div>
@@ -186,7 +324,7 @@ export default function Registration({
 
                                         {/* Card 3: 24/7 Online Account Creation */}
                                         <div className="col-md-6">
-                                            <div className="p-4 rounded-4 h-100 border transition-all" style={{ backgroundColor: '#f1f5f9', borderColor: '#cbd5e1' }}>
+                                            <div className="p-4 rounded-4 h-100 border transition-all" >
                                                 <div className="d-flex align-items-center gap-3 mb-3">
                                                     <div className="p-3 rounded-3 bg-white text-primary shadow-sm">
                                                         <i className="fa-solid fa-laptop-code fs-4 text-primary"></i>
@@ -201,7 +339,7 @@ export default function Registration({
 
                                         {/* Card 4: Data Privacy & Security */}
                                         <div className="col-md-6">
-                                            <div className="p-4 rounded-4 h-100 border transition-all" style={{ backgroundColor: '#f8fafc', borderColor: '#e2e8f0' }}>
+                                            <div className="p-4 rounded-4 h-100 border transition-all" >
                                                 <div className="d-flex align-items-center gap-3 mb-3">
                                                     <div className="p-3 rounded-3 bg-white text-success shadow-sm">
                                                         <i className="fa-solid fa-user-shield fs-4 text-success"></i>
@@ -216,7 +354,7 @@ export default function Registration({
                                     </div>
 
                                     {/* Summary Callout */}
-                                    <div className="p-4 rounded-4 my-4" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                                    <div className="p-4 rounded-4 my-4" >
                                         <h6 className="fw-bold text-dark mb-2">
                                             <i className="bi bi-info-circle-fill text-primary me-2"></i> Key Registrant Commitments
                                         </h6>
@@ -245,11 +383,12 @@ export default function Registration({
                                 STEP 2: REGISTRATION FORM
                             ======================================================== */}
                             {currentStep === 2 && (
-                                <div className="bg-white rounded-4 shadow-lg p-4 p-md-5 border" style={{ borderColor: '#e2e8f0' }}>
+                                <div className="registration-card bg-white rounded-4 shadow-lg p-4 p-md-5 border" style={{ borderColor: '#e2e8f0' }}>
                                     <div className="d-flex flex-wrap align-items-center justify-content-between pb-3 mb-4 border-bottom">
-                                        <div>
-                                            <h3 className="fw-bold mb-1" style={{ color: 'var(--ch-dark-slate)' }}>Official Application Form</h3>
-                                            <p className="text-muted small mb-0">Fill in your official details to enroll into the World Plan network.</p>
+                                        <div className="registration-form-heading">
+                                            <span className="registration-form-heading-icon"><i className="bi bi-card-list"></i></span>
+                                            <div><h3 className="fw-bold mb-1" style={{ color: 'var(--ch-dark-slate)' }}>Official Application Form</h3>
+                                            <p className="text-muted small mb-0">Fill in your official details to enroll into the World Plan network.</p></div>
                                         </div>
                                         <button
                                             type="button"
@@ -277,7 +416,7 @@ export default function Registration({
                                                     onChange={(e) => setData('username', e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                                                     required
                                                 />
-                                                <label htmlFor="username" className="ms-2">Username (used for backoffice login) *</label>
+                                                <label htmlFor="username" className="ms-2">Username (Required) *</label>
                                                 {errors.username && <div className="invalid-feedback">{errors.username}</div>}
                                             </div>
 
@@ -385,12 +524,12 @@ export default function Registration({
                                                     id="country"
                                                     className="form-select bg-light"
                                                     value={data.country}
-                                                    onChange={(e) => setData('country', e.target.value)}
+                                                    onChange={(e) => handleCountryChange(e.target.value)}
                                                     required
                                                 >
-                                                    {countries.map((c) => (
-                                                        <option key={c.code} value={c.name}>{c.name}</option>
-                                                    ))}
+                                                    <option value="Philippines">Philippines (PHP ₱)</option>
+                                                    <option value="United States">United States (USD $)</option>
+                                                    <option value="Papua New Guinea">Papua New Guinea (PGK K)</option>
                                                 </select>
                                                 <label htmlFor="country" className="ms-2">Country / Region *</label>
                                             </div>
@@ -412,40 +551,60 @@ export default function Registration({
 
                                         {/* SECTION 3: PACKAGE & PRODUCT SET */}
                                         <h5 className="fw-bold mb-3" style={{ color: 'var(--ch-teal)' }}>
-                                            <i className="fa-solid fa-gem me-2"></i> 3. Package &amp; Product Set Selection
+                                            <i className="fa-solid fa-gem me-2"></i> 3. Package &amp; Product Set Selection (Price)
                                         </h5>
-                                        <div className="row g-3 mb-4">
-                                            <div className="col-md-6 form-floating">
+                                        <div className="row g-3 mb-3">
+                                            <div className="col-12 form-floating">
                                                 <select
                                                     id="packageType"
-                                                    className="form-select bg-light"
+                                                    className={`form-select bg-light ${errors.packageType ? 'is-invalid' : ''}`}
                                                     value={data.packageType}
-                                                    onChange={(e) => setData('packageType', e.target.value)}
+                                                    onChange={(e) => handlePackageChange(e.target.value)}
                                                     required
                                                 >
-                                                    {packageOptions.map((pkg) => (
-                                                        <option key={pkg.id} value={pkg.name}>
-                                                            {pkg.name} — ({pkg.price})
+                                                    {WORLD_PACKAGES.map((pkg) => (
+                                                        <option key={pkg.name} value={pkg.name}>
+                                                            {pkg.name.toUpperCase()} — {formatWorldPrice(pkg.prices[selectedCurrency], selectedCurrency)}
                                                         </option>
                                                     ))}
                                                 </select>
                                                 <label htmlFor="packageType" className="ms-2">Select World Plan Package *</label>
+                                                {errors.packageType && <div className="invalid-feedback">{errors.packageType}</div>}
                                             </div>
-
-                                            <div className="col-md-6 form-floating">
-                                                <select
-                                                    id="productSet"
-                                                    className="form-select bg-light"
-                                                    value={data.productSet}
-                                                    onChange={(e) => setData('productSet', e.target.value)}
-                                                    required
-                                                >
-                                                    {productSets.map((set, idx) => (
-                                                        <option key={idx} value={set}>{set}</option>
-                                                    ))}
-                                                </select>
-                                                <label htmlFor="productSet" className="ms-2">Product Set Inclusions *</label>
+                                        </div>
+                                        <div className="rounded-4 border p-3 p-md-4 mb-4" style={{ background: '#f8fbfd', borderColor: '#dce6f0' }}>
+                                            <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                                                <div>
+                                                    <div className="small text-muted fw-bold">{selectedCurrency} WORLD PLAN PACKAGE</div>
+                                                    <h5 className="fw-bold mb-0" style={{ color: '#10233d' }}>{selectedPackage.name.toUpperCase()}</h5>
+                                                </div>
+                                                <div className="text-end">
+                                                    <div className="fw-bold" style={{ color: '#10233d', fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>
+                                                        {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}
+                                                    </div>
+                                                    <div className="small text-muted">Product Worth: <strong style={{ color: '#079e9d' }}>{formatWorldPrice(selectedPackage.worth[selectedCurrency], selectedCurrency)}</strong></div>
+                                                </div>
                                             </div>
+                                            {selectedPackage.rank && (
+                                                <div className="mb-3">
+                                                    <span className="rounded-pill px-3 py-2 d-inline-block fw-bold" style={{ background: '#17243b', color: '#fbbf24', fontSize: 12 }}>
+                                                        ★ {selectedPackage.rank.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="small fw-bold mb-2" style={{ color: '#64748b' }}>PACKAGE INCLUSIONS:</div>
+                                            <ul className="list-unstyled mb-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px 18px' }}>
+                                                {selectedInclusions.map((item, index) => (
+                                                    <li key={`${selectedCurrency}-${selectedPackage.name}-${index}`} style={{ color: '#334155', fontSize: 14 }}>
+                                                        <span style={{ color: '#10b981', marginRight: 8 }}>✓</span>{item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <div className="small text-muted mt-3">
+                                                Product set is automatically matched to your selected package and currency. These are fixed market prices, not currency conversions.
+                                            </div>
+                                            <input type="hidden" name="productSet" value={data.productSet} readOnly />
+                                            {errors.productSet && <div className="text-danger small mt-2">{errors.productSet}</div>}
                                         </div>
 
                                         {/* SECTION 4: PAYMENT DETAILS & PROOF */}
@@ -470,14 +629,16 @@ export default function Registration({
 
                                             <div className="col-md-4 form-floating">
                                                 <input
-                                                    type="text"
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
                                                     id="amountPaid"
                                                     className="form-control bg-light"
-                                                    placeholder="e.g. $1,750 USD or ₱72,888"
+                                                    placeholder="Enter amount"
                                                     value={data.amountPaid}
                                                     onChange={(e) => setData('amountPaid', e.target.value)}
                                                 />
-                                                <label htmlFor="amountPaid" className="ms-2">Amount Paid &amp; Currency (e.g. $1,750 USD)</label>
+                                                <label htmlFor="amountPaid" className="ms-2">Amount Paid ({selectedCurrency})</label>
                                             </div>
 
                                             <div className="col-md-4 form-floating">
@@ -525,7 +686,7 @@ export default function Registration({
                                         </div>
 
                                         {/* MANDATORY CONSENT CHECKBOX */}
-                                        <div className="p-4 rounded-4 mb-4 border" style={{ backgroundColor: '#fffbeb', borderColor: '#fde68a' }}>
+                                        <div className="p-4 rounded-4 mb-4 border" >
                                             <div className="form-check d-flex align-items-start gap-3">
                                                 <input
                                                     type="checkbox"
@@ -536,13 +697,25 @@ export default function Registration({
                                                     onChange={(e) => setData('agreedTerms', e.target.checked)}
                                                     required
                                                 />
-                                                <label htmlFor="agreedTerms" className="form-check-label" style={{ fontSize: '0.92rem', color: '#78350f', cursor: 'pointer', lineHeight: 1.6 }}>
+                                                <label htmlFor="agreedTerms" className="form-check-label" style={{ fontSize: '0.92rem', cursor: 'pointer', lineHeight: 1.6 }}>
                                                     <strong>I agree to the Privacy Policy and Terms of Conditions and consent to the processing of my information.</strong><br />
                                                     I acknowledge that all package payments, memberships, and product allotments are strictly <strong>NON-REFUNDABLE</strong> with lifetime account validity once turned over. I consent to receiving confirmation emails and backoffice notifications from Infinite Live Limitless.
                                                 </label>
                                             </div>
                                             {errors.agreedTerms && <div className="text-danger small mt-2 ms-4">{errors.agreedTerms}</div>}
                                         </div>
+
+                                        {/* REGISTRATION VALIDATION ERRORS */}
+                                        {Object.keys(errors).length > 0 && (
+                                            <div className="alert alert-danger mb-4" role="alert">
+                                                <strong>Please correct the following errors:</strong>
+                                                <ul className="mb-0 mt-2">
+                                                    {Object.entries(errors).map(([field, message]) => (
+                                                        <li key={field}>{message}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
 
                                         {/* SUBMIT BUTTON */}
                                         <div className="d-flex flex-column flex-sm-row gap-3 align-items-center justify-content-between pt-2">
@@ -586,60 +759,55 @@ export default function Registration({
                                 STEP 3: SUCCESS / CONFIRMATION
                             ======================================================== */}
                             {currentStep === 3 && (
-                                <div className="bg-white rounded-4 shadow-lg p-4 p-md-5 border text-center" style={{ borderColor: '#e2e8f0' }}>
-                                    <div className="d-inline-flex align-items-center justify-content-center rounded-circle mb-4 shadow" style={{ width: '90px', height: '90px', background: 'rgba(20, 184, 166, 0.15)', color: 'var(--ch-teal)' }}>
-                                        <i className="bi bi-check-circle-fill display-4"></i>
+                                <div className="registration-card registration-confirmation bg-white rounded-4 shadow-lg p-4 p-md-5 border text-center">
+                                    <div className="confirmation-success-icon mx-auto mb-3" aria-hidden="true">
+                                        <i className="bi bi-check2-circle"></i>
                                     </div>
-
-                                    <h2 className="fw-bold mb-2" style={{ color: 'var(--ch-dark-slate)' }}>Registration Successfully Submitted!</h2>
-                                    <p className="text-muted fs-5 mb-4" style={{ maxWidth: '600px', margin: '0 auto' }}>
-                                        Thank you, <strong>{data.firstName} {data.lastName}</strong>! Your application for the <strong>{data.packageType}</strong> has been received and routed to our administration desk.
+                                    <span className="confirmation-eyebrow">APPLICATION RECEIVED</span>
+                                    <h2 className="fw-bold mt-2 mb-2">Registration Successfully Submitted!</h2>
+                                    <p className="confirmation-intro mx-auto mb-4">
+                                        Thank you, <strong>{data.firstName} {data.lastName}</strong>! Your registration for
+                                        <strong> {data.packageType}</strong> has been received and is awaiting administrator review.
                                     </p>
 
-                                    {/* Confirmation Details Card */}
-                                    <div className="p-4 rounded-4 text-start mx-auto mb-4" style={{ maxWidth: '640px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                                        <h6 className="fw-bold text-dark mb-3 border-bottom pb-2">
-                                            <i className="bi bi-clipboard-check text-success me-2"></i> Submitted Application Summary
-                                        </h6>
-                                        <div className="row g-2" style={{ fontSize: '0.9rem' }}>
-                                            <div className="col-sm-5 text-muted">Registered Username:</div>
-                                            <div className="col-sm-7 fw-bold text-dark">{data.username}</div>
-                                            <div className="col-sm-5 text-muted">Email Address:</div>
-                                            <div className="col-sm-7 text-dark">{data.email}</div>
-                                            <div className="col-sm-5 text-muted">Package Level:</div>
-                                            <div className="col-sm-7 fw-bold" style={{ color: 'var(--ch-teal)' }}>{data.packageType}</div>
-                                            <div className="col-sm-5 text-muted">Product Set:</div>
-                                            <div className="col-sm-7 text-dark">{data.productSet}</div>
-                                            <div className="col-sm-5 text-muted">Country / Territory:</div>
-                                            <div className="col-sm-7 text-dark">{data.country}</div>
-                                            <div className="col-sm-5 text-muted">Terms &amp; Non-Refundable:</div>
-                                            <div className="col-sm-7 text-success fw-bold"><i className="bi bi-check-circle me-1"></i> Agreed &amp; Accepted</div>
-                                            <div className="col-sm-5 text-muted">Application Status:</div>
-                                            <div className="col-sm-7"><span className="badge bg-warning text-dark">PENDING ADMINISTRATOR REVIEW</span></div>
+                                    <div className="confirmation-status mx-auto mb-4" role="status">
+                                        <i className="bi bi-clock-history" aria-hidden="true"></i>
+                                        <div className="text-start">
+                                            <strong>Pending Administrator Review</strong>
+                                            <span>Your application has been submitted. We will notify you of any updates.</span>
                                         </div>
                                     </div>
 
-                                    {/* Next Steps Notification */}
-                                    <div className="alert alert-info text-start mx-auto mb-4 shadow-sm" style={{ maxWidth: '640px', borderRadius: '12px' }}>
-                                        <h6 className="fw-bold mb-1"><i className="bi bi-envelope-check me-2"></i> Confirmation Email Sent</h6>
-                                        <p className="small mb-0" style={{ lineHeight: 1.6 }}>
-                                            We have sent a detailed confirmation email to <strong>{data.email}</strong>. It contains your full application details, terms and privacy policy summary, plus a <strong>secure edit link</strong> allowing you to update your information if needed before admin approval.
-                                        </p>
+                                    <div className="confirmation-summary mx-auto mb-4 text-start">
+                                        <div className="confirmation-section-title">
+                                            <i className="bi bi-card-checklist" aria-hidden="true"></i>
+                                            <h3>Application Summary</h3>
+                                        </div>
+                                        <dl className="confirmation-details">
+                                            <div><dt>Username</dt><dd>{data.username}</dd></div>
+                                            <div><dt>Email Address</dt><dd>{data.email}</dd></div>
+                                            <div><dt>World Plan Package</dt><dd>{data.packageType} — {formatWorldPrice(selectedPackage.prices[selectedCurrency], selectedCurrency)}</dd></div>
+                                            <div><dt>Product Set</dt><dd>{data.productSet}</dd></div>
+                                            <div><dt>Country / Region</dt><dd>{data.country}</dd></div>
+                                            <div><dt>Amount Paid</dt><dd>{data.amountPaid ? `${data.amountPaid} ${selectedCurrency}` : 'Not provided'}</dd></div>
+                                            <div><dt>Terms &amp; Privacy</dt><dd className="confirmation-accepted"><i className="bi bi-check-circle-fill me-1" aria-hidden="true"></i> Agreed &amp; Accepted</dd></div>
+                                        </dl>
                                     </div>
 
-                                    <div className="d-flex flex-wrap gap-3 justify-content-center pt-2">
-                                        <Link
-                                            href="/"
-                                            className="btn btn-outline-dark px-4 py-2.5 rounded-pill fw-semibold"
-                                        >
-                                            <i className="bi bi-house me-1"></i> Return to Homepage
+                                    <div className="confirmation-next mx-auto mb-4 text-start">
+                                        <div className="confirmation-next-icon"><i className="bi bi-envelope-check" aria-hidden="true"></i></div>
+                                        <div>
+                                            <h3>What happens next?</h3>
+                                            <p>Check <strong>{data.email}</strong> for your confirmation details and any available secure edit link. Your registration will remain pending until an administrator completes the review.</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="confirmation-actions d-flex flex-column flex-sm-row justify-content-center gap-3">
+                                        <Link href="/" className="btn btn-outline-secondary rounded-pill px-4 py-3 fw-semibold">
+                                            <i className="bi bi-house me-2" aria-hidden="true"></i> Return to Homepage
                                         </Link>
-                                        <Link
-                                            href="/"
-                                            className="btn px-4 py-2.5 rounded-pill fw-bold text-white shadow-sm"
-                                            style={{ backgroundColor: 'var(--ch-teal)' }}
-                                        >
-                                            🌐 Explore INFINITE Website <i className="bi bi-arrow-right ms-1"></i>
+                                        <Link href="/" className="btn confirmation-primary rounded-pill px-4 py-3 fw-bold text-white">
+                                            Explore INFINITE Website <i className="bi bi-arrow-right ms-2" aria-hidden="true"></i>
                                         </Link>
                                     </div>
                                 </div>
@@ -651,7 +819,7 @@ export default function Registration({
             </section>
 
             {/* MINIMAL FOOTER FOR REGISTRATION */}
-            <footer className="py-4 text-center text-white-50 small border-top" style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'var(--ch-dark-slate, #0f172a)' }}>
+            <footer className="registration-footer py-4 text-center text-white-50 small border-top" style={{ borderColor: 'rgba(255, 255, 255, 0.08)', background: 'var(--ch-dark-slate, #0f172a)' }}>
                 <div className="container">
                     <p className="mb-1 text-slate-400">
                         &copy; {new Date().getFullYear()} INFINITE LIVE LIMITLESS. All rights reserved.
