@@ -58,6 +58,11 @@ Route::get('/receipts/{filename}/download', [WorldPlanAdminController::class, 'd
 Route::get('/realtime/pulse', [RealtimeController::class, 'pulse'])->name('realtime.pulse');
 Route::get('/realtime/stream', [RealtimeController::class, 'stream'])->name('realtime.stream');
 
+// Flare & Ignition Diagnostic Test Route
+Route::get('/flare-test-error', function () {
+    throw new \Exception('Infinite System Test Exception: Laravel Flare & Ignition is successfully active and capturing application errors!');
+})->name('flare.test.error');
+
 // Legacy login redirect
 Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
 

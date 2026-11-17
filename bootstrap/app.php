@@ -35,22 +35,27 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // Allow forced Flare-Ignition error page inspection (e.g. ?flare=1 or ?ignition=1)
-        // while preserving standard validation, authentication, and HTTP redirects
+        // Always render rich Flare-Ignition error page for unhandled application errors
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            // Preserve standard redirects for validation and authentication flows
             if ($e instanceof \Illuminate\Validation\ValidationException ||
                 $e instanceof \Illuminate\Auth\AuthenticationException ||
                 $e instanceof \Illuminate\Auth\Access\AuthorizationException) {
-                return null; // Let Laravel handle standard redirect and validation flows
+                return null;
             }
 
-            $forceIgnition = $request->has('_ignition') || $request->has('flare') || $request->has('ignition');
-            if ($forceIgnition) {
-                if (app()->bound(\Illuminate\Contracts\Foundation\ExceptionRenderer::class)) {
-                    return response(
-                        app(\Illuminate\Contracts\Foundation\ExceptionRenderer::class)->render($e),
-                        500
-                    );
+            // Preserve standard JSON error responses for API calls unless explicit
+            if ($request->expectsJson() && ! $request->has('_ignition') && ! $request->has('flare') && ! $request->has('ignition')) {
+                return null;
+            }
+
+            // Render interactive Flare-Ignition error page
+            if (app()->bound(\Illuminate\Contracts\Foundation\ExceptionRenderer::class)) {
+                try {
+                    $html = app(\Illuminate\Contracts\Foundation\ExceptionRenderer::class)->render($e);
+                    return response($html, 500)->header('Content-Type', 'text/html; charset=UTF-8');
+                } catch (\Throwable $ignitionError) {
+                    return null;
                 }
             }
 

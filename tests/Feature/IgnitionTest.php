@@ -52,4 +52,26 @@ class IgnitionTest extends TestCase
         // Verify HTML contains built CSS and JS assets
         $this->assertStringContainsString('assets/app-', $content);
     }
+
+    public function test_flare_test_error_route_triggers_ignition(): void
+    {
+        $response = $this->get('/flare-test-error');
+        $this->assertEquals(500, $response->getStatusCode());
+        $content = $response->getContent();
+
+        $this->assertTrue(str_contains($content, 'window.ignite'));
+        $this->assertTrue(str_contains($content, 'Infinite System Test Exception'));
+    }
+
+    public function test_flare_ignition_renders_even_when_debug_is_disabled(): void
+    {
+        config(['app.debug' => false]);
+
+        $response = $this->get('/flare-test-error');
+        $this->assertEquals(500, $response->getStatusCode());
+        $content = $response->getContent();
+
+        // Ignition still renders even when app.debug is false
+        $this->assertTrue(str_contains($content, 'window.ignite'));
+    }
 }
