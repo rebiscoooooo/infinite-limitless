@@ -4,11 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\AdminUser;
 use App\Models\Inquiry;
+use App\Models\MarketingCampaign;
+use App\Models\MarketingUnsubscribe;
 use App\Models\MemberRegistration;
 use App\Models\ProductStat;
 use App\Models\SiteStat;
 use App\Models\WorldPlanRegistration;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -72,6 +79,50 @@ class DashboardController extends Controller
         $recentLogs = ActivityLog::orderBy('created_at', 'desc')->take(6)->get();
         $recentRegistrations = WorldPlanRegistration::orderBy('created_at', 'desc')->take(5)->get();
 
+        // 8:00 AM Daily Marketing Campaign Recipients Overview
+        $rawWorldPlan = WorldPlanRegistration::whereNotNull('email')->pluck('email')->all();
+        $rawInquiries = Inquiry::whereNotNull('email')->pluck('email')->all();
+
+        // Admin accounts to strictly exclude
+        $adminExcludes = AdminUser::whereNotNull('email')
+            ->pluck('email')
+            ->map(fn($e) => strtolower(trim((string) $e)))
+            ->flip()
+            ->all();
+
+        $configAdmin = strtolower(trim((string) config('mail.admin_address', 'infinitelimitless123@gmail.com')));
+        if (!empty($configAdmin)) {
+            $adminExcludes[$configAdmin] = true;
+        }
+
+        $unsubscribes = MarketingUnsubscribe::pluck('email')
+            ->map(fn($e) => strtolower(trim((string) $e)))
+            ->flip()
+            ->all();
+
+        $eligibleCandidates = [];
+        foreach (array_merge($rawWorldPlan, $rawInquiries) as $em) {
+            $em = strtolower(trim((string) $em));
+            if (!empty($em) && filter_var($em, FILTER_VALIDATE_EMAIL)) {
+                if (!isset($adminExcludes[$em]) && !isset($unsubscribes[$em])) {
+                    $eligibleCandidates[$em] = true;
+                }
+            }
+        }
+
+        $lastCampaign = MarketingCampaign::orderBy('created_at', 'desc')->first();
+        $marketingStats = [
+            'schedule' => 'Every morning at 8:00 AM (Asia/Manila)',
+            'schedule_time' => '08:00 AM',
+            'eligible_count' => count($eligibleCandidates),
+            'world_plan_count' => count(array_unique(array_filter(array_map('strtolower', $rawWorldPlan)))),
+            'inquiries_count' => count(array_unique(array_filter(array_map('strtolower', $rawInquiries)))),
+            'admin_excluded_count' => count($adminExcludes),
+            'last_sent_date' => $lastCampaign?->sent_date,
+            'last_product_name' => $lastCampaign?->product_name,
+            'last_recipients_count' => $lastCampaign?->recipients_count,
+        ];
+
         return Inertia::render('Admin/Dashboard', [
             'metrics' => [
                 'total_inquiries' => $totalInquiries,
@@ -88,6 +139,42 @@ class DashboardController extends Controller
             'recentInquiries' => $recentInquiries,
             'recentLogs' => $recentLogs,
             'recentRegistrations' => $recentRegistrations,
+            'marketingStats' => $marketingStats,
         ]);
+    }
+
+    /**
+     * Trigger on-demand dispatch of the 8:00 AM Daily Product Marketing campaign.
+     */
+    public function dispatchDailyMarketing(Request $request): RedirectResponse
+    {
+        $testEmail = $request->input('test_email');
+        $params = ['--force' => true];
+        if (!empty($testEmail)) {
+            $params['--test-email'] = trim($testEmail);
+        }
+
+        try {
+            Artisan::call('marketing:send-daily-product', $params);
+
+            $admin = Auth::guard('admin')->user();
+            ActivityLog::create([
+                'admin_user' => $admin?->username ?? 'Admin',
+                'action_type' => 'Triggered 8:00 AM Daily Email Marketing Dispatch' . (!empty($testEmail) ? " (Test: {$testEmail})" : ''),
+                'device_type' => 'Desktop PC',
+                'os_browser' => substr($request->userAgent() ?? '', 0, 100),
+                'ip_address' => substr($request->ip() ?? '127.0.0.1', 0, 45),
+                'status' => 'Success',
+                'created_at' => now(),
+            ]);
+
+            $message = !empty($testEmail)
+                ? "Test marketing spotlight email successfully dispatched to {$testEmail}!"
+                : "Daily 8:00 AM Product Marketing campaign dispatched successfully to World Plan registrants and Inquiries (Admin accounts strictly excluded).";
+
+            return back()->with('success', $message);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Daily Marketing dispatch error: ' . $e->getMessage());
+        }
     }
 }

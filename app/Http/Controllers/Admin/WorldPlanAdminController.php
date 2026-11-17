@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WorldPlanCredentialsMail;
 use App\Mail\WorldPlanStatusUpdatedMail;
 use App\Models\ActivityLog;
 use App\Models\WorldPlanRegistration;
@@ -124,6 +125,58 @@ class WorldPlanAdminController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Dispatch account login credentials to the client via email.
+     */
+    public function sendCredentials(Request $request, WorldPlanRegistration $registration): RedirectResponse
+    {
+        $validated = $request->validate([
+            'username' => ['required', 'string', 'max:100'],
+            'password' => ['required', 'string', 'max:255'],
+        ]);
+
+        $username = trim($validated['username']);
+        $password = trim($validated['password']);
+
+        // Keep registered username in sync if changed by admin
+        if ($registration->username !== $username) {
+            $registration->update(['username' => $username]);
+        }
+
+        $mailSent = false;
+        $mailError = null;
+
+        try {
+            Mail::to($registration->email)->send(new WorldPlanCredentialsMail(
+                registration: $registration,
+                username: $username,
+                password: $password,
+                portalUrl: 'https://helloinfinity.net/iprosperity'
+            ));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            $mailError = $e->getMessage();
+            Log::error("Failed to send portal credentials to {$registration->email}: " . $mailError);
+            report($e);
+        }
+
+        ActivityLog::create([
+            'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
+            'action_type' => "Dispatched Login Credentials to {$registration->email}" . ($mailSent ? ' (Email Sent)' : ($mailError ? ' (Email Failed)' : '')),
+            'device_type' => 'Desktop PC',
+            'os_browser' => $request->userAgent() ?? '',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'status' => $mailSent ? 'Success' : 'Failed',
+            'created_at' => now(),
+        ]);
+
+        if ($mailError) {
+            return back()->with('error', "Could not dispatch credentials email: {$mailError}");
+        }
+
+        return back()->with('success', "Official login credentials successfully dispatched to {$registration->email} (Username: {$username}).");
     }
 
     /**

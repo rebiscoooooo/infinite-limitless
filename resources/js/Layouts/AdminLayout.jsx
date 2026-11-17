@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, usePage, router } from '@inertiajs/react';
+import { Link, usePage, router, useForm } from '@inertiajs/react';
 import FlashToast from '../Components/FlashToast';
 import useRealtimeSync from '../Hooks/useRealtimeSync';
 import {
@@ -25,6 +25,12 @@ import {
     VolumeX,
     RefreshCw,
     Radio,
+    KeyRound,
+    Lock,
+    Eye,
+    EyeOff,
+    AlertCircle,
+    Check,
 } from 'lucide-react';
 
 export default function AdminLayout({ children, title = 'Executive Console', subtitle }) {
@@ -73,6 +79,38 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
         const timer = setInterval(updateClock, 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // Change Password Modal State
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showCurrentPass, setShowCurrentPass] = useState(false);
+    const [showNewPass, setShowNewPass] = useState(false);
+    const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+    const passwordForm = useForm({
+        current_password: '',
+        password: '',
+        password_confirmation: '',
+    });
+
+    const openPasswordModal = () => {
+        passwordForm.reset();
+        passwordForm.clearErrors();
+        setShowCurrentPass(false);
+        setShowNewPass(false);
+        setShowConfirmPass(false);
+        setShowPasswordModal(true);
+    };
+
+    const handleChangePasswordSubmit = (e) => {
+        e.preventDefault();
+        passwordForm.post('/admin/change-password', {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowPasswordModal(false);
+                passwordForm.reset();
+            },
+        });
+    };
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -278,19 +316,31 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                 {/* Bottom Profile & Actions */}
                 <div className="pt-3 border-t border-[#1b5361]/60 space-y-2.5">
                     {/* Admin User Card */}
-                    <div className="p-2.5 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0">
-                            {adminInitial}
+                    <div className="p-2.5 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 space-y-2">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0">
+                                {adminInitial}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <span className="text-xs font-bold text-white block truncate">
+                                    {adminUsername}
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[9px] xl:text-[10px] font-semibold text-[#27dec9]">
+                                    <Shield className="w-2.5 h-2.5 xl:w-3 xl:h-3 text-[#25dec0]" />
+                                    <span>Verified Admin</span>
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <span className="text-xs font-bold text-white block truncate">
-                                {adminUsername}
-                            </span>
-                            <span className="inline-flex items-center gap-1 text-[9px] xl:text-[10px] font-semibold text-[#27dec9]">
-                                <Shield className="w-2.5 h-2.5 xl:w-3 xl:h-3 text-[#25dec0]" />
-                                <span>Verified Admin</span>
-                            </span>
-                        </div>
+
+                        {/* Quick Change Password Button */}
+                        <button
+                            type="button"
+                            onClick={openPasswordModal}
+                            className="w-full px-2.5 py-1.5 rounded-xl bg-[#0a273b] hover:bg-[#103750] border border-[#24dbc3]/40 hover:border-[#24dbc3]/80 text-[#25dec0] hover:text-[#42f1ce] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                        >
+                            <KeyRound className="w-3.5 h-3.5" />
+                            <span>Change Password</span>
+                        </button>
                     </div>
 
                     {/* Quick Action Buttons */}
@@ -373,6 +423,17 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                         </div>
 
                         <div className="pt-4 border-t border-[#1b5361]/60 space-y-2">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setSidebarOpen(false);
+                                    openPasswordModal();
+                                }}
+                                className="w-full px-3 py-2.5 rounded-xl bg-[#0a273b] hover:bg-[#103750] text-[#25dec0] text-xs font-bold flex items-center justify-center gap-2 border border-[#24dbc3]/40 cursor-pointer shadow-sm"
+                            >
+                                <KeyRound className="w-4 h-4" />
+                                <span>Change Password</span>
+                            </button>
                             <Link
                                 href="/"
                                 target="_blank"
@@ -503,13 +564,28 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                             <ExternalLink className="w-3 h-3 text-[#25dec0]" />
                         </Link>
 
-                        {/* User Avatar Badge */}
-                        <div
-                            className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] flex items-center justify-center font-bold text-xs text-[#031927] shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0"
-                            title={`Logged in as ${adminUsername}`}
+                        {/* User Avatar & Quick Password Trigger */}
+                        <button
+                            type="button"
+                            onClick={openPasswordModal}
+                            className="flex items-center gap-2 py-1 pl-2.5 pr-1 rounded-xl bg-[#082033]/90 hover:bg-[#0c2638] border border-[#1e4e5b]/80 hover:border-[#24dbc3]/60 transition-all text-left cursor-pointer group shadow-sm"
+                            title="Click to change your administrator password"
                         >
-                            {adminInitial}
-                        </div>
+                            <div className="flex flex-col text-right hidden sm:flex">
+                                <span className="text-xs font-bold text-white leading-tight group-hover:text-[#25dec0] transition-colors">
+                                    {adminUsername}
+                                </span>
+                                <span className="text-[9px] text-slate-400 font-mono leading-tight flex items-center justify-end gap-1">
+                                    <KeyRound className="w-2.5 h-2.5 text-[#25dec0]" />
+                                    <span>Change Pass</span>
+                                </span>
+                            </div>
+                            <div
+                                className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] flex items-center justify-center font-bold text-xs text-[#031927] shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0"
+                            >
+                                {adminInitial}
+                            </div>
+                        </button>
                     </div>
                 </header>
 
@@ -518,6 +594,228 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                     {children}
                 </main>
             </div>
+
+            {/* ========================================================
+                CHANGE ADMIN PASSWORD MODAL
+            ======================================================== */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 text-left">
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between pb-3.5 border-b border-[#1b5361]/60">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                    <KeyRound className="w-5 h-5 stroke-[2.2]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0 leading-tight">
+                                        Change Admin Password
+                                    </h3>
+                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">
+                                        Security Settings &bull; @{adminUsername}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (!passwordForm.processing) {
+                                        setShowPasswordModal(false);
+                                    }
+                                }}
+                                disabled={passwordForm.processing}
+                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                title="Close modal"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Account Summary Banner */}
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-4 h-4 text-[#25dec0] shrink-0" />
+                                <span className="text-slate-300 text-[11px]">Logged in as:</span>
+                                <strong className="text-white text-[11px]">@{adminUsername}</strong>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/30">
+                                {auth?.admin?.role || 'Administrator'}
+                            </span>
+                        </div>
+
+                        <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
+                            {/* Current Password */}
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    Current Password <span className="text-rose-400">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showCurrentPass ? 'text' : 'password'}
+                                        required
+                                        value={passwordForm.data.current_password}
+                                        onChange={(e) => passwordForm.setData('current_password', e.target.value)}
+                                        placeholder="Enter your current password..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPass(!showCurrentPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showCurrentPass ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {passwordForm.errors.current_password && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{passwordForm.errors.current_password}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* New Password */}
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    New Password <span className="text-[#25dec0]">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showNewPass ? 'text' : 'password'}
+                                        required
+                                        minLength={8}
+                                        value={passwordForm.data.password}
+                                        onChange={(e) => passwordForm.setData('password', e.target.value)}
+                                        placeholder="Enter strong new password (min. 8 chars)..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPass(!showNewPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showNewPass ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {passwordForm.errors.password && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{passwordForm.errors.password}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Confirm New Password */}
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    Confirm New Password <span className="text-[#25dec0]">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showConfirmPass ? 'text' : 'password'}
+                                        required
+                                        minLength={8}
+                                        value={passwordForm.data.password_confirmation}
+                                        onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
+                                        placeholder="Re-type new password to confirm..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showConfirmPass ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {passwordForm.errors.password_confirmation && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{passwordForm.errors.password_confirmation}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Password Rules Checklist */}
+                            <div className="p-3 bg-[#082033]/50 rounded-xl border border-[#1e4e5b]/50 text-[11px] space-y-1 text-slate-400">
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                                        passwordForm.data.password.length >= 8
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                            : 'bg-slate-700/40 text-slate-400'
+                                    }`}>
+                                        ✓
+                                    </span>
+                                    <span className={passwordForm.data.password.length >= 8 ? 'text-emerald-400 font-semibold' : ''}>
+                                        Minimum 8 characters
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                                        passwordForm.data.password.length > 0 &&
+                                        passwordForm.data.password === passwordForm.data.password_confirmation
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                            : 'bg-slate-700/40 text-slate-400'
+                                    }`}>
+                                        ✓
+                                    </span>
+                                    <span className={
+                                        passwordForm.data.password.length > 0 &&
+                                        passwordForm.data.password === passwordForm.data.password_confirmation
+                                            ? 'text-emerald-400 font-semibold'
+                                            : ''
+                                    }>
+                                        Passwords match
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Footer Buttons */}
+                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswordModal(false)}
+                                    disabled={passwordForm.processing}
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={
+                                        passwordForm.processing ||
+                                        !passwordForm.data.current_password ||
+                                        passwordForm.data.password.length < 8 ||
+                                        passwordForm.data.password !== passwordForm.data.password_confirmation
+                                    }
+                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {passwordForm.processing ? (
+                                        <>
+                                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                            <span>Updating Password...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <KeyRound className="w-3.5 h-3.5" />
+                                            <span>Save New Password</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

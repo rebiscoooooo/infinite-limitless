@@ -18,6 +18,7 @@ class AutoSeederTest extends TestCase
     public function test_auto_seeder_populates_missing_baseline_data(): void
     {
         // 1. Trigger auto-seeder
+        Product::truncate();
         app()->getProvider(AppServiceProvider::class)->autoSeedIfNeeded();
 
         // 2. Verify admin accounts exist with default credentials

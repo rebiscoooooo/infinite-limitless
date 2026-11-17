@@ -106,6 +106,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/world-plan/bulk-restore', [WorldPlanAdminController::class, 'bulkRestore'])->name('world-plan.bulk-restore');
         Route::match(['post', 'delete'], '/world-plan/bulk-delete', [WorldPlanAdminController::class, 'bulkDelete'])->name('world-plan.bulk-delete');
         Route::patch('/world-plan/{registration}/status', [WorldPlanAdminController::class, 'updateStatus'])->name('world-plan.status');
+        Route::post('/world-plan/{registration}/send-credentials', [WorldPlanAdminController::class, 'sendCredentials'])->name('world-plan.send-credentials');
         Route::delete('/world-plan/{registration}', [WorldPlanAdminController::class, 'destroy'])->name('world-plan.destroy');
 
         // Administrator Users Management & Creation
@@ -114,9 +115,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/admins/bulk-archive', [AdminUserController::class, 'bulkArchive'])->name('admins.bulk-archive');
         Route::post('/admins/bulk-restore', [AdminUserController::class, 'bulkRestore'])->name('admins.bulk-restore');
         Route::match(['post', 'delete'], '/admins/bulk-delete', [AdminUserController::class, 'bulkDelete'])->name('admins.bulk-delete');
-        Route::post('/admins/{admin}', [AdminUserController::class, 'update'])->name('admins.update');
+        Route::match(['post', 'put', 'patch'], '/admins/{admin}', [AdminUserController::class, 'update'])->name('admins.update');
+        Route::post('/admins/{admin}/change-password', [AdminUserController::class, 'changeAdminPassword'])->name('admins.change-password');
         Route::delete('/admins/{admin}', [AdminUserController::class, 'destroy'])->name('admins.destroy');
         Route::patch('/admins/{admin}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admins.toggle-status');
+
+        // Administrator Password Security & Profile
+        Route::post('/change-password', [AdminAuthController::class, 'changePassword'])->name('change-password');
+        Route::post('/profile/change-password', [AdminAuthController::class, 'changePassword'])->name('profile.change-password');
 
         // Activity Logs & Bulk Actions
         Route::get('/activity-logs', [ActivityLogAdminController::class, 'index'])->name('activity-logs.index');
@@ -124,8 +130,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/activity-logs/bulk-restore', [ActivityLogAdminController::class, 'bulkRestore'])->name('activity-logs.bulk-restore');
         Route::match(['post', 'delete'], '/activity-logs/bulk-delete', [ActivityLogAdminController::class, 'bulkDelete'])->name('activity-logs.bulk-delete');
 
-        // Email Diagnostic Testing
+        // Email Diagnostic Testing & Marketing
         Route::post('/test-email', [EmailApiController::class, 'testEmail'])->name('test-email');
+        Route::post('/marketing/dispatch-daily', [DashboardController::class, 'dispatchDailyMarketing'])->name('marketing.dispatch-daily');
     });
 });
 

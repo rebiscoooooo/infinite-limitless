@@ -26,6 +26,12 @@ import {
     Image as ImageIcon,
     Sparkles,
     ArrowUpRight,
+    KeyRound,
+    Lock,
+    Mail,
+    EyeOff,
+    Send,
+    Loader2,
 } from 'lucide-react';
 
 export default function WorldPlanRegistrations({
@@ -51,6 +57,63 @@ export default function WorldPlanRegistrations({
     const [adminNotes, setAdminNotes] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
     const [processingAction, setProcessingAction] = useState(false);
+
+    // Credentials Modal States
+    const [credentialsModalItem, setCredentialsModalItem] = useState(null);
+    const [credUsername, setCredUsername] = useState('');
+    const [credPassword, setCredPassword] = useState('');
+    const [showCredPassword, setShowCredPassword] = useState(false);
+    const [sendingCredentials, setSendingCredentials] = useState(false);
+
+    const openCredentialsModal = (item) => {
+        setCredentialsModalItem(item);
+        setCredUsername(item.username || '');
+        setCredPassword('');
+        setShowCredPassword(false);
+    };
+
+    const generateRandomPassword = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
+        let pass = 'Inf#';
+        for (let i = 0; i < 8; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setCredPassword(pass);
+    };
+
+    const handleSendCredentialsSubmit = (e) => {
+        e.preventDefault();
+        if (!credentialsModalItem) return;
+        if (!credUsername.trim()) {
+            alert('Please enter a username.');
+            return;
+        }
+        if (!credPassword.trim()) {
+            alert('Please enter a password.');
+            return;
+        }
+
+        setSendingCredentials(true);
+        router.post(
+            `/admin/world-plan/${credentialsModalItem.id}/send-credentials`,
+            {
+                username: credUsername.trim(),
+                password: credPassword.trim(),
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setSendingCredentials(false);
+                    setCredentialsModalItem(null);
+                    setCredPassword('');
+                },
+                onError: (errors) => {
+                    setSendingCredentials(false);
+                    alert(Object.values(errors).flat().join('\n') || 'Failed to dispatch credentials.');
+                },
+            }
+        );
+    };
 
     const openProofModal = (item) => {
         setProofZoom(1);
@@ -677,6 +740,15 @@ export default function WorldPlanRegistrations({
                                                         )}
 
                                                         <button
+                                                            type="button"
+                                                            onClick={() => openCredentialsModal(reg)}
+                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#25dec0] transition-colors border border-[#24dbc3]/30 cursor-pointer"
+                                                            title="Send Portal Login Credentials"
+                                                        >
+                                                            <KeyRound className="w-4 h-4" />
+                                                        </button>
+
+                                                        <button
                                                             onClick={() => handleDelete(reg.id, reg.full_name || reg.username)}
                                                             className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/30 cursor-pointer"
                                                             title="Delete Permanently"
@@ -818,6 +890,14 @@ export default function WorldPlanRegistrations({
                                                     <span>Approve</span>
                                                 </button>
                                             )}
+                                            <button
+                                                type="button"
+                                                onClick={() => openCredentialsModal(reg)}
+                                                className="px-2.5 py-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30 cursor-pointer"
+                                            >
+                                                <KeyRound className="w-3.5 h-3.5" />
+                                                <span>Credentials</span>
+                                            </button>
                                         </div>
 
                                         <button
@@ -971,7 +1051,18 @@ export default function WorldPlanRegistrations({
                             )}
 
                             {/* Actions in details modal */}
-                            <div className="flex justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                            <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#1b5361]/60 flex-wrap">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const target = detailsModalItem;
+                                        setDetailsModalItem(null);
+                                        openCredentialsModal(target);
+                                    }}
+                                    className="bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow"
+                                >
+                                    <KeyRound className="w-4 h-4" /> Send Credentials
+                                </button>
                                 {detailsModalItem.status !== 'Approved' && (
                                     <button
                                         type="button"
@@ -1117,6 +1208,170 @@ export default function WorldPlanRegistrations({
                                 >
                                     <XCircle className="w-4 h-4" />
                                     <span>{processingAction ? 'Sending Rejection Notice...' : 'Confirm Rejection'}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL 5: SEND LOGIN CREDENTIALS */}
+            {credentialsModalItem && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="relative w-full max-w-lg rounded-2xl sm:rounded-3xl bg-[#061726] border border-[#2c6973] shadow-[0_25px_70px_rgba(0,0,0,0.6)] p-5 sm:p-7 overflow-hidden text-left">
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                        <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="relative z-10 flex items-center justify-between pb-4 border-b border-[#1b5361]/60">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                    <KeyRound className="w-5 h-5 stroke-[2.2]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0">
+                                        Send Login Credentials
+                                    </h3>
+                                    <p className="text-xs text-slate-400 mb-0">
+                                        Dispatch official portal credentials to client email
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (!sendingCredentials) {
+                                        setCredentialsModalItem(null);
+                                    }
+                                }}
+                                disabled={sendingCredentials}
+                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSendCredentialsSubmit} className="relative z-10 mt-5 space-y-4">
+                            {/* 1. Client Email (Viewable Only, Not Editable) */}
+                            <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                        <span>Client Email (Viewable Only)</span>
+                                    </label>
+                                    <span className="text-[10px] text-amber-400 font-semibold flex items-center gap-1">
+                                        <Lock className="w-3 h-3" /> Locked &bull; Non-editable
+                                    </span>
+                                </div>
+                                <div className="relative">
+                                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type="email"
+                                        value={credentialsModalItem.email || ''}
+                                        readOnly
+                                        disabled
+                                        className="w-full bg-[#082033]/60 border border-[#1e4e5b]/60 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-300 font-medium cursor-not-allowed select-all"
+                                    />
+                                </div>
+                                <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
+                                    <span>Recipient: <strong className="text-white">{credentialsModalItem.full_name || `${credentialsModalItem.first_name || ''} ${credentialsModalItem.last_name || ''}`.trim()}</strong></span>
+                                    <span className="text-[#25dec0] font-semibold">{credentialsModalItem.package_type}</span>
+                                </div>
+                            </div>
+
+                            {/* 2. Username (Manually Editable) */}
+                            <div>
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+                                    Client Username <span className="text-[#25dec0]">*</span>
+                                </label>
+                                <div className="relative">
+                                    <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type="text"
+                                        value={credUsername}
+                                        onChange={(e) => setCredUsername(e.target.value)}
+                                        required
+                                        placeholder="Type client username..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-medium"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-slate-400 mt-1 mb-0">
+                                    Pre-filled with registered username. You can manually type or customize it.
+                                </p>
+                            </div>
+
+                            {/* 3. Password (Manually Editable + Generator) */}
+                            <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                                        Client Password <span className="text-[#25dec0]">*</span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={generateRandomPassword}
+                                        className="text-[11px] font-bold text-[#25dec0] hover:text-[#42f1ce] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <span>Generate Password</span>
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showCredPassword ? 'text' : 'password'}
+                                        value={credPassword}
+                                        onChange={(e) => setCredPassword(e.target.value)}
+                                        required
+                                        placeholder="Type or generate client portal password..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCredPassword(!showCredPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showCredPassword ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showCredPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-slate-400 mt-1 mb-0">
+                                    Manually type the client&apos;s password or click &apos;Generate Password&apos; above.
+                                </p>
+                            </div>
+
+                            {/* Direct Portal Notice */}
+                            <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                    <Globe className="w-4 h-4 text-[#25dec0] shrink-0" />
+                                    <span className="text-slate-300 text-[11px]">Official Portal link in email:</span>
+                                </div>
+                                <span className="font-mono text-[11px] font-bold text-[#25dec0]">helloinfinity.net/iprosperity</span>
+                            </div>
+
+                            {/* Footer Buttons */}
+                            <div className="pt-3 border-t border-[#1b5361]/60 flex items-center justify-end gap-2.5">
+                                <button
+                                    type="button"
+                                    onClick={() => setCredentialsModalItem(null)}
+                                    disabled={sendingCredentials}
+                                    className="px-4 py-2.5 bg-[#082033] text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={sendingCredentials || !credUsername.trim() || !credPassword.trim()}
+                                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold text-xs flex items-center gap-2 shadow-[0_4px_15px_rgba(36,219,195,0.25)] transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {sendingCredentials ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <span>Sending Email...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Send className="w-4 h-4" />
+                                            <span>Send Credentials Email</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </form>

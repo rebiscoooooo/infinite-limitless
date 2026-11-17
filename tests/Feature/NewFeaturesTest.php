@@ -65,9 +65,9 @@ class NewFeaturesTest extends TestCase
 
         $inqEmail = 'jane_' . uniqid() . '@example.com';
         $regEmail = 'bob_' . uniqid() . '@example.com';
-        $userEmail = 'alice_' . uniqid() . '@example.com';
+        $adminEmail = 'admin_target_' . uniqid() . '@infinite-limitless.com';
 
-        // Seed inquiries, registrations, users
+        // Seed inquiries, registrations, admin accounts
         Inquiry::create([
             'name' => 'Inquirer Jane',
             'email' => $inqEmail,
@@ -92,12 +92,13 @@ class NewFeaturesTest extends TestCase
             'agreed_privacy' => true,
         ]);
 
-        User::create([
-            'username' => 'alice_' . uniqid(),
-            'name' => 'Customer Alice',
-            'full_name' => 'Customer Alice',
-            'email' => $userEmail,
+        AdminUser::create([
+            'name' => 'Internal Staff Admin',
+            'username' => 'staff_' . uniqid(),
+            'email' => $adminEmail,
             'password' => Hash::make('password123'),
+            'role' => 'Admin',
+            'status' => 'Active',
         ]);
 
         // Run marketing command with dry-run
@@ -113,12 +114,18 @@ class NewFeaturesTest extends TestCase
             '--force' => true,
         ])->assertExitCode(0);
 
-        Mail::assertQueued(ProductMarketingMail::class, function ($mail) use ($inqEmail, $regEmail, $userEmail) {
-            return in_array($mail->recipientEmail, [
-                $inqEmail,
-                $regEmail,
-                $userEmail,
-            ]);
+        // Verify Inquiry and World Plan recipients received marketing
+        Mail::assertQueued(ProductMarketingMail::class, function ($mail) use ($inqEmail) {
+            return $mail->recipientEmail === $inqEmail;
+        });
+
+        Mail::assertQueued(ProductMarketingMail::class, function ($mail) use ($regEmail) {
+            return $mail->recipientEmail === $regEmail;
+        });
+
+        // Strictly verify that Admin account DID NOT receive marketing
+        Mail::assertNotQueued(ProductMarketingMail::class, function ($mail) use ($adminEmail) {
+            return $mail->recipientEmail === $adminEmail;
         });
     }
 
@@ -444,5 +451,303 @@ class NewFeaturesTest extends TestCase
 
         $this->assertFalse($imgReg->is_pdf_receipt);
         $this->assertEquals('/storage/payment_proofs/nested_receipt.png', $imgReg->payment_proof_url);
+    }
+
+    /**
+     * Test admin can dispatch official portal login credentials to client via email.
+     */
+    public function test_admin_can_send_world_plan_credentials_email(): void
+    {
+        Mail::fake();
+
+        $this->loginAdmin();
+
+        $suffix = uniqid();
+        $email = "alexander.{$suffix}@example.com";
+        $username = "alex_{$suffix}";
+        $newUsername = "alex_official_{$suffix}";
+
+        $reg = WorldPlanRegistration::create([
+            'first_name' => 'Alexander',
+            'last_name' => 'Vanguard',
+            'full_name' => 'Alexander Vanguard',
+            'birthdate' => '1990-01-01',
+            'contact_no' => '+639171234567',
+            'address' => 'Manila, Philippines',
+            'email' => $email,
+            'contact_number' => '+639171234567',
+            'country' => 'Philippines',
+            'package_type' => 'Infinite Legacy',
+            'amount_paid' => '₱50,000.00',
+            'payment_date' => '2026-11-10',
+            'status' => 'Approved',
+            'username' => $username,
+            'payment_proof' => 'sample_receipt.png',
+            'agreed_terms' => true,
+            'agreed_privacy' => true,
+        ]);
+
+        $response = $this->post("/admin/world-plan/{$reg->id}/send-credentials", [
+            'username' => $newUsername,
+            'password' => 'Pass#Secure2026',
+        ]);
+
+        $response->assertSessionHas('success');
+
+        // Verify username was synchronized
+        $this->assertDatabaseHas('world_plan_registrations', [
+            'id' => $reg->id,
+            'username' => $newUsername,
+        ]);
+
+        // Verify mail queued for sending
+        Mail::assertQueued(\App\Mail\WorldPlanCredentialsMail::class, function ($mail) use ($email, $newUsername) {
+            $hasRecipient = $mail->hasTo($email);
+            $correctUsername = $mail->username === $newUsername;
+            $correctPassword = $mail->password === 'Pass#Secure2026';
+            $correctPortal = $mail->portalUrl === 'https://helloinfinity.net/iprosperity';
+
+            return $hasRecipient && $correctUsername && $correctPassword && $correctPortal;
+        });
+
+        // Verify Activity Log
+        $this->assertDatabaseHas('activity_logs', [
+            'action_type' => "Dispatched Login Credentials to {$email} (Email Sent)",
+            'status' => 'Success',
+        ]);
+    }
+
+    /**
+     * Test credentials email template rendering and anti-spam headers.
+     */
+    public function test_world_plan_credentials_mail_renders_correctly(): void
+    {
+        $reg = new WorldPlanRegistration([
+            'id' => 99,
+            'full_name' => 'Maria Santos',
+            'first_name' => 'Maria',
+            'last_name' => 'Santos',
+            'email' => 'maria.santos@example.com',
+            'package_type' => 'Diamond Elite',
+        ]);
+
+        $mail = new \App\Mail\WorldPlanCredentialsMail(
+            registration: $reg,
+            username: 'maria_elite',
+            password: 'My#Password!99',
+            portalUrl: 'https://helloinfinity.net/iprosperity'
+        );
+
+        // Verify envelope
+        $envelope = $mail->envelope();
+        $this->assertStringContainsString('Official Portal Login Credentials', $envelope->subject);
+        $this->assertStringContainsString('Maria Santos', $envelope->subject);
+
+        // Verify anti-spam headers
+        $headers = $mail->headers();
+        $this->assertArrayHasKey('X-Entity-Ref-ID', $headers->text);
+        $this->assertArrayHasKey('X-Auto-Response-Suppress', $headers->text);
+
+        // Verify Blade rendered content
+        $html = $mail->render();
+        $this->assertStringContainsString('Dear Maria Santos', $html);
+        $this->assertStringContainsString('maria_elite', $html);
+        $this->assertStringContainsString('My#Password!99', $html);
+        $this->assertStringContainsString('DIAMOND ELITE', $html);
+        $this->assertStringContainsString('helloinfinity.net/iprosperity', $html);
+        $this->assertStringContainsString('From the Infinite Limitless Team', $html);
+    }
+
+    /**
+     * Test credentials dispatch validation for missing fields.
+     */
+    public function test_send_world_plan_credentials_validation(): void
+    {
+        $this->loginAdmin();
+
+        $suffix = uniqid();
+        $reg = WorldPlanRegistration::create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'full_name' => 'Test User',
+            'birthdate' => '1995-02-02',
+            'contact_no' => '+639171234568',
+            'address' => 'Cebu, Philippines',
+            'email' => "test.user.{$suffix}@example.com",
+            'contact_number' => '+639171234568',
+            'country' => 'Philippines',
+            'package_type' => 'Infinite Basic',
+            'amount_paid' => '₱5,000.00',
+            'payment_date' => '2026-11-10',
+            'status' => 'Pending',
+            'username' => "testuser_{$suffix}",
+            'payment_proof' => 'proof_test.png',
+            'agreed_terms' => true,
+            'agreed_privacy' => true,
+        ]);
+
+        $response = $this->post("/admin/world-plan/{$reg->id}/send-credentials", [
+            'username' => '',
+            'password' => '',
+        ]);
+
+        $response->assertSessionHasErrors(['username', 'password']);
+    }
+
+    /**
+     * Test logged-in admin can change their own password via /admin/change-password.
+     */
+    public function test_logged_in_admin_can_change_own_password_successfully(): void
+    {
+        $this->loginAdmin();
+        $admin = AdminUser::where('username', 'admin')->first();
+
+        $response = $this->post('/admin/change-password', [
+            'current_password' => 'Infinite#1230',
+            'password' => 'NewAdminPass#2026',
+            'password_confirmation' => 'NewAdminPass#2026',
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('NewAdminPass#2026', $admin->fresh()->password));
+
+        // Verify activity log recorded
+        $this->assertDatabaseHas('activity_logs', [
+            'admin_user' => 'admin',
+            'action_type' => 'Changed Admin Password',
+            'status' => 'Success',
+        ]);
+
+        // Restore default password for subsequent tests
+        $admin->update(['password' => Hash::make('Infinite#1230')]);
+    }
+
+    /**
+     * Test changing password fails when current password is wrong.
+     */
+    public function test_change_password_requires_correct_current_password(): void
+    {
+        $this->loginAdmin();
+
+        $response = $this->post('/admin/change-password', [
+            'current_password' => 'WrongPassword123!',
+            'password' => 'NewAdminPass#2026',
+            'password_confirmation' => 'NewAdminPass#2026',
+        ]);
+
+        $response->assertSessionHasErrors(['current_password']);
+    }
+
+    /**
+     * Test validation rules for changing password (min 8, confirmed, different).
+     */
+    public function test_change_password_validation_rules(): void
+    {
+        $this->loginAdmin();
+
+        // 1. Mismatched confirmation
+        $res1 = $this->post('/admin/change-password', [
+            'current_password' => 'Infinite#1230',
+            'password' => 'NewAdminPass#2026',
+            'password_confirmation' => 'DifferentPass#2026',
+        ]);
+        $res1->assertSessionHasErrors(['password']);
+
+        // 2. Too short (< 8 chars)
+        $res2 = $this->post('/admin/change-password', [
+            'current_password' => 'Infinite#1230',
+            'password' => 'Short1!',
+            'password_confirmation' => 'Short1!',
+        ]);
+        $res2->assertSessionHasErrors(['password']);
+
+        // 3. Same as current password
+        $res3 = $this->post('/admin/change-password', [
+            'current_password' => 'Infinite#1230',
+            'password' => 'Infinite#1230',
+            'password_confirmation' => 'Infinite#1230',
+        ]);
+        $res3->assertSessionHasErrors(['password']);
+    }
+
+    /**
+     * Test admin can reset another admin's password via /admin/admins/{id}/change-password.
+     */
+    public function test_admin_can_reset_another_admin_password(): void
+    {
+        $this->loginAdmin();
+
+        $username = 'operator_' . uniqid();
+        $target = AdminUser::create([
+            'name' => 'Support Operator',
+            'username' => $username,
+            'email' => "{$username}@infinite.com",
+            'password' => Hash::make('InitialPass#123'),
+            'role' => 'Manager',
+            'status' => 'Active',
+        ]);
+
+        $response = $this->post("/admin/admins/{$target->id}/change-password", [
+            'password' => 'ResetPass#Secure99',
+            'password_confirmation' => 'ResetPass#Secure99',
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('ResetPass#Secure99', $target->fresh()->password));
+
+        // Verify activity log
+        $this->assertDatabaseHas('activity_logs', [
+            'action_type' => "Reset Password for Admin (@{$username})",
+            'status' => 'Success',
+        ]);
+    }
+
+    /**
+     * Test admin update via PUT method handles password update cleanly.
+     */
+    public function test_admin_update_handles_password_change_via_put(): void
+    {
+        $this->loginAdmin();
+
+        $username = 'lead_' . uniqid();
+        $target = AdminUser::create([
+            'name' => 'Team Lead',
+            'username' => $username,
+            'email' => "{$username}@infinite.com",
+            'password' => Hash::make('InitialPass#123'),
+            'role' => 'Admin',
+            'status' => 'Active',
+        ]);
+
+        $response = $this->put("/admin/admins/{$target->id}", [
+            'name' => 'Team Lead Updated',
+            'username' => $username,
+            'email' => "{$username}@infinite.com",
+            'role' => 'Admin',
+            'status' => 'Active',
+            'password' => 'BrandNewSecret#2026',
+            'password_confirmation' => 'BrandNewSecret#2026',
+        ]);
+
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('BrandNewSecret#2026', $target->fresh()->password));
+        $this->assertEquals('Team Lead Updated', $target->fresh()->name);
+    }
+
+    /**
+     * Test admin can trigger 8:00 AM daily marketing dispatch from dashboard.
+     */
+    public function test_admin_can_dispatch_daily_marketing_from_dashboard(): void
+    {
+        Mail::fake();
+        $this->loginAdmin();
+
+        $response = $this->post('/admin/marketing/dispatch-daily');
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('activity_logs', [
+            'action_type' => 'Triggered 8:00 AM Daily Email Marketing Dispatch',
+            'status' => 'Success',
+        ]);
     }
 }

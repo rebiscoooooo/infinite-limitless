@@ -4,7 +4,12 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('marketing:send-daily-product')->dailyAt('09:00');
+// Send daily product marketing email every morning at 8:00 AM
+Schedule::command('marketing:send-daily-product')
+    ->dailyAt('08:00')
+    ->timezone(config('app.timezone', 'Asia/Manila'))
+    ->withoutOverlapping()
+    ->runInBackground();
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
@@ -45,6 +46,26 @@ class ProductMarketingMail extends Mailable
                 config('mail.from.name', 'INFINITE Live Limitless')
             ),
             subject: $subjectPrefix . $this->product->name,
+        );
+    }
+
+    /**
+     * Get the message headers to avoid spam detection, threading, and clipping.
+     */
+    public function headers(): Headers
+    {
+        $productId = $this->product->id;
+        $timestamp = time();
+
+        return new Headers(
+            text: [
+                'X-Entity-Ref-ID' => 'MKTG-DAILY-' . $productId . '-' . $timestamp,
+                'X-Auto-Response-Suppress' => 'All',
+                'Precedence' => 'bulk',
+                'Auto-Submitted' => 'auto-generated',
+                'List-Unsubscribe' => '<' . $this->unsubscribeUrl . '>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+            ],
         );
     }
 

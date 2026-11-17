@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
 import {
@@ -23,6 +23,13 @@ import {
     Smartphone,
     Tablet,
     Sparkles,
+    Mail,
+    Send,
+    Radio,
+    Check,
+    Loader2,
+    Calendar,
+    X,
 } from 'lucide-react';
 
 export default function Dashboard({
@@ -31,9 +38,30 @@ export default function Dashboard({
     recentInquiries = [],
     recentLogs = [],
     recentRegistrations = [],
+    marketingStats = {},
 }) {
     const { auth } = usePage().props || {};
     const adminUser = auth?.admin?.username || 'Administrator';
+
+    // On-demand Marketing Dispatch Modal
+    const [showMarketingModal, setShowMarketingModal] = useState(false);
+    const [testEmailInput, setTestEmailInput] = useState('');
+    const [isDispatching, setIsDispatching] = useState(false);
+
+    const handleMarketingSubmit = (e) => {
+        e.preventDefault();
+        setIsDispatching(true);
+        router.post('/admin/marketing/dispatch-daily', {
+            test_email: testEmailInput.trim(),
+        }, {
+            preserveScroll: true,
+            onFinish: () => {
+                setIsDispatching(false);
+                setShowMarketingModal(false);
+                setTestEmailInput('');
+            },
+        });
+    };
 
     const deleteInquiry = (id) => {
         if (confirm('Permanently delete this inquiry from the database?')) {
@@ -226,6 +254,101 @@ export default function Dashboard({
                             </Link>
                         </div>
                     </div>
+                </div>
+
+                {/* AUTOMATED DAILY EMAIL MARKETING BANNER CARD */}
+                <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-[#061726]/90 border border-[#2c6973]/75 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden">
+                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                    <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#1b5361]/60">
+                        <div className="flex items-start sm:items-center gap-3">
+                            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                <Mail className="w-5 h-5 stroke-[2.2]" />
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0">
+                                        Automated Email Marketing Campaign
+                                    </h3>
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                        <span>Every Morning at 8:00 AM PHT</span>
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-300 mb-0 mt-0.5">
+                                    Dispatches daily rotating product spotlight to all World Plan registrants and Inquiries (Admin accounts strictly excluded).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => setShowMarketingModal(true)}
+                                className="px-4 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold text-xs flex items-center gap-2 shadow-[0_4px_18px_rgba(36,219,195,0.25)] hover:brightness-110 active:scale-[.99] transition-all cursor-pointer border-0"
+                            >
+                                <Send className="w-3.5 h-3.5" />
+                                <span>Run Marketing Dispatch</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Marketing Audience KPI Grid */}
+                    <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 pt-4">
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">
+                                World Plan Audience
+                            </span>
+                            <span className="text-lg sm:text-xl font-mono font-bold text-white block">
+                                {marketingStats.world_plan_count || 0}
+                            </span>
+                            <span className="text-[10px] text-[#25dec0] font-medium">Registered Clients</span>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">
+                                Customer Inquiries
+                            </span>
+                            <span className="text-lg sm:text-xl font-mono font-bold text-white block">
+                                {marketingStats.inquiries_count || 0}
+                            </span>
+                            <span className="text-[10px] text-[#25dec0] font-medium">Contact Submissions</span>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">
+                                Total Verified Reach
+                            </span>
+                            <span className="text-lg sm:text-xl font-mono font-bold text-emerald-400 block">
+                                {marketingStats.eligible_count || 0}
+                            </span>
+                            <span className="text-[10px] text-slate-300 font-medium">Distinct Recipients</span>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-amber-500/30">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-0.5 flex items-center gap-1">
+                                <Shield className="w-3 h-3" /> Admin Exclusion
+                            </span>
+                            <span className="text-lg sm:text-xl font-mono font-bold text-amber-300 block">
+                                0 Sent to Admins
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-medium">
+                                {marketingStats.admin_excluded_count || 0} accounts protected
+                            </span>
+                        </div>
+                    </div>
+
+                    {marketingStats.last_product_name && (
+                        <div className="relative z-10 mt-3 pt-3 border-t border-[#1b5361]/50 flex items-center justify-between text-[11px] text-slate-400 flex-wrap gap-2">
+                            <span>
+                                Last Campaign: <strong className="text-white">{marketingStats.last_product_name}</strong> on <strong className="text-slate-200">{marketingStats.last_sent_date}</strong>
+                            </span>
+                            <span className="text-[#25dec0] font-mono">
+                                ({marketingStats.last_recipients_count || 0} emails queued)
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* TWO-COLUMN OPERATIONAL DASHBOARD */}
@@ -523,6 +646,114 @@ export default function Dashboard({
                     </div>
                 </div>
             </div>
+
+            {/* MANUAL MARKETING DISPATCH MODAL */}
+            {showMarketingModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 text-left">
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between pb-3.5 border-b border-[#1b5361]/60">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                    <Send className="w-5 h-5 stroke-[2.2]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0 leading-tight">
+                                        Run Daily Email Marketing
+                                    </h3>
+                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">
+                                        Manual dispatch or targeted test delivery
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => !isDispatching && setShowMarketingModal(false)}
+                                disabled={isDispatching}
+                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Campaign Rules & Target Overview */}
+                        <div className="p-3.5 bg-[#082033]/70 rounded-xl border border-[#1e4e5b]/70 space-y-2 text-xs">
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-300 font-semibold">Standard Schedule:</span>
+                                <span className="font-mono text-[#25dec0] font-bold">Every Morning at 8:00 AM PHT</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-300 font-semibold">Target Audience:</span>
+                                <span className="text-white font-medium">World Plan Registrations + Inquiries</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-slate-300 font-semibold">Admin Account Protection:</span>
+                                <span className="text-amber-400 font-bold flex items-center gap-1">
+                                    <Shield className="w-3.5 h-3.5" /> Strictly Excluded (0 to Admins)
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between pt-1 border-t border-[#1b5361]/40">
+                                <span className="text-slate-400">Total Live Recipients:</span>
+                                <span className="text-emerald-400 font-bold font-mono">{marketingStats.eligible_count || 0} distinct emails</span>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleMarketingSubmit} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    Optional Test Recipient Email
+                                </label>
+                                <div className="relative">
+                                    <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type="email"
+                                        value={testEmailInput}
+                                        onChange={(e) => setTestEmailInput(e.target.value)}
+                                        placeholder="Leave blank to send to all eligible World Plan + Inquiries"
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all"
+                                    />
+                                </div>
+                                <p className="text-[10px] text-slate-400 mt-1 mb-0">
+                                    {testEmailInput.trim()
+                                        ? `TEST MODE: Email will ONLY be sent to ${testEmailInput.trim()}`
+                                        : `BROADCAST MODE: Will queue daily spotlight to all ${marketingStats.eligible_count || 0} eligible clients.`}
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMarketingModal(false)}
+                                    disabled={isDispatching}
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isDispatching}
+                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {isDispatching ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <span>Queuing Marketing...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Send className="w-4 h-4" />
+                                            <span>{testEmailInput.trim() ? 'Send Test Email' : 'Dispatch to All Recipients'}</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 }

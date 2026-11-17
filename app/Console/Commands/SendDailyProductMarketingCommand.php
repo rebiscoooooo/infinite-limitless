@@ -33,7 +33,7 @@ class SendDailyProductMarketingCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Send rotating daily product marketing email to all emails recorded across the entire system database.';
+    protected $description = 'Send rotating daily product marketing email every morning at 8:00 AM to all World Plan registrants and Inquiries, strictly excluding admin accounts and unsubscribes.';
 
     /**
      * Execute the console command.
@@ -41,7 +41,7 @@ class SendDailyProductMarketingCommand extends Command
     public function handle(): int
     {
         $today = now()->toDateString();
-        $this->info("=== INFINITE Daily Product Marketing Dispatcher [{$today}] ===");
+        $this->info("=== INFINITE Daily Product Marketing Dispatcher [8:00 AM Task | {$today}] ===");
 
         // 1. Check if already dispatched today unless forced
         if (!$this->option('force') && !$this->option('test-email')) {
@@ -75,18 +75,27 @@ class SendDailyProductMarketingCommand extends Command
 
         $this->info("Selected Product for Today: {$product->name} (Category: {$product->category})");
 
-        // 3. Gather all email recipients from entire database
+        // 3. Gather email recipients strictly as requested:
+        // - All registered emails in World Plan Registrations
+        // - All emails in Customer Inquiries
+        // - STRICT EXCLUSION of all Admin Accounts
+        // - STRICT EXCLUSION of Unsubscribed Users
         $recipients = [];
         if ($testEmail = $this->option('test-email')) {
             $recipients = [strtolower(trim($testEmail))];
             $this->info("Running in TEST MODE. Recipient: {$testEmail}");
         } else {
-            $inquiryEmails = Inquiry::pluck('email')->all();
-            $regEmails = WorldPlanRegistration::pluck('email')->all();
-            $userEmails = User::pluck('email')->all();
-            $adminEmails = AdminUser::whereNotNull('email')->pluck('email')->all();
+            // Gather emails from World Plan Registrations
+            $worldPlanEmails = WorldPlanRegistration::whereNotNull('email')
+                ->pluck('email')
+                ->all();
 
-            $merged = array_merge($inquiryEmails, $regEmails, $userEmails, $adminEmails);
+            // Gather emails from Inquiries
+            $inquiryEmails = Inquiry::whereNotNull('email')
+                ->pluck('email')
+                ->all();
+
+            $merged = array_merge($worldPlanEmails, $inquiryEmails);
             $clean = [];
             foreach ($merged as $em) {
                 $em = strtolower(trim((string) $em));
@@ -95,17 +104,46 @@ class SendDailyProductMarketingCommand extends Command
                 }
             }
 
-            // Exclude unsubscribes
+            // Gather Admin accounts to strictly exclude
+            $adminEmails = AdminUser::whereNotNull('email')->pluck('email')->all();
+            $adminUsernames = AdminUser::whereNotNull('username')->pluck('username')->all();
+
+            $adminExcludes = [];
+            foreach ($adminEmails as $aEmail) {
+                $aEmail = strtolower(trim((string) $aEmail));
+                if (!empty($aEmail)) {
+                    $adminExcludes[$aEmail] = true;
+                }
+            }
+            foreach ($adminUsernames as $aUser) {
+                $aUser = strtolower(trim((string) $aUser));
+                if (!empty($aUser) && filter_var($aUser, FILTER_VALIDATE_EMAIL)) {
+                    $adminExcludes[$aUser] = true;
+                }
+            }
+
+            // Exclude default/system administrative addresses
+            $configAdmin = strtolower(trim((string) config('mail.admin_address', 'infinitelimitless123@gmail.com')));
+            if (!empty($configAdmin)) {
+                $adminExcludes[$configAdmin] = true;
+            }
+            $fromAddress = strtolower(trim((string) config('mail.from.address', 'admin@infinite-limitless.com')));
+            if (!empty($fromAddress)) {
+                $adminExcludes[$fromAddress] = true;
+            }
+
+            // Exclude unsubscribed emails
             $unsubscribes = MarketingUnsubscribe::pluck('email')
                 ->map(fn($e) => strtolower(trim((string) $e)))
                 ->flip()
                 ->all();
 
-            $recipients = array_keys(array_diff_key($clean, $unsubscribes));
+            // Filter out both admin accounts and unsubscribes
+            $recipients = array_keys(array_diff_key($clean, $adminExcludes, $unsubscribes));
         }
 
         $totalRecipients = count($recipients);
-        $this->info("Found {$totalRecipients} valid, eligible recipients across all system tables.");
+        $this->info("Found {$totalRecipients} valid, eligible recipients (World Plan + Inquiries, admin accounts excluded).");
 
         if ($totalRecipients === 0) {
             $this->warn("No eligible recipients found to email.");

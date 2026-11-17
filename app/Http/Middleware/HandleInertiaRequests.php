@@ -42,6 +42,9 @@ class HandleInertiaRequests extends Middleware
                 'admin' => Auth::guard('admin')->user() ? [
                     'id' => Auth::guard('admin')->user()->id,
                     'username' => Auth::guard('admin')->user()->username,
+                    'name' => Auth::guard('admin')->user()->name,
+                    'email' => Auth::guard('admin')->user()->email,
+                    'role' => Auth::guard('admin')->user()->role,
                     'last_login' => Auth::guard('admin')->user()->last_login,
                 ] : null,
             ],

@@ -146,6 +146,36 @@ class AdminUserController extends Controller
     }
 
     /**
+     * Directly change/reset the password of a specific administrator account.
+     */
+    public function changeAdminPassword(Request $request, AdminUser $admin): RedirectResponse
+    {
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'password.required' => 'A new password is required.',
+            'password.min' => 'The password must be at least 8 characters.',
+            'password.confirmed' => 'The password confirmation does not match.',
+        ]);
+
+        $admin->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        ActivityLog::create([
+            'admin_user' => Auth::guard('admin')->user()?->username ?? 'Administrator',
+            'action_type' => "Reset Password for Admin (@{$admin->username})",
+            'device_type' => 'Desktop PC',
+            'os_browser' => $request->userAgent() ? substr($request->userAgent(), 0, 100) : 'Admin Panel',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'status' => 'Success',
+            'created_at' => now(),
+        ]);
+
+        return back()->with('success', "Password for administrator '@{$admin->username}' has been updated successfully!");
+    }
+
+    /**
      * Delete an administrator account.
      */
     public function destroy(AdminUser $admin): RedirectResponse

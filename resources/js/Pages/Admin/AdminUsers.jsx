@@ -16,6 +16,7 @@ import {
     RotateCcw,
     Lock,
     Key,
+    KeyRound,
     Mail,
     User,
     Clock,
@@ -51,6 +52,50 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
     const [showCreateConfirmPass, setShowCreateConfirmPass] = useState(false);
     const [showEditPass, setShowEditPass] = useState(false);
     const [showEditConfirmPass, setShowEditConfirmPass] = useState(false);
+
+    // Dedicated Reset Password Modal State
+    const [resetPassModalAdmin, setResetPassModalAdmin] = useState(null);
+    const [showResetPass, setShowResetPass] = useState(false);
+    const [showResetConfirmPass, setShowResetConfirmPass] = useState(false);
+
+    const resetPassForm = useForm({
+        password: '',
+        password_confirmation: '',
+    });
+
+    const openResetPassModal = (admin) => {
+        setResetPassModalAdmin(admin);
+        resetPassForm.reset();
+        resetPassForm.clearErrors();
+        setShowResetPass(false);
+        setShowResetConfirmPass(false);
+    };
+
+    const generateRandomAdminPassword = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
+        let pass = '';
+        for (let i = 0; i < 12; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        resetPassForm.setData({
+            password: pass,
+            password_confirmation: pass,
+        });
+        setShowResetPass(true);
+        setShowResetConfirmPass(true);
+    };
+
+    const handleResetPassSubmit = (e) => {
+        e.preventDefault();
+        if (!resetPassModalAdmin) return;
+        resetPassForm.post(`/admin/admins/${resetPassModalAdmin.id}/change-password`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setResetPassModalAdmin(null);
+                resetPassForm.reset();
+            },
+        });
+    };
 
     // Filter submit
     const applyFilters = (newParams = {}) => {
@@ -627,6 +672,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                                                         <button
                                                             type="button"
+                                                            onClick={() => openResetPassModal(a)}
+                                                            className="p-1.5 rounded-lg bg-teal-500/10 text-[#25dec0] border border-[#24dbc3]/30 hover:bg-[#24dbc3]/20 transition-colors cursor-pointer"
+                                                            title="Reset administrator password"
+                                                        >
+                                                            <KeyRound className="w-3.5 h-3.5" />
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
                                                             onClick={() => openEditModal(a)}
                                                             className="p-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] border border-[#24dbc3]/30 hover:bg-[#24dbc3]/20 transition-colors cursor-pointer"
                                                             title="Edit credentials & role"
@@ -730,6 +784,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                         {a.status === 'Active' ? 'Deactivate' : 'Activate'}
                                                     </button>
                                                 )}
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openResetPassModal(a)}
+                                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#24dbc3]/10 border border-[#24dbc3]/30 text-[#25dec0] flex items-center gap-1"
+                                                >
+                                                    <KeyRound className="w-3 h-3" />
+                                                    <span>Password</span>
+                                                </button>
 
                                                 <button
                                                     type="button"
@@ -1196,6 +1259,18 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         </button>
                                     </div>
                                 </div>
+                                {editForm.errors.password && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{editForm.errors.password}</span>
+                                    </p>
+                                )}
+                                {editForm.errors.password_confirmation && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{editForm.errors.password_confirmation}</span>
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#1b5361]/60">
@@ -1252,6 +1327,196 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 Delete Account
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ========================================================
+                MODAL 4: RESET ADMIN PASSWORD
+            ======================================================== */}
+            {resetPassModalAdmin && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
+                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 text-left">
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between pb-3.5 border-b border-[#1b5361]/60">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                    <KeyRound className="w-5 h-5 stroke-[2.2]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-white mb-0 leading-tight">
+                                        Reset Admin Password
+                                    </h3>
+                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">
+                                        Assign a new password for @{resetPassModalAdmin.username}
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (!resetPassForm.processing) {
+                                        setResetPassModalAdmin(null);
+                                    }
+                                }}
+                                disabled={resetPassForm.processing}
+                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {/* Administrator Info Pill */}
+                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                                <User className="w-4 h-4 text-[#25dec0] shrink-0" />
+                                <div>
+                                    <span className="font-bold text-white block">{resetPassModalAdmin.name}</span>
+                                    <span className="text-slate-400 font-mono text-[11px]">@{resetPassModalAdmin.username}</span>
+                                </div>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/30">
+                                {resetPassModalAdmin.role || 'Admin'}
+                            </span>
+                        </div>
+
+                        <form onSubmit={handleResetPassSubmit} className="space-y-4">
+                            {/* New Password */}
+                            <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block">
+                                        New Password <span className="text-[#25dec0]">*</span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={generateRandomAdminPassword}
+                                        className="text-[11px] font-bold text-[#25dec0] hover:text-[#42f1ce] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                    >
+                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <span>Generate Strong</span>
+                                    </button>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showResetPass ? 'text' : 'password'}
+                                        required
+                                        minLength={8}
+                                        value={resetPassForm.data.password}
+                                        onChange={(e) => resetPassForm.setData('password', e.target.value)}
+                                        placeholder="Enter or generate new password..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowResetPass(!showResetPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showResetPass ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showResetPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {resetPassForm.errors.password && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{resetPassForm.errors.password}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    Confirm Password <span className="text-[#25dec0]">*</span>
+                                </label>
+                                <div className="relative">
+                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <input
+                                        type={showResetConfirmPass ? 'text' : 'password'}
+                                        required
+                                        minLength={8}
+                                        value={resetPassForm.data.password_confirmation}
+                                        onChange={(e) => resetPassForm.setData('password_confirmation', e.target.value)}
+                                        placeholder="Confirm new password..."
+                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowResetConfirmPass(!showResetConfirmPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        title={showResetConfirmPass ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showResetConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                {resetPassForm.errors.password_confirmation && (
+                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                        <span>{resetPassForm.errors.password_confirmation}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Password Rules Checklist */}
+                            <div className="p-3 bg-[#082033]/50 rounded-xl border border-[#1e4e5b]/50 text-[11px] space-y-1 text-slate-400">
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                                        resetPassForm.data.password.length >= 8
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                            : 'bg-slate-700/40 text-slate-400'
+                                    }`}>
+                                        ✓
+                                    </span>
+                                    <span className={resetPassForm.data.password.length >= 8 ? 'text-emerald-400 font-semibold' : ''}>
+                                        Minimum 8 characters
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                                        resetPassForm.data.password.length > 0 &&
+                                        resetPassForm.data.password === resetPassForm.data.password_confirmation
+                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                            : 'bg-slate-700/40 text-slate-400'
+                                    }`}>
+                                        ✓
+                                    </span>
+                                    <span className={
+                                        resetPassForm.data.password.length > 0 &&
+                                        resetPassForm.data.password === resetPassForm.data.password_confirmation
+                                            ? 'text-emerald-400 font-semibold'
+                                            : ''
+                                    }>
+                                        Passwords match
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                                <button
+                                    type="button"
+                                    onClick={() => setResetPassModalAdmin(null)}
+                                    disabled={resetPassForm.processing}
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={
+                                        resetPassForm.processing ||
+                                        resetPassForm.data.password.length < 8 ||
+                                        resetPassForm.data.password !== resetPassForm.data.password_confirmation
+                                    }
+                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {resetPassForm.processing ? 'Updating...' : 'Update Password'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
