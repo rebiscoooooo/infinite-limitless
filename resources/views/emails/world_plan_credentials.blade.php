@@ -65,8 +65,7 @@
 
             <!-- Salutation -->
             <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">
-                Dear
-                {{ $registration->full_name ?: trim(($registration->first_name ?? '') . ' ' . ($registration->last_name ?? '')) }},
+                Dear {{ $registration->full_name ?: trim(($registration->first_name ?? '') . ' ' . ($registration->last_name ?? '')) }},
             </h2>
 
             <!-- Greetings -->

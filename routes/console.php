@@ -41,3 +41,30 @@ Artisan::command('mail:test {recipient? : The destination email address}', funct
     }
     return 0;
 })->purpose('Test live SMTP email sending to a specified or default admin recipient');
+
+Artisan::command('flare:test', function () {
+    $this->info("=== SPATIE FLARE & IGNITION DIAGNOSTIC ===");
+    $this->line("Package: spatie/laravel-ignition");
+    $this->line("Renderer: " . (app()->bound(\Illuminate\Contracts\Foundation\ExceptionRenderer::class) ? 'IgnitionExceptionRenderer Active' : 'Default'));
+    $this->line("Theme: " . config('ignition.theme', 'dark'));
+    $this->line("Editor: " . config('ignition.editor', 'vscode'));
+    $this->line("Flare Key: " . (config('flare.key') ? substr(config('flare.key'), 0, 8) . '...' : '(Not set - errors rendered locally with Ignition)'));
+    $stackChannels = config('logging.channels.stack.channels');
+    $this->line("Logging Stack: " . (is_array($stackChannels) ? implode(',', $stackChannels) : 'single'));
+    $this->line("Flare Logger: " . (config('logging.channels.flare.driver') === 'flare' ? 'Configured (driver=flare)' : 'Not configured'));
+    $this->line("------------------------------------------");
+
+    if (config('flare.key')) {
+        $this->comment("Dispatching test exception report to Flare (flareapp.io)...");
+        try {
+            app(\Spatie\FlareClient\Flare::class)->sendTestReport(new \Exception('Test exception from Infinite Flare-Ignition test command'));
+            $this->info("SUCCESS: Test report dispatched to Flare successfully!");
+        } catch (\Throwable $e) {
+            $this->warn("Note: Flare report dispatch returned: " . $e->getMessage());
+        }
+    } else {
+        $this->info("Flare-Ignition is configured and active for error rendering.");
+        $this->comment("To send remote exception reports to flareapp.io, set FLARE_KEY=your_key in your .env file.");
+    }
+    return 0;
+})->purpose('Test Spatie Flare & Ignition error reporting and configuration');
