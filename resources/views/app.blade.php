@@ -60,9 +60,59 @@
     <!-- Original System Stylesheet -->
     <link rel="stylesheet" href="/assets/css/styles.css">
 
-    <!-- Scripts & Styles -->
-    @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    <!-- Scripts & Styles with Resilient Fallback -->
+    @php
+        $viteManifestPath = public_path('build/manifest.json');
+        $viteDotManifestPath = public_path('build/.vite/manifest.json');
+        $manifestData = [];
+
+        if (file_exists($viteManifestPath)) {
+            $manifestData = json_decode(@file_get_contents($viteManifestPath), true) ?: [];
+        } elseif (file_exists($viteDotManifestPath)) {
+            $manifestData = json_decode(@file_get_contents($viteDotManifestPath), true) ?: [];
+        }
+
+        $hasViteEntries = isset($manifestData['resources/css/app.css']) && isset($manifestData['resources/js/app.jsx']);
+    @endphp
+
+    @if (app()->environment('local') && file_exists(public_path('hot')))
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @elseif ($hasViteEntries)
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @else
+        @php
+            $cssFile = isset($manifestData['resources/css/app.css']['file'])
+                ? '/build/' . $manifestData['resources/css/app.css']['file']
+                : null;
+            $jsFile = isset($manifestData['resources/js/app.jsx']['file'])
+                ? '/build/' . $manifestData['resources/js/app.jsx']['file']
+                : null;
+
+            if (! $cssFile) {
+                $foundCss = glob(public_path('build/assets/app-*.css'));
+                if (! empty($foundCss)) {
+                    $cssFile = '/build/assets/' . basename($foundCss[0]);
+                }
+            }
+
+            if (! $jsFile) {
+                $foundJs = glob(public_path('build/assets/app-*.js'));
+                if (! empty($foundJs)) {
+                    $jsFile = '/build/assets/' . basename($foundJs[0]);
+                }
+            }
+        @endphp
+
+        @if ($cssFile)
+            <link rel="stylesheet" href="{{ $cssFile }}">
+        @endif
+
+        @if ($jsFile)
+            <script type="module" src="{{ $jsFile }}"></script>
+        @endif
+    @endif
     @inertiaHead
 </head>
 <body class="font-barlow antialiased selection:bg-ch-teal selection:text-ch-dark-slate overflow-x-hidden min-h-screen">
