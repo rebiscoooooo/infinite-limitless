@@ -101,8 +101,38 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
         setShowPasswordModal(true);
     };
 
+    const generateRandomPassword = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
+        let pass = '';
+        for (let i = 0; i < 12; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        passwordForm.setData({
+            ...passwordForm.data,
+            password: pass,
+            password_confirmation: pass,
+        });
+        setShowNewPass(true);
+        setShowConfirmPass(true);
+    };
+
     const handleChangePasswordSubmit = (e) => {
         e.preventDefault();
+        passwordForm.clearErrors();
+
+        if (!passwordForm.data.current_password) {
+            passwordForm.setError('current_password', 'Please enter your current password.');
+            return;
+        }
+        if (passwordForm.data.password.length < 8) {
+            passwordForm.setError('password', 'New password must be at least 8 characters long.');
+            return;
+        }
+        if (passwordForm.data.password !== passwordForm.data.password_confirmation) {
+            passwordForm.setError('password_confirmation', 'Passwords do not match. Please verify.');
+            return;
+        }
+
         passwordForm.post('/admin/change-password', {
             preserveScroll: true,
             onSuccess: () => {
@@ -647,6 +677,21 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                         </div>
 
                         <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
+                            {/* Server/Form Error Banner */}
+                            {Object.keys(passwordForm.errors).length > 0 && (
+                                <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2.5 shadow-sm">
+                                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                                    <div className="space-y-1">
+                                        <p className="font-bold text-rose-300">Unable to update password:</p>
+                                        <ul className="list-disc list-inside space-y-0.5 text-[11px] text-rose-200/90">
+                                            {Object.entries(passwordForm.errors).map(([key, msg]) => (
+                                                <li key={key}>{msg}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Current Password */}
                             <div>
                                 <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
@@ -681,9 +726,20 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
 
                             {/* New Password */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    New Password <span className="text-[#25dec0]">*</span>
-                                </label>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                                        New Password <span className="text-[#25dec0]">*</span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={generateRandomPassword}
+                                        className="text-[11px] font-semibold text-[#25dec0] hover:text-[#42f1ce] bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 border border-[#24dbc3]/30 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
+                                        title="Generate strong random password"
+                                    >
+                                        <Sparkles className="w-3 h-3" />
+                                        <span>Generate</span>
+                                    </button>
+                                </div>
                                 <div className="relative">
                                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     <input
@@ -791,12 +847,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={
-                                        passwordForm.processing ||
-                                        !passwordForm.data.current_password ||
-                                        passwordForm.data.password.length < 8 ||
-                                        passwordForm.data.password !== passwordForm.data.password_confirmation
-                                    }
+                                    disabled={passwordForm.processing}
                                     className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {passwordForm.processing ? (

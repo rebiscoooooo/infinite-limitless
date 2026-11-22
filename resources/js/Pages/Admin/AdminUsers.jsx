@@ -88,6 +88,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
     const handleResetPassSubmit = (e) => {
         e.preventDefault();
         if (!resetPassModalAdmin) return;
+        resetPassForm.clearErrors();
+        if (resetPassForm.data.password.length < 8) {
+            resetPassForm.setError('password', 'New password must be at least 8 characters long.');
+            return;
+        }
+        if (resetPassForm.data.password !== resetPassForm.data.password_confirmation) {
+            resetPassForm.setError('password_confirmation', 'Passwords do not match. Please verify.');
+            return;
+        }
         resetPassForm.post(`/admin/admins/${resetPassModalAdmin.id}/change-password`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -1506,11 +1515,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={
-                                        resetPassForm.processing ||
-                                        resetPassForm.data.password.length < 8 ||
-                                        resetPassForm.data.password !== resetPassForm.data.password_confirmation
-                                    }
+                                    disabled={resetPassForm.processing}
                                     className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {resetPassForm.processing ? 'Updating...' : 'Update Password'}

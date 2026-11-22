@@ -1,6 +1,6 @@
 {
-  "_AdminLayout-BAxR_Hzb.js": {
-    "file": "assets/AdminLayout-BAxR_Hzb.js",
+  "_AdminLayout-D7BKAWWm.js": {
+    "file": "assets/AdminLayout-D7BKAWWm.js",
     "name": "AdminLayout",
     "imports": [
       "_vendor-react-BitYOay7.js",
@@ -59,58 +59,58 @@
     "name": "vendor-react"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CeDDAmtL.css",
+    "file": "assets/app-oHzcNhLJ.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/Pages/Admin/ActivityLogs.jsx": {
-    "file": "assets/ActivityLogs-DEu0hi4P.js",
+    "file": "assets/ActivityLogs-B7r2oJhG.js",
     "name": "ActivityLogs",
     "src": "resources/js/Pages/Admin/ActivityLogs.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
   },
   "resources/js/Pages/Admin/AdminUsers.jsx": {
-    "file": "assets/AdminUsers-CFCDOufv.js",
+    "file": "assets/AdminUsers-j0fn8FXp.js",
     "name": "AdminUsers",
     "src": "resources/js/Pages/Admin/AdminUsers.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
   },
   "resources/js/Pages/Admin/Dashboard.jsx": {
-    "file": "assets/Dashboard-u6qAHgjW.js",
+    "file": "assets/Dashboard-T93wFKYT.js",
     "name": "Dashboard",
     "src": "resources/js/Pages/Admin/Dashboard.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
   },
   "resources/js/Pages/Admin/Inquiries.jsx": {
-    "file": "assets/Inquiries-0eAklUF_.js",
+    "file": "assets/Inquiries-BCxJ1tpA.js",
     "name": "Inquiries",
     "src": "resources/js/Pages/Admin/Inquiries.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
@@ -127,27 +127,27 @@
     ]
   },
   "resources/js/Pages/Admin/Products.jsx": {
-    "file": "assets/Products-Cp20UWxq.js",
+    "file": "assets/Products-mSMANcib.js",
     "name": "Products",
     "src": "resources/js/Pages/Admin/Products.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
   },
   "resources/js/Pages/Admin/WorldPlanRegistrations.jsx": {
-    "file": "assets/WorldPlanRegistrations-Bdp49otJ.js",
+    "file": "assets/WorldPlanRegistrations-Czm-hzmp.js",
     "name": "WorldPlanRegistrations",
     "src": "resources/js/Pages/Admin/WorldPlanRegistrations.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-react-BitYOay7.js",
       "_vendor-inertia-CRXGa17g.js",
-      "_AdminLayout-BAxR_Hzb.js",
+      "_AdminLayout-D7BKAWWm.js",
       "_vendor-lucide-DWenFK0y.js",
       "_useRealtimeSync-HDwpnImt.js"
     ]
@@ -279,7 +279,7 @@
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-B-wXo00s.js",
+    "file": "assets/app-L8i4pQuZ.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -308,7 +308,7 @@
       "resources/js/Pages/WorldPlan.jsx"
     ],
     "css": [
-      "assets/app-CeDDAmtL.css"
+      "assets/app-oHzcNhLJ.css"
     ]
   }
 }

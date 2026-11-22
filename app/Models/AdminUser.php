@@ -41,7 +41,6 @@ class AdminUser extends Authenticatable
         return [
             'last_login' => 'datetime',
             'archived_at' => 'datetime',
-            'password' => 'hashed',
         ];
     }
 

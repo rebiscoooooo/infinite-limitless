@@ -109,32 +109,32 @@ class AdminUserController extends Controller
      */
     public function update(Request $request, AdminUser $admin): RedirectResponse
     {
+        $adminUser = AdminUser::findOrFail($admin->id);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash', 'unique:admin_users,username,' . $admin->id],
-            'email' => ['required', 'email', 'max:255', 'unique:admin_users,email,' . $admin->id],
+            'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash', 'unique:admin_users,username,' . $adminUser->id],
+            'email' => ['required', 'email', 'max:255', 'unique:admin_users,email,' . $adminUser->id],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'string', 'in:Super Admin,Admin,Manager,Moderator'],
             'status' => ['required', 'string', 'in:Active,Inactive'],
         ]);
 
-        $updateData = [
-            'name' => $validated['name'],
-            'username' => strtolower(trim($validated['username'])),
-            'email' => strtolower(trim($validated['email'])),
-            'role' => $validated['role'],
-            'status' => $validated['status'],
-        ];
+        $adminUser->name = $validated['name'];
+        $adminUser->username = strtolower(trim($validated['username']));
+        $adminUser->email = strtolower(trim($validated['email']));
+        $adminUser->role = $validated['role'];
+        $adminUser->status = $validated['status'];
 
         if (!empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
+            $adminUser->password = Hash::make($validated['password']);
         }
 
-        $admin->update($updateData);
+        $adminUser->save();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Administrator',
-            'action_type' => "Updated Admin Account (@{$admin->username})",
+            'action_type' => "Updated Admin Account (@{$adminUser->username})",
             'device_type' => 'Desktop PC',
             'os_browser' => $request->userAgent() ? substr($request->userAgent(), 0, 100) : 'Admin Panel',
             'ip_address' => $request->ip() ?? '127.0.0.1',
@@ -142,7 +142,7 @@ class AdminUserController extends Controller
             'created_at' => now(),
         ]);
 
-        return back()->with('success', "Administrator '@{$admin->username}' updated successfully!");
+        return back()->with('success', "Administrator '@{$adminUser->username}' updated successfully!");
     }
 
     /**
@@ -158,13 +158,13 @@ class AdminUserController extends Controller
             'password.confirmed' => 'The password confirmation does not match.',
         ]);
 
-        $admin->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        $adminUser = AdminUser::findOrFail($admin->id);
+        $adminUser->password = Hash::make($validated['password']);
+        $adminUser->save();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Administrator',
-            'action_type' => "Reset Password for Admin (@{$admin->username})",
+            'action_type' => "Reset Password for Admin (@{$adminUser->username})",
             'device_type' => 'Desktop PC',
             'os_browser' => $request->userAgent() ? substr($request->userAgent(), 0, 100) : 'Admin Panel',
             'ip_address' => $request->ip() ?? '127.0.0.1',
@@ -172,7 +172,7 @@ class AdminUserController extends Controller
             'created_at' => now(),
         ]);
 
-        return back()->with('success', "Password for administrator '@{$admin->username}' has been updated successfully!");
+        return back()->with('success', "Password for administrator '@{$adminUser->username}' has been updated successfully!");
     }
 
     /**

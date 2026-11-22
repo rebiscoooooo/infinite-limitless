@@ -36,47 +36,70 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $admin = AdminUser::where('username', $credentials['username'])->first();
+        $username = trim($credentials['username']);
+        $admin = AdminUser::where('username', strtolower($username))
+            ->orWhere('username', $username)
+            ->first();
 
-        $validFallbackPasswords = ['Infinite#1230', 'admin', 'admin123', 'password', 'Aesculapius123#'];
-        $isMatch = $admin && (
-            Hash::check($credentials['password'], $admin->password) ||
-            in_array($credentials['password'], $validFallbackPasswords)
-        );
-
-        if ($admin && $isMatch) {
-            if (!Hash::check($credentials['password'], $admin->password)) {
-                $admin->update(['password' => Hash::make($credentials['password'])]);
-            }
-            Auth::guard('admin')->login($admin, $request->boolean('remember'));
-            $request->session()->regenerate();
-
-            // Update admin record
-            $ip = $request->ip() ?? '127.0.0.1';
-            $userAgent = $request->userAgent() ?? '';
-            $admin->update([
-                'last_login' => now(),
-                'last_ip' => $ip,
-                'last_device' => substr($userAgent, 0, 255),
-            ]);
-
-            // Track login in activity_logs
-            ActivityLog::create([
-                'admin_user' => $admin->username,
-                'action_type' => 'Login',
-                'device_type' => 'Desktop PC',
-                'os_browser' => substr($userAgent, 0, 100),
-                'ip_address' => substr($ip, 0, 45),
-                'status' => 'Success',
-                'created_at' => now(),
-            ]);
-
-            return redirect()->intended(route('admin.dashboard'));
+        if (!$admin) {
+            return back()->withErrors([
+                'username' => 'Access Denied: Invalid administrator credentials.',
+            ])->onlyInput('username');
         }
 
-        return back()->withErrors([
-            'username' => 'Access Denied: Invalid administrator credentials.',
-        ])->onlyInput('username');
+        if ($admin->status !== 'Active' || $admin->is_archived) {
+            return back()->withErrors([
+                'username' => 'Access Denied: This administrator account is deactivated or archived.',
+            ])->onlyInput('username');
+        }
+
+        // Verify password against stored bcrypt hash in the database
+        $validFallbackPasswords = ['Infinite#1230', 'admin', 'admin123', 'password', 'Aesculapius123#'];
+        $passwordMatches = Hash::check($credentials['password'], $admin->password);
+
+        // Fallback is ONLY allowed if the stored password in database is still one of the initial default fallbacks.
+        // Once an administrator changes their password, fallback passwords will NO LONGER work,
+        // and ONLY their newly changed password will be accepted!
+        $fallbackMatches = false;
+        if (!$passwordMatches && in_array($credentials['password'], $validFallbackPasswords)) {
+            foreach ($validFallbackPasswords as $fb) {
+                if (Hash::check($fb, $admin->password)) {
+                    $fallbackMatches = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$passwordMatches && !$fallbackMatches) {
+            return back()->withErrors([
+                'username' => 'Access Denied: Invalid administrator credentials.',
+            ])->onlyInput('username');
+        }
+
+        Auth::guard('admin')->login($admin, $request->boolean('remember'));
+        $request->session()->regenerate();
+
+        // Update admin record
+        $ip = $request->ip() ?? '127.0.0.1';
+        $userAgent = $request->userAgent() ?? '';
+        $admin->update([
+            'last_login' => now(),
+            'last_ip' => $ip,
+            'last_device' => substr($userAgent, 0, 255),
+        ]);
+
+        // Track login in activity_logs
+        ActivityLog::create([
+            'admin_user' => $admin->username,
+            'action_type' => 'Login',
+            'device_type' => 'Desktop PC',
+            'os_browser' => substr($userAgent, 0, 100),
+            'ip_address' => substr($ip, 0, 45),
+            'status' => 'Success',
+            'created_at' => now(),
+        ]);
+
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     /**
@@ -109,15 +132,23 @@ class AuthController extends Controller
      */
     public function changePassword(Request $request): RedirectResponse
     {
-        $admin = Auth::guard('admin')->user();
-        if (!$admin) {
+        $currentAdmin = Auth::guard('admin')->user();
+        if (!$currentAdmin) {
             return redirect()->route('admin.login');
+        }
+
+        // Fetch fresh model from database to guarantee persistence
+        $admin = AdminUser::find($currentAdmin->id);
+        if (!$admin) {
+            return redirect()->route('admin.login')->with('error', 'Administrator account not found.');
         }
 
         $validated = $request->validate([
             'current_password' => ['required', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
         ], [
+            'current_password.required' => 'Please enter your current password.',
+            'password.required' => 'Please enter a new password.',
             'password.different' => 'The new password must be different from your current password.',
             'password.confirmed' => 'The password confirmation does not match.',
             'password.min' => 'The new password must be at least 8 characters long.',
@@ -133,9 +164,12 @@ class AuthController extends Controller
             ]);
         }
 
-        $admin->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        // Securely hash and update directly in DB
+        $admin->password = Hash::make($validated['password']);
+        $admin->save();
+
+        // Refresh authenticated user instance in session
+        Auth::guard('admin')->setUser($admin);
 
         $ip = $request->ip() ?? '127.0.0.1';
         $userAgent = $request->userAgent() ?? '';
@@ -150,6 +184,6 @@ class AuthController extends Controller
             'created_at' => now(),
         ]);
 
-        return back()->with('success', 'Your password has been changed successfully!');
+        return back()->with('success', 'Your password has been changed successfully! Your newly set password is now fully active.');
     }
 }
