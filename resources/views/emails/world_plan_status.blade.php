@@ -61,6 +61,12 @@
                             <td style="padding: 6px 0; color: #64748b;">Selected Package:</td>
                             <td style="padding: 6px 0; color: #0f766e; font-weight: bold;">{{ strtoupper($registration->package_type) }}</td>
                         </tr>
+                        @if ($registration->amount_paid)
+                        <tr>
+                            <td style="padding: 6px 0; color: #64748b;">Package Total / Amount Paid:</td>
+                            <td style="padding: 6px 0; color: #082033; font-weight: bold;">{{ $registration->amount_paid }}</td>
+                        </tr>
+                        @endif
                         @if ($registration->product_set)
                         <tr>
                             <td style="padding: 6px 0; color: #64748b;">Product Set / Allotment:</td>
@@ -92,6 +98,24 @@
                     </table>
                 </div>
 
+                <!-- Attached Official Invoice Card -->
+                <div style="background-color: #f0fdfa; border: 1.5px solid #24dbc3; border-radius: 14px; padding: 20px; margin: 25px 0;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-size: 11px; font-weight: 800; color: #0f766e; text-transform: uppercase; letter-spacing: 1.5px;">
+                            📄 OFFICIAL PACKAGE INVOICE &amp; PAYMENT RECEIPT (PDF ATTACHED)
+                        </span>
+                        <span style="background-color: #0f766e; color: #ffffff; padding: 2px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;">
+                            VERIFIED &amp; PAID
+                        </span>
+                    </div>
+                    <p style="margin: 0 0 10px 0; color: #134e4a; font-size: 13.5px; line-height: 1.5;">
+                        We have enclosed your formal, itemized <strong>INFINITE World Plan Invoice &amp; Official Receipt</strong> as an attached PDF document. It certifies your full payment, registered package tier, itemized product inclusions, and lifetime distributor verification.
+                    </p>
+                    <div style="background-color: #ffffff; border: 1px solid #ccfbf1; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #334155; font-family: monospace;">
+                        <strong>Enclosed Document:</strong> INFINITE_Invoice_WP-{{ str_pad($registration->id, 5, '0', STR_PAD_LEFT) }}_{{ \Illuminate\Support\Str::slug($registration->username ?: 'member', '_') }}.pdf
+                    </div>
+                </div>
+
                 <!-- Terms & Operational Commitments from Official Certificate -->
                 <div style="background-color: #ffffff; border: 1px solid #ccfbf1; border-radius: 14px; padding: 22px; margin: 25px 0;">
                     <h4 style="margin: 0 0 12px 0; color: #0f766e; font-size: 15px;">Official Process &amp; Next Steps</h4>
@@ -111,7 +135,9 @@
 
                 <!-- Congratulations Graphic Notice -->
                 <div style="text-align: center; margin: 30px 0;">
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 14px;">Please find your official <strong>INFINITE Welcome &amp; Registration Certificate</strong> attached to this email (<em>image.png</em>).</p>
+                    <p style="font-size: 13px; color: #475569; margin-bottom: 14px; line-height: 1.6;">
+                        Please find your official <strong>INFINITE Package Invoice &amp; Payment Receipt (PDF)</strong> and your <strong>Official Welcome &amp; Registration Certificate</strong> attached to this email.
+                    </p>
                     <a href="{{ config('app.url') }}" style="background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%); color: #ffffff; padding: 14px 38px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 15px rgba(20, 184, 166, 0.35);">
                         🌐 Explore INFINITE Website &rarr;
                     </a>

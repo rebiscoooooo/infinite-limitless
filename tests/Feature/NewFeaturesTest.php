@@ -22,16 +22,17 @@ class NewFeaturesTest extends TestCase
         parent::setUp();
         $this->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
 
-        if (!AdminUser::where('username', 'admin')->exists()) {
-            AdminUser::create([
+        AdminUser::updateOrCreate(
+            ['username' => 'admin'],
+            [
                 'name' => 'Master Admin',
-                'username' => 'admin',
                 'email' => 'admin@infinite-limitless.com',
                 'password' => Hash::make('Infinite#1230'),
                 'role' => 'Super Admin',
                 'status' => 'Active',
-            ]);
-        }
+                'is_archived' => false,
+            ]
+        );
     }
 
     private function loginAdmin(): void

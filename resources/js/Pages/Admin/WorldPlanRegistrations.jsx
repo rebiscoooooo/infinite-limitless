@@ -739,6 +739,16 @@ export default function WorldPlanRegistrations({
                                                             </button>
                                                         )}
 
+                                                        <a
+                                                            href={`/admin/world-plan/${reg.id}/invoice`}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#25dec0] transition-colors border border-[#24dbc3]/30 cursor-pointer inline-flex items-center justify-center"
+                                                            title="Download Official Invoice (PDF)"
+                                                        >
+                                                            <Download className="w-4 h-4" />
+                                                        </a>
+
                                                         <button
                                                             type="button"
                                                             onClick={() => openCredentialsModal(reg)}
@@ -890,6 +900,15 @@ export default function WorldPlanRegistrations({
                                                     <span>Approve</span>
                                                 </button>
                                             )}
+                                            <a
+                                                href={`/admin/world-plan/${reg.id}/invoice`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="px-2.5 py-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30"
+                                            >
+                                                <Download className="w-3.5 h-3.5" />
+                                                <span>Invoice</span>
+                                            </a>
                                             <button
                                                 type="button"
                                                 onClick={() => openCredentialsModal(reg)}
@@ -1052,6 +1071,14 @@ export default function WorldPlanRegistrations({
 
                             {/* Actions in details modal */}
                             <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#1b5361]/60 flex-wrap">
+                                <a
+                                    href={`/admin/world-plan/${detailsModalItem.id}/invoice`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="bg-[#082033] hover:bg-[#0c2638] text-[#24dbc3] font-bold px-4 py-2 rounded-xl text-xs border border-[#24dbc3]/40 flex items-center gap-1.5 cursor-pointer shadow no-underline"
+                                >
+                                    <Download className="w-4 h-4" /> Download Invoice (PDF)
+                                </a>
                                 <button
                                     type="button"
                                     onClick={() => {
@@ -1120,8 +1147,17 @@ export default function WorldPlanRegistrations({
                                 </p>
                             </div>
 
-                            <div className="p-3 bg-[#092b3a]/90 rounded-xl border border-[#24dbc3]/30 text-[#27dec9] text-[11px] flex items-center gap-2">
-                                <span className="font-bold">Flyer Attachment Included:</span> Official INFINITE Congratulations Welcome Graphic attached automatically as <strong>image.png</strong>.
+                            <div className="p-3 bg-[#092b3a]/90 rounded-xl border border-[#24dbc3]/30 text-[#27dec9] text-[11px] space-y-1.5">
+                                <div className="font-bold text-white flex items-center gap-1.5">
+                                    <Sparkles className="w-3.5 h-3.5 text-[#24dbc3]" />
+                                    <span>Automated Attachments Included in Approval Email:</span>
+                                </div>
+                                <div className="text-emerald-300 pl-4">
+                                    &bull; <strong>Official Package Invoice &amp; Receipt (PDF):</strong> Complete itemized package breakdown, inclusions, and paid verification.
+                                </div>
+                                <div className="text-slate-300 pl-4">
+                                    &bull; <strong>Welcome Certificate (image.png):</strong> Official INFINITE Congratulations flyer graphic.
+                                </div>
                             </div>
 
                             <div>

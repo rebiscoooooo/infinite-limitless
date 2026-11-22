@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\WorldPlanRegistration;
+use App\Services\WorldPlanInvoiceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -12,6 +13,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class WorldPlanStatusUpdatedMail extends Mailable implements ShouldQueue
 {
@@ -80,8 +82,20 @@ class WorldPlanStatusUpdatedMail extends Mailable implements ShouldQueue
     {
         $attachments = [];
 
-        // Attach welcome congratulatory flyer when approved
+        // Attach official package invoice (PDF) & welcome certificate when approved
         if ($this->registration->status === 'Approved') {
+            try {
+                $invoiceService = app(WorldPlanInvoiceService::class);
+                $pdfRaw = $invoiceService->generateInvoiceRawPdf($this->registration);
+                $fileName = $invoiceService->getInvoiceFileName($this->registration);
+
+                $attachments[] = Attachment::fromData(fn () => $pdfRaw, $fileName)
+                    ->withMime('application/pdf');
+            } catch (\Throwable $e) {
+                Log::error("Failed to generate PDF invoice attachment for registration #{$this->registration->id}: " . $e->getMessage());
+                report($e);
+            }
+
             $flyerPaths = [
                 public_path('assets/image/flyers/image.png'),
                 public_path('assets/image/flyer.png'),

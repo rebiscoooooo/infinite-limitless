@@ -107,6 +107,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // World Plan Registrations & Bulk Actions
         Route::get('/world-plan', [WorldPlanAdminController::class, 'index'])->name('world-plan.index');
+        Route::get('/world-plan/{registration}/invoice', [WorldPlanAdminController::class, 'downloadInvoice'])->name('world-plan.invoice');
         Route::post('/world-plan/bulk-archive', [WorldPlanAdminController::class, 'bulkArchive'])->name('world-plan.bulk-archive');
         Route::post('/world-plan/bulk-restore', [WorldPlanAdminController::class, 'bulkRestore'])->name('world-plan.bulk-restore');
         Route::match(['post', 'delete'], '/world-plan/bulk-delete', [WorldPlanAdminController::class, 'bulkDelete'])->name('world-plan.bulk-delete');

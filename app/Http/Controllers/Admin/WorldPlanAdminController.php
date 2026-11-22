@@ -7,6 +7,7 @@ use App\Mail\WorldPlanCredentialsMail;
 use App\Mail\WorldPlanStatusUpdatedMail;
 use App\Models\ActivityLog;
 use App\Models\WorldPlanRegistration;
+use App\Services\WorldPlanInvoiceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,6 +126,32 @@ class WorldPlanAdminController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Download or stream the official World Plan package invoice (PDF) for a registration.
+     */
+    public function downloadInvoice(Request $request, WorldPlanRegistration $registration)
+    {
+        $invoiceService = app(WorldPlanInvoiceService::class);
+        $pdf = $invoiceService->generateInvoicePdf($registration);
+        $fileName = $invoiceService->getInvoiceFileName($registration);
+
+        ActivityLog::create([
+            'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
+            'action_type' => "Downloaded World Plan Invoice PDF for Ref #WP-{$registration->id}",
+            'device_type' => 'Desktop PC',
+            'os_browser' => request()->userAgent() ?? '',
+            'ip_address' => request()->ip() ?? '127.0.0.1',
+            'status' => 'Success',
+            'created_at' => now(),
+        ]);
+
+        if ($request->boolean('stream')) {
+            return $pdf->stream($fileName);
+        }
+
+        return $pdf->download($fileName);
     }
 
     /**

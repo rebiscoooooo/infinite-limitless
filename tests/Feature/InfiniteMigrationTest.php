@@ -21,12 +21,17 @@ class InfiniteMigrationTest extends TestCase
         parent::setUp();
         $this->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
         // Seed database if empty
-        if (!AdminUser::where('username', 'admin')->exists()) {
-            AdminUser::create([
-                'username' => 'admin',
+        AdminUser::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Master Admin',
+                'email' => 'admin@infinite-limitless.com',
                 'password' => Hash::make('Infinite#1230'),
-            ]);
-        }
+                'role' => 'Super Admin',
+                'status' => 'Active',
+                'is_archived' => false,
+            ]
+        );
     }
 
     public function test_public_pages_render_expected_inertia_components(): void
