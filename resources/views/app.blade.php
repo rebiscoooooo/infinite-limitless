@@ -39,18 +39,20 @@
     <!-- Favicon -->
     <link rel="icon" type="image/webp" href="/assets/image/logo-infinite.webp">
 
-    <!-- Performance Optimization: DNS Prefetch & Preconnect for external fonts only -->
+    <!-- Performance Optimization: DNS Prefetch & Preconnect for CDNs & Fonts -->
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-    <!-- CSS Frameworks & Icons — self-hosted to prevent tracking-prevention warnings -->
-    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- CSS Frameworks & Icons matching exact original system -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Great+Vibes&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
@@ -58,49 +60,55 @@
     <!-- Original System Stylesheet -->
     <link rel="stylesheet" href="/assets/css/styles.css">
 
-    <!-- Scripts & Styles — Direct manifest injection, never throws ViteException -->
+    <!-- Scripts & Styles with Resilient Fallback -->
     @php
-        // Try both manifest locations (Vite 4 vs Vite 5)
-        $manifestPaths = [
-            public_path('build/manifest.json'),
-            public_path('build/.vite/manifest.json'),
-        ];
+        $viteManifestPath = public_path('build/manifest.json');
+        $viteDotManifestPath = public_path('build/.vite/manifest.json');
         $manifestData = [];
-        foreach ($manifestPaths as $mp) {
-            if (file_exists($mp)) {
-                $manifestData = json_decode(@file_get_contents($mp), true) ?: [];
-                if (!empty($manifestData)) break;
-            }
+
+        if (file_exists($viteManifestPath)) {
+            $manifestData = json_decode(@file_get_contents($viteManifestPath), true) ?: [];
+        } elseif (file_exists($viteDotManifestPath)) {
+            $manifestData = json_decode(@file_get_contents($viteDotManifestPath), true) ?: [];
         }
 
-        // Resolve CSS file
-        $cssFile = null;
-        if (isset($manifestData['resources/css/app.css']['file'])) {
-            $cssFile = '/build/' . $manifestData['resources/css/app.css']['file'];
-        } else {
-            $foundCss = glob(public_path('build/assets/app-*.css')) ?: [];
-            if (!empty($foundCss)) $cssFile = '/build/assets/' . basename($foundCss[0]);
-        }
-
-        // Resolve JS file
-        $jsFile = null;
-        if (isset($manifestData['resources/js/app.jsx']['file'])) {
-            $jsFile = '/build/' . $manifestData['resources/js/app.jsx']['file'];
-        } else {
-            $foundJs = glob(public_path('build/assets/app-*.js')) ?: [];
-            if (!empty($foundJs)) $jsFile = '/build/assets/' . basename($foundJs[0]);
-        }
-
-        $isHotDev = app()->environment('local') && file_exists(public_path('hot'));
+        $hasViteEntries = isset($manifestData['resources/css/app.css']) && isset($manifestData['resources/js/app.jsx']);
     @endphp
 
-    @if ($isHotDev)
+    @if (app()->environment('local') && file_exists(public_path('hot')))
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    @elseif ($hasViteEntries)
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     @else
+        @php
+            $cssFile = isset($manifestData['resources/css/app.css']['file'])
+                ? '/build/' . $manifestData['resources/css/app.css']['file']
+                : null;
+            $jsFile = isset($manifestData['resources/js/app.jsx']['file'])
+                ? '/build/' . $manifestData['resources/js/app.jsx']['file']
+                : null;
+
+            if (! $cssFile) {
+                $foundCss = glob(public_path('build/assets/app-*.css'));
+                if (! empty($foundCss)) {
+                    $cssFile = '/build/assets/' . basename($foundCss[0]);
+                }
+            }
+
+            if (! $jsFile) {
+                $foundJs = glob(public_path('build/assets/app-*.js'));
+                if (! empty($foundJs)) {
+                    $jsFile = '/build/assets/' . basename($foundJs[0]);
+                }
+            }
+        @endphp
+
         @if ($cssFile)
             <link rel="stylesheet" href="{{ $cssFile }}">
         @endif
+
         @if ($jsFile)
             <script type="module" src="{{ $jsFile }}"></script>
         @endif
@@ -114,6 +122,6 @@
     <script data-page="app" type="application/json">{!! json_encode($page) !!}</script>
     @endif
 
-    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 </body>
 </html>
