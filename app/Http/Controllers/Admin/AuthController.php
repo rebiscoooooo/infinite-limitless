@@ -57,16 +57,12 @@ class AuthController extends Controller
         $validFallbackPasswords = ['Infinite#1230', 'admin', 'admin123', 'password', 'Aesculapius123#'];
         $passwordMatches = Hash::check($credentials['password'], $admin->password);
 
-        // Fallback is ONLY allowed if the stored password in database is still one of the initial default fallbacks.
-        // Once an administrator changes their password, fallback passwords will NO LONGER work,
-        // and ONLY their newly changed password will be accepted!
+        // Fallback is ONLY allowed if the stored password still matches the default initial seed (Infinite#1230)
+        // Once an admin sets a custom password, the fallback is disabled and only their custom password works!
         $fallbackMatches = false;
         if (!$passwordMatches && in_array($credentials['password'], $validFallbackPasswords)) {
-            foreach ($validFallbackPasswords as $fb) {
-                if (Hash::check($fb, $admin->password)) {
-                    $fallbackMatches = true;
-                    break;
-                }
+            if (Hash::check('Infinite#1230', $admin->password)) {
+                $fallbackMatches = true;
             }
         }
 
@@ -74,6 +70,12 @@ class AuthController extends Controller
             return back()->withErrors([
                 'username' => 'Access Denied: Invalid administrator credentials.',
             ])->onlyInput('username');
+        }
+
+        // If fallback matched during initial setup, sync the hash to the typed password
+        if (!$passwordMatches && $fallbackMatches) {
+            $admin->password = Hash::make($credentials['password']);
+            $admin->save();
         }
 
         Auth::guard('admin')->login($admin, $request->boolean('remember'));
