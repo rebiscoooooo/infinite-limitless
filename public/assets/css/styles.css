@@ -74,18 +74,20 @@ body::before {
     opacity: 0.02;
 }
 
-/* ========== SCROLLBAR ========== */
-::-webkit-scrollbar {
-    width: 6px;
+/* ========== SCROLLBAR (HIDDEN GLOBALLY) ========== */
+* {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
-::-webkit-scrollbar-track {
-    background: var(--ch-bg-light);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--ch-teal);
-    border-radius: 3px;
+::-webkit-scrollbar,
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
 }
 
 /* ========== NAVBAR ========== */

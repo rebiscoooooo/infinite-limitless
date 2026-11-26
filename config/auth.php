@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admin_users',
         ],
+        'academy' => [
+            'driver' => 'session',
+            'provider' => 'academy_members',
+        ],
     ],
 
     /*
@@ -60,6 +64,10 @@ return [
         'admin_users' => [
             'driver' => 'eloquent',
             'model' => App\Models\AdminUser::class,
+        ],
+        'academy_members' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AcademyMember::class,
         ],
     ],
 

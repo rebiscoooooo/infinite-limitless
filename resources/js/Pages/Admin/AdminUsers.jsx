@@ -253,27 +253,27 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
         switch (r) {
             case 'Super Admin':
                 return {
-                    bg: 'bg-purple-950/70 text-purple-300 border-purple-500/40',
-                    dot: 'bg-purple-400',
+                    bg: 'bg-purple-50 text-purple-700 border-purple-200',
+                    dot: 'bg-purple-500',
                     icon: ShieldAlert,
                 };
             case 'Manager':
                 return {
-                    bg: 'bg-blue-950/70 text-blue-300 border-blue-500/40',
-                    dot: 'bg-blue-400',
+                    bg: 'bg-blue-50 text-blue-700 border-blue-200',
+                    dot: 'bg-blue-500',
                     icon: Shield,
                 };
             case 'Moderator':
                 return {
-                    bg: 'bg-amber-950/70 text-amber-300 border-amber-500/40',
-                    dot: 'bg-amber-400',
+                    bg: 'bg-amber-50 text-amber-700 border-amber-200',
+                    dot: 'bg-amber-500',
                     icon: User,
                 };
             case 'Admin':
             default:
                 return {
-                    bg: 'bg-[#24dbc3]/15 text-[#27dec9] border border-[#24dbc3]/30',
-                    dot: 'bg-[#25dec0]',
+                    bg: 'bg-teal-50 text-[#0f766e] border-teal-200',
+                    dot: 'bg-[#0f766e]',
                     icon: ShieldCheck,
                 };
         }
@@ -290,20 +290,19 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
             <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
                 {/* Top Header Card */}
-                <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 xl:p-8 bg-[#061726]/90 border border-[#2c6973]/75 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                    <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 bg-white border border-slate-200/90 shadow-xs overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
-                    <div className="relative z-10 space-y-1.5">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#24dbc3]/10 border border-[#24dbc3]/30 text-[#27dec9] text-xs font-semibold">
-                            <Sparkles className="w-3.5 h-3.5 text-[#25dec0] shrink-0" />
+                    <div className="space-y-1.5">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0f766e] text-xs font-semibold">
+                            <Sparkles className="w-3.5 h-3.5 text-[#0f766e] shrink-0" />
                             <span>RBAC &amp; Access Control</span>
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                            <Users className="w-6 h-6 text-[#25dec0]" />
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <Users className="w-6 h-6 text-[#0f766e]" />
                             <span>Administrator Accounts</span>
                         </h2>
-                        <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-500 max-w-xl leading-relaxed">
                             Manage executive console credentials, assign permission levels, and govern portal access.
                         </p>
                     </div>
@@ -311,7 +310,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     <button
                         type="button"
                         onClick={() => setShowCreateModal(true)}
-                        className="relative z-10 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold text-xs flex items-center gap-2 shadow-[0_4px_20px_rgba(36,219,195,0.25)] hover:brightness-110 active:scale-[.99] transition-all border-0 shrink-0 cursor-pointer"
+                        className="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all border-0 shrink-0 cursor-pointer"
                     >
                         <UserPlus className="w-4 h-4 stroke-[2.5]" />
                         <span>Create New Admin</span>
@@ -319,111 +318,111 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 </div>
 
                 {/* 4 Header KPI Stat Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                     {/* KPI 1: Total Admins */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-[#24dbc3]/50 hover:shadow-[0_10px_35px_rgba(36,219,195,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-[#24dbc3] before:to-[#42f1ce]">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#0f766e] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Total Administrators
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-[#25dec0] group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Users className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[#0f766e] shadow-xs">
+                                <Users className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                 {stats.total || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-[#24dbc3]/15 text-[#27dec9] border border-[#24dbc3]/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200">
                                 RBAC Team
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Console Accounts</span>
-                            <span className="text-[#25dec0] font-mono text-[11px]">{stats.active || 0} active</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Console Accounts</span>
+                            <span className="text-[#0f766e] font-mono text-[11px] font-semibold">{stats.active || 0} active</span>
                         </div>
                     </div>
 
                     {/* KPI 2: Active Accounts */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-emerald-500/50 hover:shadow-[0_10px_35px_rgba(16,185,129,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-emerald-400 before:to-teal-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Active Accounts
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <CheckCircle2 className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
+                                <CheckCircle2 className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-emerald-400 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight">
                                 {stats.active || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 Operational
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Authorized Operators</span>
-                            <span className="text-slate-400 text-[11px]">{stats.inactive || 0} suspended</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Authorized Operators</span>
+                            <span className="text-slate-500 text-[11px] font-semibold">{stats.inactive || 0} suspended</span>
                         </div>
                     </div>
 
                     {/* KPI 3: Super Admins */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-purple-500/50 hover:shadow-[0_10px_35px_rgba(168,85,247,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-purple-400 before:to-pink-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-purple-500 transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Super Administrators
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <ShieldAlert className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-xs">
+                                <ShieldAlert className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-purple-300 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-purple-700 tracking-tight">
                                 {stats.super_admins || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
                                 Full Authority
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Root Permissions</span>
-                            <span className="text-purple-300 font-bold text-[11px]">Primary Tier</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Root Permissions</span>
+                            <span className="text-purple-700 font-bold text-[11px]">Primary Tier</span>
                         </div>
                     </div>
 
                     {/* KPI 4: Archived Accounts */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-amber-500/50 hover:shadow-[0_10px_35px_rgba(245,158,11,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-amber-400 before:to-orange-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#f59e0b] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Archived Accounts
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Archive className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#f59e0b] shadow-xs">
+                                <Archive className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-300 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-[#d97706] tracking-tight">
                                 {stats.archived || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                 Archived
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Preserved in Database</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Preserved in Database</span>
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('archived')}
-                                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>View Archive</span>
                                 <RotateCcw className="w-3 h-3" />
@@ -433,17 +432,17 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 </div>
 
                 {/* Main Filter and Controls Container */}
-                <div className="bg-[#061726]/90 border border-[#1b5361]/60 rounded-2xl p-4 sm:p-6 shadow-[0_12px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl space-y-4">
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
                     {/* View Switcher Tabs */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#1b5361]/60">
-                        <div className="flex items-center gap-1.5 bg-[#082033]/90 p-1 rounded-xl border border-[#1e4e5b]/70 text-xs font-semibold shadow-inner">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 text-xs font-semibold">
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('active')}
                                 className={`px-3.5 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'active'
-                                        ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold shadow-[0_2px_12px_rgba(36,219,195,0.25)]'
-                                        : 'text-slate-300 hover:text-white bg-transparent'
+                                        ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -454,8 +453,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 onClick={() => handleViewChange('archived')}
                                 className={`px-3.5 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'archived'
-                                        ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/20'
-                                        : 'text-slate-300 hover:text-white bg-transparent'
+                                        ? 'bg-[#f59e0b] text-slate-900 font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <Archive className="w-3.5 h-3.5" />
@@ -466,8 +465,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 onClick={() => handleViewChange('all')}
                                 className={`px-3.5 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'all'
-                                        ? 'bg-[#0c2638] text-white font-extrabold border border-[#276472]/80 shadow-md'
-                                        : 'text-slate-300 hover:text-white bg-transparent'
+                                        ? 'bg-slate-800 text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <Users className="w-3.5 h-3.5" />
@@ -475,8 +474,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                             </button>
                         </div>
 
-                        <div className="text-xs text-slate-400 font-medium">
-                            Displaying <strong className="text-white">{adminList.length}</strong> operator(s)
+                        <div className="text-xs text-slate-500 font-medium">
+                            Displaying <strong className="text-slate-900">{adminList.length}</strong> operator(s)
                         </div>
                     </div>
 
@@ -489,13 +488,13 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 placeholder="Search administrators by username, name, email address..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30 transition-all"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all"
                             />
                             {search && (
                                 <button
                                     type="button"
                                     onClick={handleClearSearch}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0.5"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0.5"
                                 >
                                     <X className="w-3.5 h-3.5" />
                                 </button>
@@ -509,7 +508,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                     setRole(e.target.value);
                                     applyFilters({ role: e.target.value });
                                 }}
-                                className="bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#24dbc3] font-medium"
+                                className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-[#0f766e] focus:bg-white font-medium"
                             >
                                 <option value="all">All Roles</option>
                                 <option value="Super Admin">Super Admin</option>
@@ -524,7 +523,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                     setStatus(e.target.value);
                                     applyFilters({ status: e.target.value });
                                 }}
-                                className="bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[#24dbc3] font-medium"
+                                className="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-[#0f766e] focus:bg-white font-medium"
                             >
                                 <option value="all">All Status</option>
                                 <option value="Active">Active Only</option>
@@ -534,10 +533,10 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     </div>
 
                     {/* DESKTOP DATA TABLE (md:block) */}
-                    <div className="hidden md:block overflow-x-auto border border-[#1b5361]/60 rounded-xl bg-[#061726]/90">
+                    <div className="hidden md:block overflow-x-auto border border-slate-200/90 rounded-xl bg-white">
                         <table className="w-full text-left border-collapse text-xs min-w-[760px]">
                             <thead>
-                                <tr className="border-b border-[#1b5361]/70 bg-[#082033]/95 text-slate-300 uppercase tracking-wider font-bold text-[11px]">
+                                <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 uppercase tracking-wider font-bold text-[11px]">
                                     <th className="p-3.5 w-12 text-center">
                                         <input
                                             type="checkbox"
@@ -546,7 +545,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 selectedIds.length === selectableAdmins.length
                                             }
                                             onChange={handleSelectAll}
-                                            className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer"
+                                            className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e] cursor-pointer"
                                             title="Select all administrators"
                                         />
                                     </th>
@@ -558,13 +557,13 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                     <th className="p-3.5 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1b5361]/40 text-slate-300">
+                            <tbody className="divide-y divide-slate-100 text-slate-700">
                                 {adminList.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="p-12 text-center text-slate-400">
-                                            <Users className="w-10 h-10 mx-auto mb-2 opacity-30 text-[#25dec0]" />
-                                            <p className="text-sm font-bold text-slate-300">No administrator accounts found</p>
-                                            <p className="text-xs text-slate-400 mt-1">Try adjusting your filters or search keywords</p>
+                                        <td colSpan={7} className="p-12 text-center text-slate-500">
+                                            <Users className="w-10 h-10 mx-auto mb-2 opacity-30 text-[#0f766e]" />
+                                            <p className="text-sm font-bold text-slate-800">No administrator accounts found</p>
+                                            <p className="text-xs text-slate-500 mt-1">Try adjusting your filters or search keywords</p>
                                         </td>
                                     </tr>
                                 ) : (
@@ -580,10 +579,10 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 key={a.id}
                                                 className={`transition-colors ${
                                                     isSelected
-                                                        ? 'bg-[#15cbb7]/15'
+                                                        ? 'bg-teal-50/70 border-l-4 border-l-[#0f766e]'
                                                         : isSelf
-                                                        ? 'bg-[#092b3a]/50'
-                                                        : 'hover:bg-[#0c2638]/70'
+                                                        ? 'bg-slate-50/90'
+                                                        : 'hover:bg-slate-50/70'
                                                 }`}
                                             >
                                                 <td className="p-3.5 text-center">
@@ -592,26 +591,26 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                         disabled={isSelf}
                                                         checked={isSelected}
                                                         onChange={() => handleToggleSelect(a.id)}
-                                                        className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] disabled:opacity-30 cursor-pointer"
+                                                        className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e] disabled:opacity-30 cursor-pointer"
                                                     />
                                                 </td>
                                                 <td className="p-3.5">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-sm shrink-0">
+                                                        <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#0f766e] border border-teal-200 flex items-center justify-center font-extrabold text-xs shadow-xs shrink-0">
                                                             {initial}
                                                         </div>
                                                         <div className="min-w-0">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="font-bold text-white text-xs truncate">
+                                                                <span className="font-bold text-slate-900 text-xs truncate">
                                                                     {a.name || a.username}
                                                                 </span>
                                                                 {isSelf && (
-                                                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/40">
+                                                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-teal-50 text-[#0f766e] border border-teal-200">
                                                                         YOU
                                                                     </span>
                                                                 )}
                                                             </div>
-                                                            <div className="text-[11px] text-slate-400 font-mono truncate">
+                                                            <div className="text-[11px] text-slate-500 font-mono truncate">
                                                                 @{a.username} • {a.email}
                                                             </div>
                                                         </div>
@@ -628,28 +627,28 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 </td>
                                                 <td className="p-3.5 text-center">
                                                     {a.is_archived ? (
-                                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/30">
-                                                            <Archive className="w-3 h-3 text-amber-400" />
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                                            <Archive className="w-3 h-3 text-[#f59e0b]" />
                                                             <span>Archived</span>
                                                         </span>
                                                     ) : (
                                                         <span
                                                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                                                                 a.status === 'Active'
-                                                                    ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                                                    : 'bg-rose-950/50 text-rose-300 border-rose-500/30'
+                                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                                    : 'bg-rose-50 text-rose-700 border-rose-200'
                                                             }`}
                                                         >
                                                             <span
                                                                 className={`w-1.5 h-1.5 rounded-full ${
-                                                                    a.status === 'Active' ? 'bg-emerald-400' : 'bg-rose-400'
+                                                                    a.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'
                                                                 }`}
                                                             />
                                                             <span>{a.status || 'Active'}</span>
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="p-3.5 text-slate-300 font-mono text-[11px]">
+                                                <td className="p-3.5 text-slate-600 font-mono text-[11px]">
                                                     {a.last_login_at
                                                         ? new Date(a.last_login_at).toLocaleString('en-PH', {
                                                               month: 'short',
@@ -659,7 +658,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                           })
                                                         : 'Never logged in'}
                                                 </td>
-                                                <td className="p-3.5 text-slate-400 font-mono text-[11px]">
+                                                <td className="p-3.5 text-slate-500 font-mono text-[11px]">
                                                     {new Date(a.created_at).toLocaleDateString()}
                                                 </td>
                                                 <td className="p-3.5 text-right whitespace-nowrap">
@@ -670,8 +669,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                                 onClick={() => handleToggleStatus(a)}
                                                                 className={`p-1.5 rounded-lg border text-xs cursor-pointer transition-colors ${
                                                                     a.status === 'Active'
-                                                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
-                                                                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                                                                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                                                                        : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                                                                 }`}
                                                                 title={a.status === 'Active' ? 'Deactivate account' : 'Activate account'}
                                                             >
@@ -682,7 +681,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                         <button
                                                             type="button"
                                                             onClick={() => openResetPassModal(a)}
-                                                            className="p-1.5 rounded-lg bg-teal-500/10 text-[#25dec0] border border-[#24dbc3]/30 hover:bg-[#24dbc3]/20 transition-colors cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-teal-50 text-[#0f766e] border border-teal-200 hover:bg-teal-100 transition-colors cursor-pointer"
                                                             title="Reset administrator password"
                                                         >
                                                             <KeyRound className="w-3.5 h-3.5" />
@@ -691,7 +690,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                         <button
                                                             type="button"
                                                             onClick={() => openEditModal(a)}
-                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] border border-[#24dbc3]/30 hover:bg-[#24dbc3]/20 transition-colors cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors cursor-pointer"
                                                             title="Edit credentials & role"
                                                         >
                                                             <Edit2 className="w-3.5 h-3.5" />
@@ -701,7 +700,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setDeleteModalAdmin(a)}
-                                                                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                                                className="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 transition-colors cursor-pointer"
                                                                 title="Delete administrator"
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
@@ -720,8 +719,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     {/* MOBILE CARD VIEW (md:hidden) */}
                     <div className="md:hidden space-y-3">
                         {adminList.length === 0 ? (
-                            <div className="p-8 text-center text-slate-400 text-xs bg-[#082033]/60 rounded-xl border border-[#1e4e5b]/60">
-                                <Users className="w-8 h-8 mx-auto mb-2 opacity-30 text-[#25dec0]" />
+                            <div className="p-8 text-center text-slate-500 text-xs bg-slate-50 rounded-xl border border-slate-200">
+                                <Users className="w-8 h-8 mx-auto mb-2 opacity-30 text-[#0f766e]" />
                                 <span>No administrator accounts found.</span>
                             </div>
                         ) : (
@@ -737,10 +736,10 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         key={a.id}
                                         className={`p-4 rounded-xl border transition-all ${
                                             isSelected
-                                                ? 'bg-[#15cbb7]/15 border-[#24dbc3]/60 shadow-lg'
+                                                ? 'bg-teal-50/70 border-[#0f766e] shadow-md'
                                                 : isSelf
-                                                ? 'bg-[#092b3a]/70 border-[#24dbc3]/40'
-                                                : 'bg-[#082033]/70 border-[#1e4e5b]/60'
+                                                ? 'bg-slate-50 border-slate-300'
+                                                : 'bg-white border-slate-200/90 shadow-xs'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
@@ -750,23 +749,23 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                     disabled={isSelf}
                                                     checked={isSelected}
                                                     onChange={() => handleToggleSelect(a.id)}
-                                                    className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] disabled:opacity-30"
+                                                    className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e] disabled:opacity-30"
                                                 />
-                                                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shrink-0">
+                                                <div className="w-9 h-9 rounded-xl bg-teal-50 text-[#0f766e] border border-teal-200 flex items-center justify-center font-extrabold text-xs shrink-0 shadow-xs">
                                                     {initial}
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-1.5">
-                                                        <h4 className="font-bold text-white text-xs mb-0">
+                                                        <h4 className="font-bold text-slate-900 text-xs mb-0">
                                                             {a.name || a.username}
                                                         </h4>
                                                         {isSelf && (
-                                                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#24dbc3]/20 text-[#27dec9]">
+                                                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200">
                                                                 YOU
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <span className="text-[11px] text-slate-400 font-mono">@{a.username}</span>
+                                                    <span className="text-[11px] text-slate-500 font-mono">@{a.username}</span>
                                                 </div>
                                             </div>
 
@@ -778,8 +777,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             </div>
                                         </div>
 
-                                        <div className="mt-3 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between gap-2">
-                                            <div className="text-[10px] text-slate-400">
+                                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                                            <div className="text-[10px] text-slate-500 font-medium">
                                                 Created {new Date(a.created_at).toLocaleDateString()}
                                             </div>
 
@@ -788,7 +787,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                     <button
                                                         type="button"
                                                         onClick={() => handleToggleStatus(a)}
-                                                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#082033] border border-[#1e4e5b]/80 text-slate-300 hover:text-white"
+                                                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200"
                                                     >
                                                         {a.status === 'Active' ? 'Deactivate' : 'Activate'}
                                                     </button>
@@ -797,7 +796,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 <button
                                                     type="button"
                                                     onClick={() => openResetPassModal(a)}
-                                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#24dbc3]/10 border border-[#24dbc3]/30 text-[#25dec0] flex items-center gap-1"
+                                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-teal-50 border border-teal-200 text-[#0f766e] flex items-center gap-1"
                                                 >
                                                     <KeyRound className="w-3 h-3" />
                                                     <span>Password</span>
@@ -806,7 +805,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 <button
                                                     type="button"
                                                     onClick={() => openEditModal(a)}
-                                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#24dbc3]/10 border border-[#24dbc3]/30 text-[#27dec9]"
+                                                    className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200"
                                                 >
                                                     Edit
                                                 </button>
@@ -815,7 +814,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                     <button
                                                         type="button"
                                                         onClick={() => setDeleteModalAdmin(a)}
-                                                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-300"
+                                                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100"
                                                     >
                                                         Delete
                                                     </button>
@@ -830,11 +829,11 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                     {/* Pagination */}
                     {admins.links && admins.links.length > 3 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#1b5361]/60 text-xs text-slate-400">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200 text-xs text-slate-500">
                             <div>
-                                Showing <strong className="text-white">{admins.from || 0}</strong> to{' '}
-                                <strong className="text-white">{admins.to || 0}</strong> of{' '}
-                                <strong className="text-white">{admins.total || 0}</strong> administrators
+                                Showing <strong className="text-slate-900">{admins.from || 0}</strong> to{' '}
+                                <strong className="text-slate-900">{admins.to || 0}</strong> of{' '}
+                                <strong className="text-slate-900">{admins.total || 0}</strong> administrators
                             </div>
                             <div className="flex items-center gap-1">
                                 {admins.links.map((link, idx) => (
@@ -844,8 +843,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
                                         className={`px-3 py-1.5 rounded-lg font-medium transition-all border-0 cursor-pointer ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-bold shadow'
-                                                : 'bg-[#061726] text-slate-400 hover:text-white disabled:opacity-30'
+                                                ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 disabled:opacity-30'
                                         }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -858,9 +857,9 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
             {/* FIXED BOTTOM FLOATING BULK ACTIONS TOOLBAR */}
             {selectedIds.length > 0 && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-[#061726]/95 backdrop-blur-xl border border-[#24dbc3]/40 rounded-2xl p-3 sm:p-4 shadow-[0_20px_60px_rgba(0,0,0,0.7)] flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-slate-900 text-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
                     <div className="flex items-center gap-2.5">
-                        <span className="w-7 h-7 rounded-full bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-black flex items-center justify-center text-xs shadow-md">
+                        <span className="w-7 h-7 rounded-full bg-[#14b8a6] text-slate-950 font-black flex items-center justify-center text-xs shadow-md">
                             {selectedIds.length}
                         </span>
                         <span className="text-xs sm:text-sm font-bold text-white">
@@ -882,7 +881,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                             <button
                                 type="button"
                                 onClick={handleBulkArchive}
-                                className="bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs border-0 shadow cursor-pointer"
+                                className="bg-[#f59e0b] hover:bg-amber-600 text-slate-950 font-bold rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs border-0 shadow cursor-pointer"
                             >
                                 <Archive className="w-3.5 h-3.5" />
                                 <span>Archive</span>
@@ -901,7 +900,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                         <button
                             type="button"
                             onClick={() => setSelectedIds([])}
-                            className="bg-[#082033] text-slate-300 hover:text-white rounded-xl px-2.5 py-1.5 text-xs border border-[#1e4e5b]/80 cursor-pointer"
+                            className="bg-slate-800 text-slate-300 hover:text-white rounded-xl px-2.5 py-1.5 text-xs border border-slate-700 cursor-pointer"
                         >
                             Cancel
                         </button>
@@ -913,24 +912,24 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 MODAL 1: CREATE ADMIN
             ======================================================== */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-4">
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
-                        <div className="flex items-center justify-between pb-4 border-b border-[#1b5361]/60 mb-2">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-2">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/10 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0]">
+                                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e]">
                                     <UserPlus className="w-5 h-5 stroke-[2.5]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-white tracking-tight mb-0">Create New Administrator</h3>
-                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">Provision authorized portal operator credentials</p>
+                                    <h3 className="text-base font-bold text-slate-900 tracking-tight mb-0">Create New Administrator</h3>
+                                    <p className="text-xs text-slate-500 mb-0 mt-0.5">Provision authorized portal operator credentials</p>
                                 </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setShowCreateModal(false)}
-                                className="w-8 h-8 rounded-xl bg-[#082033] hover:bg-[#0c2638] text-slate-400 hover:text-white flex items-center justify-center border border-[#1e4e5b]/80 cursor-pointer transition-colors"
+                                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center border border-slate-200 cursor-pointer transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -938,8 +937,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                         <form onSubmit={handleCreateSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    Full Name <span className="text-rose-400">*</span>
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Full Name <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -949,11 +948,11 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={createForm.data.name}
                                         onChange={(e) => createForm.setData('name', e.target.value)}
                                         placeholder="e.g. Johnathan Doe"
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white"
                                     />
                                 </div>
                                 {createForm.errors.name && (
-                                    <p className="text-rose-400 text-xs mt-1 flex items-center gap-1">
+                                    <p className="text-rose-600 text-xs mt-1 flex items-center gap-1">
                                         <AlertCircle className="w-3.5 h-3.5" />
                                         {createForm.errors.name}
                                     </p>
@@ -962,8 +961,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Username <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Username <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -971,16 +970,16 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={createForm.data.username}
                                         onChange={(e) => createForm.setData('username', e.target.value)}
                                         placeholder="e.g. jdoe_admin"
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white"
                                     />
                                     {createForm.errors.username && (
-                                        <p className="text-rose-400 text-xs mt-1">{createForm.errors.username}</p>
+                                        <p className="text-rose-600 text-xs mt-1">{createForm.errors.username}</p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Email Address <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Email Address <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -990,24 +989,24 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={createForm.data.email}
                                             onChange={(e) => createForm.setData('email', e.target.value)}
                                             placeholder="admin@example.com"
-                                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white"
                                         />
                                     </div>
                                     {createForm.errors.email && (
-                                        <p className="text-rose-400 text-xs mt-1">{createForm.errors.email}</p>
+                                        <p className="text-rose-600 text-xs mt-1">{createForm.errors.email}</p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                         Permission Role
                                     </label>
                                     <select
                                         value={createForm.data.role}
                                         onChange={(e) => createForm.setData('role', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                     >
                                         <option value="Admin">Admin (Full Operational)</option>
                                         <option value="Super Admin">Super Admin (Root Access)</option>
@@ -1017,13 +1016,13 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                         Account Status
                                     </label>
                                     <select
                                         value={createForm.data.status}
                                         onChange={(e) => createForm.setData('status', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                     >
                                         <option value="Active">Active (Permit Login)</option>
                                         <option value="Inactive">Inactive (Suspend Login)</option>
@@ -1033,8 +1032,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Password (Min 8 chars) <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Password (Min 8 chars) <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1044,24 +1043,24 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={createForm.data.password}
                                             onChange={(e) => createForm.setData('password', e.target.value)}
                                             placeholder="••••••••"
-                                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-9 pr-9 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-9 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowCreatePass(!showCreatePass)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 bg-transparent border-0 cursor-pointer"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
                                         >
                                             {showCreatePass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                                         </button>
                                     </div>
                                     {createForm.errors.password && (
-                                        <p className="text-rose-400 text-xs mt-1">{createForm.errors.password}</p>
+                                        <p className="text-rose-600 text-xs mt-1">{createForm.errors.password}</p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Confirm Password <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Confirm Password <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1071,12 +1070,12 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={createForm.data.password_confirmation}
                                             onChange={(e) => createForm.setData('password_confirmation', e.target.value)}
                                             placeholder="••••••••"
-                                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-9 pr-9 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-9 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowCreateConfirmPass(!showCreateConfirmPass)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 bg-transparent border-0 cursor-pointer"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
                                         >
                                             {showCreateConfirmPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                                         </button>
@@ -1084,18 +1083,18 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#1b5361]/60">
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                                 <button
                                     type="button"
                                     onClick={() => setShowCreateModal(false)}
-                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer"
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={createForm.processing}
-                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] disabled:opacity-60 cursor-pointer"
+                                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#0f766e] hover:bg-[#115e59] border-0 shadow-xs disabled:opacity-60 cursor-pointer"
                                 >
                                     {createForm.processing ? 'Creating...' : 'Create Admin Account'}
                                 </button>
@@ -1109,26 +1108,26 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 MODAL 2: EDIT ADMIN
             ======================================================== */}
             {editingAdmin && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-4">
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
-                        <div className="flex items-center justify-between pb-4 border-b border-[#1b5361]/60 mb-2">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-2">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/10 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0]">
+                                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e]">
                                     <Edit2 className="w-5 h-5 stroke-[2.5]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-white tracking-tight mb-0">
+                                    <h3 className="text-base font-bold text-slate-900 tracking-tight mb-0">
                                         Edit Administrator: @{editingAdmin.username}
                                     </h3>
-                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">Update operator account details and security</p>
+                                    <p className="text-xs text-slate-500 mb-0 mt-0.5">Update operator account details and security</p>
                                 </div>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setEditingAdmin(null)}
-                                className="w-8 h-8 rounded-xl bg-[#082033] hover:bg-[#0c2638] text-slate-400 hover:text-white flex items-center justify-center border border-[#1e4e5b]/80 cursor-pointer transition-colors"
+                                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center border border-slate-200 cursor-pointer transition-colors"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -1136,8 +1135,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                         <form onSubmit={handleEditSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    Full Name <span className="text-rose-400">*</span>
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Full Name <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -1146,34 +1145,34 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         required
                                         value={editForm.data.name}
                                         onChange={(e) => editForm.setData('name', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                     />
                                 </div>
                                 {editForm.errors.name && (
-                                    <p className="text-rose-400 text-xs mt-1">{editForm.errors.name}</p>
+                                    <p className="text-rose-600 text-xs mt-1">{editForm.errors.name}</p>
                                 )}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Username <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Username <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         required
                                         value={editForm.data.username}
                                         onChange={(e) => editForm.setData('username', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                     />
                                     {editForm.errors.username && (
-                                        <p className="text-rose-400 text-xs mt-1">{editForm.errors.username}</p>
+                                        <p className="text-rose-600 text-xs mt-1">{editForm.errors.username}</p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                        Email Address <span className="text-rose-400">*</span>
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                        Email Address <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -1182,24 +1181,24 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             required
                                             value={editForm.data.email}
                                             onChange={(e) => editForm.setData('email', e.target.value)}
-                                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                         />
                                     </div>
                                     {editForm.errors.email && (
-                                        <p className="text-rose-400 text-xs mt-1">{editForm.errors.email}</p>
+                                        <p className="text-rose-600 text-xs mt-1">{editForm.errors.email}</p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                         Permission Role
                                     </label>
                                     <select
                                         value={editForm.data.role}
                                         onChange={(e) => editForm.setData('role', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                     >
                                         <option value="Admin">Admin</option>
                                         <option value="Super Admin">Super Admin</option>
@@ -1209,29 +1208,29 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                         Account Status
                                     </label>
                                     <select
                                         disabled={editingAdmin.id === currentAdminId}
                                         value={editForm.data.status}
                                         onChange={(e) => editForm.setData('status', e.target.value)}
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] disabled:opacity-40"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#0f766e] focus:bg-white disabled:opacity-50"
                                     >
                                         <option value="Active">Active</option>
                                         <option value="Inactive">Inactive</option>
                                     </select>
                                     {editingAdmin.id === currentAdminId && (
-                                        <span className="text-[10px] text-amber-400 mt-1 block">
+                                        <span className="text-[10px] text-amber-600 mt-1 block">
                                             Cannot deactivate your current session
                                         </span>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="p-3.5 bg-[#082033]/80 rounded-2xl border border-[#1e4e5b]/70 space-y-2.5">
-                                <div className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Key className="w-3.5 h-3.5 text-[#25dec0]" />
+                            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+                                <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Key className="w-3.5 h-3.5 text-[#0f766e]" />
                                     <span>Reset Password (Leave blank to keep current)</span>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1241,12 +1240,12 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={editForm.data.password}
                                             onChange={(e) => editForm.setData('password', e.target.value)}
                                             placeholder="New Password"
-                                            className="w-full bg-[#061726] border border-[#1e4e5b]/80 rounded-xl pl-3 pr-8 py-2 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowEditPass(!showEditPass)}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 bg-transparent border-0 cursor-pointer"
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
                                         >
                                             {showEditPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                                         </button>
@@ -1257,43 +1256,43 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={editForm.data.password_confirmation}
                                             onChange={(e) => editForm.setData('password_confirmation', e.target.value)}
                                             placeholder="Confirm Password"
-                                            className="w-full bg-[#061726] border border-[#1e4e5b]/80 rounded-xl pl-3 pr-8 py-2 text-xs text-white focus:outline-none focus:border-[#24dbc3]"
+                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowEditConfirmPass(!showEditConfirmPass)}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 bg-transparent border-0 cursor-pointer"
+                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
                                         >
                                             {showEditConfirmPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                                         </button>
                                     </div>
                                 </div>
                                 {editForm.errors.password && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                    <p className="text-rose-600 text-xs mt-1.5 flex items-center gap-1 font-medium">
                                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                         <span>{editForm.errors.password}</span>
                                     </p>
                                 )}
                                 {editForm.errors.password_confirmation && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                    <p className="text-rose-600 text-xs mt-1.5 flex items-center gap-1 font-medium">
                                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                         <span>{editForm.errors.password_confirmation}</span>
                                     </p>
                                 )}
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#1b5361]/60">
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                                 <button
                                     type="button"
                                     onClick={() => setEditingAdmin(null)}
-                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer"
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={editForm.processing}
-                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] disabled:opacity-60 cursor-pointer"
+                                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#0f766e] hover:bg-[#115e59] border-0 shadow-xs disabled:opacity-60 cursor-pointer"
                                 >
                                     {editForm.processing ? 'Saving...' : 'Save Updates'}
                                 </button>
@@ -1307,31 +1306,31 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 MODAL 3: DELETE CONFIRMATION
             ======================================================== */}
             {deleteModalAdmin && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl text-center relative overflow-hidden">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-rose-500 via-rose-400 to-amber-500" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-2xl text-center relative overflow-hidden">
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-rose-500 via-rose-400 to-[#f59e0b]" />
 
-                        <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4">
+                        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-xs">
                             <Trash2 className="w-7 h-7" />
                         </div>
-                        <h4 className="text-lg font-bold text-white mb-2">Delete Administrator Account?</h4>
-                        <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+                        <h4 className="text-lg font-bold text-slate-900 mb-2">Delete Administrator Account?</h4>
+                        <p className="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed">
                             Are you sure you want to permanently delete account{' '}
-                            <strong className="text-white">@{deleteModalAdmin.username}</strong> ({deleteModalAdmin.name})?
+                            <strong className="text-slate-900">@{deleteModalAdmin.username}</strong> ({deleteModalAdmin.name})?
                             This administrator will immediately lose all portal access.
                         </p>
                         <div className="flex items-center justify-center gap-3">
                             <button
                                 type="button"
                                 onClick={() => setDeleteModalAdmin(null)}
-                                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer"
+                                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="button"
                                 onClick={confirmDelete}
-                                className="px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 border-0 shadow-lg shadow-rose-500/20 cursor-pointer"
+                                className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 border-0 shadow-xs cursor-pointer"
                             >
                                 Delete Account
                             </button>
@@ -1344,22 +1343,21 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 MODAL 4: RESET ADMIN PASSWORD
             ======================================================== */}
             {resetPassModalAdmin && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 text-left">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-4 text-left">
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between pb-3.5 border-b border-[#1b5361]/60">
+                        <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
                                     <KeyRound className="w-5 h-5 stroke-[2.2]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base font-bold text-white mb-0 leading-tight">
+                                    <h3 className="text-base font-bold text-slate-900 mb-0 leading-tight">
                                         Reset Admin Password
                                     </h3>
-                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">
+                                    <p className="text-xs text-slate-500 mb-0 mt-0.5">
                                         Assign a new password for @{resetPassModalAdmin.username}
                                     </p>
                                 </div>
@@ -1372,22 +1370,22 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                     }
                                 }}
                                 disabled={resetPassForm.processing}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                className="text-slate-400 hover:text-slate-600 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer disabled:opacity-50"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         {/* Administrator Info Pill */}
-                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-[#25dec0] shrink-0" />
+                                <User className="w-4 h-4 text-[#0f766e] shrink-0" />
                                 <div>
-                                    <span className="font-bold text-white block">{resetPassModalAdmin.name}</span>
-                                    <span className="text-slate-400 font-mono text-[11px]">@{resetPassModalAdmin.username}</span>
+                                    <span className="font-bold text-slate-900 block">{resetPassModalAdmin.name}</span>
+                                    <span className="text-slate-500 font-mono text-[11px]">@{resetPassModalAdmin.username}</span>
                                 </div>
                             </div>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/30">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200">
                                 {resetPassModalAdmin.role || 'Admin'}
                             </span>
                         </div>
@@ -1396,13 +1394,13 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                             {/* New Password */}
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block">
-                                        New Password <span className="text-[#25dec0]">*</span>
+                                    <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider block">
+                                        New Password <span className="text-[#0f766e]">*</span>
                                     </label>
                                     <button
                                         type="button"
                                         onClick={generateRandomAdminPassword}
-                                        className="text-[11px] font-bold text-[#25dec0] hover:text-[#42f1ce] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                        className="text-[11px] font-bold text-[#0f766e] hover:text-[#115e59] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
                                     >
                                         <Sparkles className="w-3.5 h-3.5" />
                                         <span>Generate Strong</span>
@@ -1417,19 +1415,19 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={resetPassForm.data.password}
                                         onChange={(e) => resetPassForm.setData('password', e.target.value)}
                                         placeholder="Enter or generate new password..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowResetPass(!showResetPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0"
                                         title={showResetPass ? 'Hide password' : 'Show password'}
                                     >
                                         {showResetPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                                 {resetPassForm.errors.password && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                    <p className="text-rose-600 text-xs mt-1.5 flex items-center gap-1 font-medium">
                                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                         <span>{resetPassForm.errors.password}</span>
                                     </p>
@@ -1438,8 +1436,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
                             {/* Confirm Password */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    Confirm Password <span className="text-[#25dec0]">*</span>
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Confirm Password <span className="text-[#0f766e]">*</span>
                                 </label>
                                 <div className="relative">
                                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1450,19 +1448,19 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={resetPassForm.data.password_confirmation}
                                         onChange={(e) => resetPassForm.setData('password_confirmation', e.target.value)}
                                         placeholder="Confirm new password..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowResetConfirmPass(!showResetConfirmPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0"
                                         title={showResetConfirmPass ? 'Hide password' : 'Show password'}
                                     >
                                         {showResetConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
                                 {resetPassForm.errors.password_confirmation && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
+                                    <p className="text-rose-600 text-xs mt-1.5 flex items-center gap-1 font-medium">
                                         <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                                         <span>{resetPassForm.errors.password_confirmation}</span>
                                     </p>
@@ -1470,16 +1468,16 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                             </div>
 
                             {/* Password Rules Checklist */}
-                            <div className="p-3 bg-[#082033]/50 rounded-xl border border-[#1e4e5b]/50 text-[11px] space-y-1 text-slate-400">
+                            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-[11px] space-y-1 text-slate-500">
                                 <div className="flex items-center gap-1.5">
                                     <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
                                         resetPassForm.data.password.length >= 8
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                                            : 'bg-slate-700/40 text-slate-400'
+                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
+                                            : 'bg-slate-200 text-slate-400'
                                     }`}>
                                         ✓
                                     </span>
-                                    <span className={resetPassForm.data.password.length >= 8 ? 'text-emerald-400 font-semibold' : ''}>
+                                    <span className={resetPassForm.data.password.length >= 8 ? 'text-emerald-700 font-semibold' : ''}>
                                         Minimum 8 characters
                                     </span>
                                 </div>
@@ -1487,15 +1485,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                     <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
                                         resetPassForm.data.password.length > 0 &&
                                         resetPassForm.data.password === resetPassForm.data.password_confirmation
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                                            : 'bg-slate-700/40 text-slate-400'
+                                            ? 'bg-emerald-50 text-emerald-600 border border-emerald-300'
+                                            : 'bg-slate-200 text-slate-400'
                                     }`}>
                                         ✓
                                     </span>
                                     <span className={
                                         resetPassForm.data.password.length > 0 &&
                                         resetPassForm.data.password === resetPassForm.data.password_confirmation
-                                            ? 'text-emerald-400 font-semibold'
+                                            ? 'text-emerald-700 font-semibold'
                                             : ''
                                     }>
                                         Passwords match
@@ -1504,19 +1502,19 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
                                 <button
                                     type="button"
                                     onClick={() => setResetPassModalAdmin(null)}
                                     disabled={resetPassForm.processing}
-                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={resetPassForm.processing}
-                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#0f766e] hover:bg-[#115e59] border-0 shadow-xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                 >
                                     {resetPassForm.processing ? 'Updating...' : 'Update Password'}
                                 </button>

@@ -1,0 +1,135 @@
+/**
+ * Country phone dial codes, flags, and country names.
+ */
+export const COUNTRY_DIAL_MAP = {
+    '+63': { flag: '🇵🇭', country: 'Philippines', code: 'PH', dial: '+63' },
+    '+1': { flag: '🇺🇸', country: 'United States', code: 'US', dial: '+1' },
+    '+44': { flag: '🇬🇧', country: 'United Kingdom', code: 'GB', dial: '+44' },
+    '+61': { flag: '🇦🇺', country: 'Australia', code: 'AU', dial: '+61' },
+    '+65': { flag: '🇸🇬', country: 'Singapore', code: 'SG', dial: '+65' },
+    '+81': { flag: '🇯🇵', country: 'Japan', code: 'JP', dial: '+81' },
+    '+82': { flag: '🇰🇷', country: 'South Korea', code: 'KR', dial: '+82' },
+    '+971': { flag: '🇦🇪', country: 'United Arab Emirates', code: 'AE', dial: '+971' },
+    '+966': { flag: '🇸🇦', country: 'Saudi Arabia', code: 'SA', dial: '+966' },
+    '+852': { flag: '🇭🇰', country: 'Hong Kong', code: 'HK', dial: '+852' },
+    '+886': { flag: '🇹🇼', country: 'Taiwan', code: 'TW', dial: '+886' },
+    '+60': { flag: '🇲🇾', country: 'Malaysia', code: 'MY', dial: '+60' },
+    '+62': { flag: '🇮🇩', country: 'Indonesia', code: 'ID', dial: '+62' },
+    '+66': { flag: '🇹🇭', country: 'Thailand', code: 'TH', dial: '+66' },
+    '+84': { flag: '🇻🇳', country: 'Vietnam', code: 'VN', dial: '+84' },
+    '+91': { flag: '🇮🇳', country: 'India', code: 'IN', dial: '+91' },
+    '+86': { flag: '🇨🇳', country: 'China', code: 'CN', dial: '+86' },
+    '+49': { flag: '🇩🇪', country: 'Germany', code: 'DE', dial: '+49' },
+    '+33': { flag: '🇫🇷', country: 'France', code: 'FR', dial: '+33' },
+    '+39': { flag: '🇮🇹', country: 'Italy', code: 'IT', dial: '+39' },
+    '+34': { flag: '🇪🇸', country: 'Spain', code: 'ES', dial: '+34' },
+    '+226': { flag: '🇧🇫', country: 'Burkina Faso', code: 'BF', dial: '+226' },
+    '+675': { flag: '🇵🇬', country: 'Papua New Guinea', code: 'PG', dial: '+675' },
+    '+234': { flag: '🇳🇬', country: 'Nigeria', code: 'NG', dial: '+234' },
+    '+27': { flag: '🇿🇦', country: 'South Africa', code: 'ZA', dial: '+27' },
+    '+55': { flag: '🇧🇷', country: 'Brazil', code: 'BR', dial: '+55' },
+    '+52': { flag: '🇲🇽', country: 'Mexico', code: 'MX', dial: '+52' },
+    '+64': { flag: '🇳🇿', country: 'New Zealand', code: 'NZ', dial: '+64' },
+    '+31': { flag: '🇳🇱', country: 'Netherlands', code: 'NL', dial: '+31' },
+    '+41': { flag: '🇨🇭', country: 'Switzerland', code: 'CH', dial: '+41' },
+    '+46': { flag: '🇸🇪', country: 'Sweden', code: 'SE', dial: '+46' },
+    '+47': { flag: '🇳🇴', country: 'Norway', code: 'NO', dial: '+47' },
+    '+45': { flag: '🇩🇰', country: 'Denmark', code: 'DK', dial: '+45' },
+    '+353': { flag: '🇮🇪', country: 'Ireland', code: 'IE', dial: '+353' },
+    '+351': { flag: '🇵🇹', country: 'Portugal', code: 'PT', dial: '+351' },
+    '+48': { flag: '🇵🇱', country: 'Poland', code: 'PL', dial: '+48' },
+    '+30': { flag: '🇬🇷', country: 'Greece', code: 'GR', dial: '+30' },
+    '+90': { flag: '🇹🇷', country: 'Turkey', code: 'TR', dial: '+90' },
+    '+20': { flag: '🇪🇬', country: 'Egypt', code: 'EG', dial: '+20' },
+    '+974': { flag: '🇶🇦', country: 'Qatar', code: 'QA', dial: '+974' },
+    '+965': { flag: '🇰🇼', country: 'Kuwait', code: 'KW', dial: '+965' },
+    '+968': { flag: '🇴🇲', country: 'Oman', code: 'OM', dial: '+968' },
+    '+973': { flag: '🇧🇭', country: 'Bahrain', code: 'BH', dial: '+973' },
+};
+
+/**
+ * Resolve country info from dial code (e.g. "+63", "+1", "63", etc.).
+ */
+export function getCountryInfo(dialCode) {
+    if (!dialCode) {
+        return { flag: '🇵🇭', country: 'Philippines', code: 'PH', dial: '+63' };
+    }
+    const clean = dialCode.startsWith('+') ? dialCode.trim() : `+${dialCode.trim()}`;
+    return (
+        COUNTRY_DIAL_MAP[clean] || {
+            flag: '🌐',
+            country: 'International',
+            code: 'INTL',
+            dial: clean,
+        }
+    );
+}
+
+/**
+ * Official Legacy Club Academy Tiers metadata with badge images.
+ */
+export const ACADEMY_TIERS = {
+    rookie: {
+        name: 'ROOKIE',
+        tier: 'Rookie',
+        stars: 1,
+        stars_display: '★',
+        badge_image: '/assets/image/academy/badge-rookie.png',
+        title: 'Ascending Mountaineer',
+        theme: 'silver',
+        pill_class: 'bg-slate-100 text-slate-800',
+        description: 'Mountain Ascent: Foundational member rank embarking on the path of leadership and skill mastery.',
+    },
+    elite: {
+        name: 'ELITE',
+        tier: 'Elite',
+        stars: 2,
+        stars_display: '★★',
+        badge_image: '/assets/image/academy/badge-elite.png',
+        title: 'High-Performance Pioneer',
+        theme: 'blue',
+        pill_class: 'bg-blue-50 text-blue-800',
+        description: 'Ascending Trend: High-performance pioneer demonstrating rapid momentum and strategic capability.',
+    },
+    master: {
+        name: 'MASTER',
+        tier: 'Master',
+        stars: 3,
+        stars_display: '★★★',
+        badge_image: '/assets/image/academy/badge-master.png',
+        title: 'Elite Lionheart Member',
+        theme: 'amber',
+        pill_class: 'bg-amber-50 text-amber-800',
+        description: 'Lionheart Sovereign: Exemplifying fearless leadership, tactical excellence, and team mentorship.',
+    },
+    'grand master': {
+        name: 'GRAND MASTER',
+        tier: 'Grand Master',
+        stars: 4,
+        stars_display: '★★★★',
+        badge_image: '/assets/image/academy/badge-grand-master.png',
+        title: 'Distinguished Champion',
+        theme: 'purple',
+        pill_class: 'bg-purple-50 text-purple-800',
+        description: 'Imperial Eagle: Distinguished champion with visionary foresight and multi-tier organizational impact.',
+    },
+    legend: {
+        name: 'LEGEND',
+        tier: 'Legend',
+        stars: 5,
+        stars_display: '★★★★★',
+        badge_image: '/assets/image/academy/badge-legend.png',
+        title: 'Supreme Sovereign Member',
+        theme: 'gold',
+        pill_class: 'bg-amber-100 text-amber-900',
+        description: 'Crown of Sovereign Prestige: The highest apex tier of distinction, honor, and enduring legacy in the Academy.',
+    },
+};
+
+/**
+ * Get tier details safely with badge image.
+ */
+export function getTierDetails(tierName) {
+    const key = (tierName || 'Rookie').toLowerCase().trim();
+    return ACADEMY_TIERS[key] || ACADEMY_TIERS.rookie;
+}

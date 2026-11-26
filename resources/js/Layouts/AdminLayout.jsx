@@ -31,6 +31,8 @@ import {
     EyeOff,
     AlertCircle,
     Check,
+    GraduationCap,
+    Maximize2,
 } from 'lucide-react';
 
 export default function AdminLayout({ children, title = 'Executive Console', subtitle }) {
@@ -38,7 +40,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
     const { auth, flash } = page.props || {};
     const currentUrl = page.url || '';
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [currentTime, setCurrentTime] = useState('');
+    const [currentTime, setCurrentTime] = useState({ time: '', date: '' });
     const [isTestingEmail, setIsTestingEmail] = useState(false);
 
     // Realtime Synchronization Engine
@@ -56,7 +58,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
         intervalMs: 3500,
     });
 
-    // Live Clock (PHT)
+    // Live Clock (PHT) formatted exactly like reference portal
     useEffect(() => {
         const updateClock = () => {
             const now = new Date();
@@ -69,11 +71,12 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
             });
             const dateString = now.toLocaleDateString('en-US', {
                 timeZone: 'Asia/Manila',
+                weekday: 'short',
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
-            });
-            setCurrentTime(`${dateString} • ${timeString}`);
+            }).toUpperCase();
+            setCurrentTime({ time: timeString, date: dateString });
         };
         updateClock();
         const timer = setInterval(updateClock, 1000);
@@ -193,6 +196,18 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
             description: 'Verify Payment & Onboard',
         },
         {
+            name: 'Academy Verification',
+            href: '/admin/verify-academy',
+            icon: (props) => (
+                <img
+                    src="/assets/image/academy/logo-black-trimmed.png"
+                    alt="Academy"
+                    className={`${props?.className || 'w-4 h-4'} object-contain`}
+                />
+            ),
+            description: 'Verify Members & Assign Ranks',
+        },
+        {
             name: 'Admin Accounts',
             href: '/admin/admins',
             icon: Users,
@@ -209,443 +224,347 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
     const isActive = (href) => currentUrl === href || (href !== '/admin' && currentUrl.startsWith(href));
 
     const adminUsername = auth?.admin?.username || 'admin';
-    const adminInitial = adminUsername.charAt(0).toUpperCase();
+    const adminFullName = auth?.admin?.name || 'Administrator';
+    const adminRole = auth?.admin?.role || 'Administrator';
 
     return (
         <div
-            className="admin-console min-h-screen text-slate-100 flex font-barlow selection:bg-[#24dbc3] selection:text-[#031927] antialiased"
+            className="admin-console min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans antialiased selection:bg-[#24dbc3] selection:text-[#031927]"
             style={{
-                background: 'radial-gradient(ellipse at 50% 15%, #071c2c 0%, #031323 50%, #020d1b 100%)',
-                fontFamily: "'Barlow', 'Inter', sans-serif",
+                backgroundColor: '#f8fafc',
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             }}
         >
             <FlashToast flash={flash} />
 
-            {/* FLOATING REAL-TIME NOTIFICATION POPUPS */}
-            {notifications.length > 0 && (
-                <div className="fixed top-20 right-4 sm:right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
-                    {notifications.map((n) => (
-                        <div
-                            key={n.id}
-                            className="pointer-events-auto p-4 rounded-2xl bg-[#061726]/95 backdrop-blur-xl border border-[#24dbc3]/40 shadow-[0_10px_35px_rgba(0,0,0,0.5)] flex items-start gap-3 animate-in fade-in slide-in-from-top-3 duration-200"
-                        >
-                            <div className="w-8 h-8 rounded-xl bg-[#24dbc3]/10 border border-[#24dbc3]/25 flex items-center justify-center text-[#24dbc3] shrink-0 mt-0.5">
-                                {n.type === 'world_plan' ? (
-                                    <Globe className="w-4 h-4 text-emerald-400" />
-                                ) : n.type === 'inquiry' ? (
-                                    <Inbox className="w-4 h-4 text-[#24dbc3]" />
-                                ) : (
-                                    <Sparkles className="w-4 h-4 text-[#24dbc3]" />
-                                )}
+            {/* TOP DUAL-COLOR ACCENT STRIPE (System Palette: Dark Teal & Warm Gold Accent like in reference image) */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b] shrink-0" />
+
+            {/* TOP HEADER BAR (Clean, Elegant Light Header matching reference image) */}
+            <header className="h-16 sm:h-20 shrink-0 bg-white border-b border-slate-200/90 px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+                {/* Left: Mobile Menu Toggle & Brand / Title */}
+                <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 shrink-0 cursor-pointer"
+                        aria-label="Toggle Navigation"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
+
+                    {/* Logo & Portal Name */}
+                    <div className="flex items-center gap-3">
+                        <Link href="/" className="flex items-center gap-2.5 no-underline">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-black shadow-md shadow-teal-700/20 shrink-0">
+                                <Shield className="w-5 h-5 fill-white stroke-white" />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="text-xs font-bold text-white flex items-center justify-between">
-                                    <span>{n.title}</span>
-                                    <span className="text-[10px] text-[#24dbc3] font-mono">Live</span>
+                            <div className="hidden sm:block">
+                                <span className="text-sm font-black tracking-wider text-slate-900 block leading-tight font-mono">
+                                    INFINITE
+                                </span>
+                                <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#0f766e] block">
+                                    EXECUTIVE PORTAL
+                                </span>
+                            </div>
+                        </Link>
+
+                        <div className="hidden md:block h-7 w-[1px] bg-slate-200 mx-2" />
+
+                        {/* Large Title exactly like reference image ("STUDENT PORTAL" -> "ADMIN PORTAL") */}
+                        <div className="min-w-0">
+                            <h1 className="text-base sm:text-xl font-extrabold text-[#0f766e] tracking-tight truncate uppercase font-sans">
+                                {title}
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right: Live Sync, Clock Pill (Reference Match) & Controls */}
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                    {/* Live Sync Indicator Pill */}
+                    <div
+                        className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border ${
+                            connected
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                : 'bg-rose-50 border-rose-200 text-rose-700'
+                        }`}
+                        title={connected ? 'Realtime live sync active' : 'Reconnecting...'}
+                    >
+                        <span className="relative flex h-2 w-2 shrink-0">
+                            {connected ? (
+                                <>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </>
+                            ) : (
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                            )}
+                        </span>
+                        <span className="text-[11px] font-bold">
+                            {connected ? 'Live Sync' : 'Offline'}
+                        </span>
+                    </div>
+
+                    {/* Sound Notification Chime Toggle */}
+                    <button
+                        type="button"
+                        onClick={toggleSound}
+                        title={soundEnabled ? 'Chimes: ON (Click to Mute)' : 'Chimes: MUTED (Click to Enable)'}
+                        className={`p-2 rounded-xl border-0 transition-all cursor-pointer ${
+                            soundEnabled
+                                ? 'text-[#0f766e] bg-teal-50'
+                                : 'text-slate-400 bg-slate-100 hover:text-slate-700'
+                        }`}
+                    >
+                        {soundEnabled ? <Volume2 className="w-4 h-4 text-[#0f766e]" /> : <VolumeX className="w-4 h-4" />}
+                    </button>
+
+                    {/* Manual Sync */}
+                    <button
+                        type="button"
+                        onClick={syncNow}
+                        disabled={isSyncing}
+                        title="Force immediate refresh"
+                        className="p-2 rounded-xl text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 border-0 transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin text-[#0f766e]' : ''}`} />
+                    </button>
+
+                    {/* CLOCK PILL (MATCHING EXACT AMBER/GOLD THEME IN REFERENCE IMAGE) */}
+                    {currentTime.time && (
+                        <div className="flex items-center gap-2.5 px-3.5 py-1.5 sm:py-2 rounded-2xl bg-amber-50/70 border border-amber-300/80 text-amber-900 shadow-sm">
+                            <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                            <div className="text-right leading-none">
+                                <div className="text-xs font-black font-mono tracking-tight text-slate-900">
+                                    {currentTime.time}
                                 </div>
-                                <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-                                    {n.message}
+                                <div className="text-[9px] font-bold font-sans text-amber-700 tracking-wider mt-0.5 hidden sm:block">
+                                    {currentTime.date}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </header>
+
+            {/* MAIN SHELL: SIDEBAR + CONTENT CANVAS */}
+            <div className="flex-1 flex min-w-0">
+                {/* Desktop Left Sidebar (Matching Reference Image) */}
+                <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-slate-200 p-4 xl:p-5 justify-between shrink-0 min-h-[calc(100vh-5rem)] sticky top-20 z-20">
+                    <div className="space-y-6">
+                        {/* USER PROFILE BOX (MATCHING EXACT HIGHLIGHT BOX IN REFERENCE SCREENSHOT) */}
+                        <div className="rounded-2xl p-3.5 bg-gradient-to-r from-teal-50/50 via-white to-slate-50 border border-slate-200/90 border-l-4 border-l-[#f59e0b] shadow-sm space-y-2">
+                            <div>
+                                <h3 className="text-xs font-black text-slate-900 uppercase tracking-tight truncate">
+                                    {adminFullName}
+                                </h3>
+                                <p className="text-[11px] text-slate-500 font-medium capitalize mt-0.5">
+                                    {adminRole} account
                                 </p>
                             </div>
-                            <button
-                                onClick={() => dismissNotification(n.id)}
-                                className="text-slate-400 hover:text-white p-1 rounded-lg bg-transparent border-0 shrink-0 cursor-pointer"
-                                title="Dismiss"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            )}
 
-            {/* Desktop Fixed Sidebar */}
-            <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-[#061726]/95 border-r border-[#1b5361]/60 p-4 xl:p-5 justify-between shrink-0 h-screen sticky top-0 z-40 shadow-[4px_0_30px_rgba(0,0,0,0.4)] backdrop-blur-xl">
-                <div className="space-y-5">
-                    {/* Brand Header */}
-                    <div className="p-3 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 shadow-[inset_0_0_15px_rgba(16,212,196,.05)] flex items-center justify-between gap-2">
-                        <Link href="/" className="flex items-center gap-2.5 no-underline group min-w-0">
-                            <svg aria-hidden="true" viewBox="0 0 120 55" className="h-6 w-11 drop-shadow-[0_0_8px_rgba(39,220,192,.3)] shrink-0">
-                                <defs>
-                                    <linearGradient id="sidebarInfiniteMark" x1="0" y1="0" x2="1" y2="1">
-                                        <stop offset="0%" stopColor="#42efce" />
-                                        <stop offset="55%" stopColor="#15cbb7" />
-                                        <stop offset="100%" stopColor="#068b9e" />
-                                    </linearGradient>
-                                </defs>
-                                <path d="M60 27 C43 7 28 4 16 13 C1 24 11 44 27 43 C40 42 49 29 60 27 C72 24 81 12 94 12 C113 12 116 43 95 43 C82 43 72 31 60 27" fill="none" stroke="url(#sidebarInfiniteMark)" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <div className="min-w-0">
-                                <span className="font-extrabold text-lg xl:text-xl tracking-wider text-white block leading-none truncate">
-                                    INFINITE<span className="text-[#25dec0]">.</span>
+                            <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">
+                                    ADMIN ID
                                 </span>
-                                <span className="text-[8px] xl:text-[9px] uppercase font-extrabold tracking-[0.2em] text-[#27dec9] block mt-1 truncate">
-                                    EXECUTIVE CONSOLE
-                                </span>
-                            </div>
-                        </Link>
-
-                        {/* Animated Online Pulse */}
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 shrink-0">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider hidden xl:inline">Online</span>
-                        </div>
-                    </div>
-
-                    {/* Navigation Section */}
-                    <div>
-                        <div className="text-[9px] xl:text-[10px] uppercase tracking-[0.2em] font-extrabold text-slate-400 px-2.5 mb-2 flex items-center justify-between">
-                            <span>Main Navigation</span>
-                            <span className="text-[9px] text-[#27dec9] font-mono font-semibold">PORTAL</span>
-                        </div>
-                        <nav className="space-y-1">
-                            {navItems.map((item) => {
-                                const active = isActive(item.href);
-                                const Icon = item.icon;
-
-                                return (
-                                    <Link
-                                        key={item.name}
-                                        href={item.href}
-                                        className={`group relative flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 text-decoration-none ${
-                                            active
-                                                ? 'bg-gradient-to-r from-[#15cbb7]/20 via-[#15cbb7]/10 to-transparent border-l-4 border-l-[#25dec0] border-y border-r border-[#24dbc3]/30 text-white shadow-[0_4px_20px_rgba(36,219,195,0.15)]'
-                                                : 'text-slate-300 hover:text-white hover:bg-[#10293a]/70 border border-transparent'
-                                        }`}
-                                    >
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div
-                                                className={`w-7 h-7 xl:w-8 xl:h-8 rounded-lg xl:rounded-xl flex items-center justify-center transition-colors shrink-0 ${
-                                                    active
-                                                        ? 'bg-[#24dbc3] text-[#031927] shadow-[0_0_15px_rgba(36,219,195,0.4)]'
-                                                        : 'bg-[#0c2436] text-slate-400 group-hover:text-[#25dec0] group-hover:bg-[#12364e]'
-                                                }`}
-                                            >
-                                                <Icon className="w-3.5 h-3.5 xl:w-4 xl:h-4" />
-                                            </div>
-                                            <div className="min-w-0">
-                                                <span className={`block font-bold leading-tight truncate text-xs ${active ? 'text-white' : 'text-slate-200'}`}>
-                                                    {item.name}
-                                                </span>
-                                                <span className="text-[9px] xl:text-[10px] text-slate-400 block leading-tight mt-0.5 truncate hidden xl:block">
-                                                    {item.description}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {active && (
-                                            <ChevronRight className="w-3.5 h-3.5 text-[#25dec0] shrink-0 ml-1.5 animate-pulse" />
-                                        )}
-                                    </Link>
-                                );
-                            })}
-                        </nav>
-                    </div>
-                </div>
-
-                {/* Bottom Profile & Actions */}
-                <div className="pt-3 border-t border-[#1b5361]/60 space-y-2.5">
-                    {/* Admin User Card */}
-                    <div className="p-2.5 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 space-y-2">
-                        <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0">
-                                {adminInitial}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <span className="text-xs font-bold text-white block truncate">
-                                    {adminUsername}
-                                </span>
-                                <span className="inline-flex items-center gap-1 text-[9px] xl:text-[10px] font-semibold text-[#27dec9]">
-                                    <Shield className="w-2.5 h-2.5 xl:w-3 xl:h-3 text-[#25dec0]" />
-                                    <span>Verified Admin</span>
+                                <span className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 font-mono font-bold text-xs text-[#0f766e] shadow-xs">
+                                    ADM-{auth?.admin?.id || '01'}
                                 </span>
                             </div>
                         </div>
 
-                        {/* Quick Change Password Button */}
-                        <button
-                            type="button"
-                            onClick={openPasswordModal}
-                            className="w-full px-2.5 py-1.5 rounded-xl bg-[#0a273b] hover:bg-[#103750] border border-[#24dbc3]/40 hover:border-[#24dbc3]/80 text-[#25dec0] hover:text-[#42f1ce] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm"
-                        >
-                            <KeyRound className="w-3.5 h-3.5" />
-                            <span>Change Password</span>
-                        </button>
-                    </div>
-
-                    {/* Quick Action Buttons */}
-                    <div className="grid grid-cols-2 gap-2">
-                        <Link
-                            href="/"
-                            target="_blank"
-                            className="px-2.5 py-1.5 rounded-xl bg-[#0c2638] hover:bg-[#12364e] border border-[#276472]/60 text-slate-200 hover:text-white text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all text-decoration-none shadow-sm"
-                        >
-                            <span>Live Site</span>
-                            <ExternalLink className="w-3 h-3 text-[#25dec0]" />
-                        </Link>
-
-                        <button
-                            onClick={handleLogout}
-                            className="px-2.5 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/50 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                        >
-                            <LogOut className="w-3 h-3" />
-                            <span>Sign Out</span>
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Mobile Drawer Navigation */}
-            {sidebarOpen && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    <div
-                        onClick={() => setSidebarOpen(false)}
-                        className="fixed inset-0 bg-[#020d1b]/85 backdrop-blur-md transition-opacity"
-                    />
-                    <aside className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-[#061726]/98 border-r border-[#1b5361]/80 p-5 flex flex-col justify-between z-10 shadow-2xl overflow-y-auto">
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between pb-4 border-b border-[#1b5361]/60">
-                                <div className="flex items-center gap-2.5">
-                                    <svg aria-hidden="true" viewBox="0 0 120 55" className="h-6 w-11 drop-shadow-[0_0_8px_rgba(39,220,192,.3)]">
-                                        <defs>
-                                            <linearGradient id="mobileInfiniteMark" x1="0" y1="0" x2="1" y2="1">
-                                                <stop offset="0%" stopColor="#42efce" />
-                                                <stop offset="55%" stopColor="#15cbb7" />
-                                                <stop offset="100%" stopColor="#068b9e" />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M60 27 C43 7 28 4 16 13 C1 24 11 44 27 43 C40 42 49 29 60 27 C72 24 81 12 94 12 C113 12 116 43 95 43 C82 43 72 31 60 27" fill="none" stroke="url(#mobileInfiniteMark)" strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    <div>
-                                        <span className="font-bold text-lg text-white tracking-wide">INFINITE PORTAL</span>
-                                        <span className="text-[9px] uppercase font-bold text-[#27dec9] block">EXECUTIVE CONSOLE</span>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setSidebarOpen(false)}
-                                    className="p-2 rounded-xl text-slate-400 hover:text-white bg-[#0c2436] border border-[#276472]/60"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                        {/* Sidebar Category 1: PORTAL NAVIGATION */}
+                        <div>
+                            <div className="text-[10px] uppercase tracking-[0.2em] font-extrabold text-slate-400 px-2.5 mb-2.5">
+                                ADMIN PORTAL
                             </div>
-
-                            <nav className="space-y-1.5">
+                            <nav className="space-y-1">
                                 {navItems.map((item) => {
                                     const active = isActive(item.href);
                                     const Icon = item.icon;
+
                                     return (
                                         <Link
                                             key={item.name}
                                             href={item.href}
-                                            onClick={() => setSidebarOpen(false)}
-                                            className={`flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold text-decoration-none ${
+                                            className={`group relative flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-decoration-none ${
                                                 active
-                                                    ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-bold shadow-lg shadow-teal-500/20'
-                                                    : 'text-slate-300 hover:bg-[#0c2436]'
+                                                    ? 'bg-[#f0fdfa] text-[#0f766e] font-bold border-l-4 border-l-[#0f766e] shadow-xs'
+                                                    : 'text-slate-600 hover:text-[#0f766e] hover:bg-slate-50'
                                             }`}
                                         >
-                                            <Icon className="w-4 h-4 shrink-0" />
-                                            <span>{item.name}</span>
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <Icon
+                                                    className={`w-4 h-4 shrink-0 transition-colors ${
+                                                        active ? 'text-[#0f766e]' : 'text-slate-400 group-hover:text-[#0f766e]'
+                                                    }`}
+                                                />
+                                                <span className="truncate text-xs font-bold leading-tight">
+                                                    {item.name}
+                                                </span>
+                                            </div>
+
+                                            {active && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#0f766e] shrink-0 ml-1.5" />
+                                            )}
                                         </Link>
                                     );
                                 })}
                             </nav>
                         </div>
 
-                        <div className="pt-4 border-t border-[#1b5361]/60 space-y-2">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setSidebarOpen(false);
-                                    openPasswordModal();
-                                }}
-                                className="w-full px-3 py-2.5 rounded-xl bg-[#0a273b] hover:bg-[#103750] text-[#25dec0] text-xs font-bold flex items-center justify-center gap-2 border border-[#24dbc3]/40 cursor-pointer shadow-sm"
-                            >
-                                <KeyRound className="w-4 h-4" />
-                                <span>Change Password</span>
-                            </button>
-                            <Link
-                                href="/"
-                                target="_blank"
-                                className="w-full px-3 py-2.5 rounded-xl bg-[#0c2436] text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 text-decoration-none border border-[#276472]/60"
-                            >
-                                <ExternalLink className="w-4 h-4 text-[#25dec0]" />
-                                <span>Open Public Website</span>
-                            </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="w-full px-3 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/60 text-rose-300 text-xs font-semibold flex items-center justify-center gap-2 border border-rose-500/30 cursor-pointer"
-                            >
-                                <LogOut className="w-4 h-4" />
-                                <span>Sign Out</span>
-                            </button>
-                        </div>
-                    </aside>
-                </div>
-            )}
+                        {/* Sidebar Category 2: ACCOUNT & TOOLS (Matching Reference) */}
+                        <div>
+                            <div className="text-[10px] uppercase tracking-[0.2em] font-extrabold text-slate-400 px-2.5 mb-2.5">
+                                ACCOUNT
+                            </div>
+                            <div className="space-y-1">
+                                <button
+                                    type="button"
+                                    onClick={openPasswordModal}
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#0f766e] hover:bg-slate-50 transition-colors text-left cursor-pointer border-0 bg-transparent"
+                                >
+                                    <KeyRound className="w-4 h-4 text-slate-400" />
+                                    <span>Update Password</span>
+                                </button>
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0">
-                {/* Modern Glassmorphic Top Bar */}
-                <header className="h-16 shrink-0 border-b border-[#1b5361]/60 bg-[#061726]/90 backdrop-blur-xl px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-                    {/* Left: Mobile Toggle & Page Title */}
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white bg-[#0c2436] border border-[#276472]/60 shrink-0 cursor-pointer"
-                            aria-label="Toggle Navigation"
-                        >
-                            <Menu className="w-4 h-4" />
-                        </button>
+                                <Link
+                                    href="/"
+                                    target="_blank"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#0f766e] hover:bg-slate-50 transition-colors no-underline border-0"
+                                >
+                                    <ExternalLink className="w-4 h-4 text-slate-400" />
+                                    <span>Public Website</span>
+                                </Link>
 
-                        <div className="min-w-0">
-                            <h1 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-wide truncate mb-0">
-                                {title}
-                            </h1>
-                            {subtitle && (
-                                <p className="text-[11px] text-slate-400 truncate hidden md:block mb-0">
-                                    {subtitle}
-                                </p>
-                            )}
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-colors text-left cursor-pointer border-0 bg-transparent"
+                                >
+                                    <LogOut className="w-4 h-4 text-rose-500" />
+                                    <span>Logout</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Right: Realtime Status & Action Pills */}
-                    <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-                        {/* REALTIME LIVE SYNC PILL */}
+                    {/* Bottom System Brand Tag */}
+                    <div className="pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400 font-mono">
+                        INFINITE &bull; Live Limitless
+                    </div>
+                </aside>
+
+                {/* Mobile Drawer Sidebar */}
+                {sidebarOpen && (
+                    <div className="fixed inset-0 z-50 lg:hidden">
                         <div
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs border transition-all ${
-                                connected
-                                    ? 'bg-[#082033]/90 border-[#1e4e5b]/70 text-slate-200'
-                                    : 'bg-rose-950/40 border-rose-500/30 text-rose-300'
-                            }`}
-                            title={connected ? 'Realtime live sync active' : 'Reconnecting to realtime stream...'}
-                        >
-                            <span className="relative flex h-2 w-2 shrink-0">
-                                {connected ? (
-                                    <>
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25dec0] opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#18cdbb]"></span>
-                                    </>
-                                ) : (
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-                                )}
-                            </span>
-                            <span className="text-[11px] font-bold hidden sm:inline">
-                                {connected ? (
-                                    <span className="text-[#25dec0]">Live Sync</span>
-                                ) : (
-                                    <span className="text-rose-400">Reconnecting</span>
-                                )}
-                            </span>
-                        </div>
+                            onClick={() => setSidebarOpen(false)}
+                            className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+                        />
+                        <aside className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white border-r border-slate-200 p-5 flex flex-col justify-between z-10 shadow-2xl overflow-y-auto">
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-9 h-9 rounded-xl bg-[#0f766e] flex items-center justify-center text-white font-black shadow-md">
+                                            <Shield className="w-4 h-4 fill-white stroke-white" />
+                                        </div>
+                                        <div>
+                                            <span className="font-extrabold text-base text-slate-900 tracking-tight font-mono">INFINITE</span>
+                                            <span className="text-[9px] uppercase font-bold text-[#0f766e] block tracking-widest">ADMIN PORTAL</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="p-2 rounded-xl text-slate-400 hover:text-slate-800 bg-slate-100"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
 
-                        {/* Sound Notification Chime Toggle */}
-                        <button
-                            type="button"
-                            onClick={toggleSound}
-                            title={soundEnabled ? 'Notification Chimes: ON (Click to Mute)' : 'Notification Chimes: MUTED (Click to Enable)'}
-                            className={`p-1.5 rounded-xl border transition-all cursor-pointer ${
-                                soundEnabled
-                                    ? 'text-[#25dec0] bg-[#25dec0]/10 border-[#25dec0]/30 hover:bg-[#25dec0]/20'
-                                    : 'text-slate-400 bg-[#082033] border-[#1e4e5b]/60 hover:text-slate-200'
-                            }`}
-                        >
-                            {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-                        </button>
+                                {/* User box */}
+                                <div className="rounded-2xl p-3.5 bg-slate-50 border border-slate-200 border-l-4 border-l-[#f59e0b] shadow-xs">
+                                    <h3 className="text-xs font-black text-slate-900 uppercase truncate">
+                                        {adminFullName}
+                                    </h3>
+                                    <p className="text-[11px] text-slate-500 capitalize">{adminRole} account</p>
+                                </div>
 
-                        {/* Force Instant Manual Sync */}
-                        <button
-                            type="button"
-                            onClick={syncNow}
-                            disabled={isSyncing}
-                            title="Force immediate refresh without page reload"
-                            className="p-1.5 rounded-xl text-slate-400 hover:text-white bg-[#082033] hover:bg-[#0c2638] border border-[#1e4e5b]/60 transition-all disabled:opacity-50 cursor-pointer"
-                        >
-                            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-[#25dec0]' : ''}`} />
-                        </button>
-
-                        {/* Live PHT Clock (visible on wide screens) */}
-                        {currentTime && (
-                            <div className="hidden 2xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/60 text-xs text-slate-300 font-mono shadow-inner">
-                                <Clock className="w-3.5 h-3.5 text-[#25dec0]" />
-                                <span>{currentTime}</span>
+                                <nav className="space-y-1">
+                                    {navItems.map((item) => {
+                                        const active = isActive(item.href);
+                                        const Icon = item.icon;
+                                        return (
+                                            <Link
+                                                key={item.name}
+                                                href={item.href}
+                                                onClick={() => setSidebarOpen(false)}
+                                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-decoration-none ${
+                                                    active
+                                                        ? 'bg-[#f0fdfa] text-[#0f766e] border-l-4 border-l-[#0f766e]'
+                                                        : 'text-slate-600 hover:bg-slate-50'
+                                                }`}
+                                            >
+                                                <Icon className="w-4 h-4 shrink-0" />
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
                             </div>
-                        )}
 
-                        {/* Test SMTP Ping Button (visible on wide screens) */}
-                        <button
-                            onClick={handleTestEmail}
-                            disabled={isTestingEmail}
-                            title="Send quick SMTP diagnostic ping"
-                            className="hidden 2xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 border border-[#24dbc3]/30 text-[#27dec9] hover:text-[#42f1ce] text-xs font-semibold transition-all cursor-pointer"
-                        >
-                            <Mail className="w-3.5 h-3.5 text-[#25dec0]" />
-                            <span>{isTestingEmail ? 'Testing...' : 'Test SMTP'}</span>
-                        </button>
-
-                        {/* Public Site Quick Pill (visible on xl screens) */}
-                        <Link
-                            href="/"
-                            target="_blank"
-                            className="hidden xl:inline-flex px-3 py-1.5 rounded-xl bg-[#0c2638] hover:bg-[#12364e] border border-[#276472]/60 text-xs font-semibold text-slate-200 hover:text-white items-center gap-1.5 transition-all text-decoration-none shadow-sm"
-                        >
-                            <span>Live Site</span>
-                            <ExternalLink className="w-3 h-3 text-[#25dec0]" />
-                        </Link>
-
-                        {/* User Avatar & Quick Password Trigger */}
-                        <button
-                            type="button"
-                            onClick={openPasswordModal}
-                            className="flex items-center gap-2 py-1 pl-2.5 pr-1 rounded-xl bg-[#082033]/90 hover:bg-[#0c2638] border border-[#1e4e5b]/80 hover:border-[#24dbc3]/60 transition-all text-left cursor-pointer group shadow-sm"
-                            title="Click to change your administrator password"
-                        >
-                            <div className="flex flex-col text-right hidden sm:flex">
-                                <span className="text-xs font-bold text-white leading-tight group-hover:text-[#25dec0] transition-colors">
-                                    {adminUsername}
-                                </span>
-                                <span className="text-[9px] text-slate-400 font-mono leading-tight flex items-center justify-end gap-1">
-                                    <KeyRound className="w-2.5 h-2.5 text-[#25dec0]" />
-                                    <span>Change Pass</span>
-                                </span>
+                            <div className="pt-4 border-t border-slate-200 space-y-2">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSidebarOpen(false);
+                                        openPasswordModal();
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border-0"
+                                >
+                                    <KeyRound className="w-4 h-4" />
+                                    <span>Change Password</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 border-0"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    <span>Logout</span>
+                                </button>
                             </div>
-                            <div
-                                className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] flex items-center justify-center font-bold text-xs text-[#031927] shadow-[0_0_12px_rgba(36,219,195,0.3)] shrink-0"
-                            >
-                                {adminInitial}
-                            </div>
-                        </button>
+                        </aside>
                     </div>
-                </header>
+                )}
 
-                {/* Page Content Body */}
-                <main className="flex-1 min-w-0">
+                {/* Main Content Area (Clean Canvas matching Reference Portal) */}
+                <main className="flex-1 min-w-0 bg-[#f8fafc]">
                     {children}
                 </main>
             </div>
 
             {/* ========================================================
-                CHANGE ADMIN PASSWORD MODAL
+                CHANGE ADMIN PASSWORD MODAL (CLEAN LIGHT THEME)
             ======================================================== */}
             {showPasswordModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 text-left">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-4 text-left">
+                        {/* Top Accent Stripe */}
+                        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between pb-3.5 border-b border-[#1b5361]/60">
+                        <div className="flex items-center justify-between pb-3.5 border-b border-slate-200">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
                                     <KeyRound className="w-5 h-5 stroke-[2.2]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0 leading-tight">
-                                        Change Admin Password
+                                    <h3 className="text-base sm:text-lg font-black text-slate-900 mb-0 leading-tight">
+                                        Update Password
                                     </h3>
-                                    <p className="text-xs text-slate-400 mb-0 mt-0.5">
-                                        Security Settings &bull; @{adminUsername}
+                                    <p className="text-xs text-slate-500 mb-0 mt-0.5">
+                                        Account Credentials &bull; @{adminUsername}
                                     </p>
                                 </div>
                             </div>
@@ -657,33 +576,20 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                     }
                                 }}
                                 disabled={passwordForm.processing}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
-                                title="Close modal"
+                                className="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 cursor-pointer disabled:opacity-50"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
-                        {/* Account Summary Banner */}
-                        <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                                <Shield className="w-4 h-4 text-[#25dec0] shrink-0" />
-                                <span className="text-slate-300 text-[11px]">Logged in as:</span>
-                                <strong className="text-white text-[11px]">@{adminUsername}</strong>
-                            </div>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/30">
-                                {auth?.admin?.role || 'Administrator'}
-                            </span>
-                        </div>
-
                         <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
-                            {/* Server/Form Error Banner */}
+                            {/* Server Errors */}
                             {Object.keys(passwordForm.errors).length > 0 && (
-                                <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs flex items-start gap-2.5 shadow-sm">
-                                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-start gap-2.5">
+                                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
                                     <div className="space-y-1">
-                                        <p className="font-bold text-rose-300">Unable to update password:</p>
-                                        <ul className="list-disc list-inside space-y-0.5 text-[11px] text-rose-200/90">
+                                        <p className="font-bold">Unable to update password:</p>
+                                        <ul className="list-disc list-inside space-y-0.5 text-[11px]">
                                             {Object.entries(passwordForm.errors).map(([key, msg]) => (
                                                 <li key={key}>{msg}</li>
                                             ))}
@@ -694,8 +600,8 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
 
                             {/* Current Password */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    Current Password <span className="text-rose-400">*</span>
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Current Password <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -705,159 +611,102 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                         value={passwordForm.data.current_password}
                                         onChange={(e) => passwordForm.setData('current_password', e.target.value)}
                                         placeholder="Enter your current password..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowCurrentPass(!showCurrentPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
-                                        title={showCurrentPass ? 'Hide password' : 'Show password'}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
                                     >
                                         {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
-                                {passwordForm.errors.current_password && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
-                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                                        <span>{passwordForm.errors.current_password}</span>
-                                    </p>
-                                )}
                             </div>
 
                             {/* New Password */}
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                        New Password <span className="text-[#25dec0]">*</span>
+                                    <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                        New Password <span className="text-[#0f766e]">*</span>
                                     </label>
                                     <button
                                         type="button"
                                         onClick={generateRandomPassword}
-                                        className="text-[11px] font-semibold text-[#25dec0] hover:text-[#42f1ce] bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 border border-[#24dbc3]/30 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
-                                        title="Generate strong random password"
+                                        className="text-[11px] font-semibold text-[#0f766e] hover:text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-lg flex items-center gap-1 transition-colors cursor-pointer"
                                     >
                                         <Sparkles className="w-3 h-3" />
                                         <span>Generate</span>
                                     </button>
                                 </div>
                                 <div className="relative">
-                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     <input
                                         type={showNewPass ? 'text' : 'password'}
                                         required
-                                        minLength={8}
                                         value={passwordForm.data.password}
                                         onChange={(e) => passwordForm.setData('password', e.target.value)}
-                                        placeholder="Enter strong new password (min. 8 chars)..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        placeholder="At least 8 characters..."
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowNewPass(!showNewPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
-                                        title={showNewPass ? 'Hide password' : 'Show password'}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
                                     >
                                         {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
-                                {passwordForm.errors.password && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
-                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                                        <span>{passwordForm.errors.password}</span>
-                                    </p>
-                                )}
                             </div>
 
-                            {/* Confirm New Password */}
+                            {/* Confirm Password */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                                    Confirm New Password <span className="text-[#25dec0]">*</span>
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    Confirm New Password <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
-                                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     <input
                                         type={showConfirmPass ? 'text' : 'password'}
                                         required
-                                        minLength={8}
                                         value={passwordForm.data.password_confirmation}
                                         onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
-                                        placeholder="Re-type new password to confirm..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        placeholder="Re-type new password..."
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPass(!showConfirmPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
-                                        title={showConfirmPass ? 'Hide password' : 'Show password'}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
                                     >
                                         {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
-                                {passwordForm.errors.password_confirmation && (
-                                    <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1 font-medium">
-                                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                                        <span>{passwordForm.errors.password_confirmation}</span>
-                                    </p>
-                                )}
                             </div>
 
-                            {/* Password Rules Checklist */}
-                            <div className="p-3 bg-[#082033]/50 rounded-xl border border-[#1e4e5b]/50 text-[11px] space-y-1 text-slate-400">
-                                <div className="flex items-center gap-1.5">
-                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
-                                        passwordForm.data.password.length >= 8
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                                            : 'bg-slate-700/40 text-slate-400'
-                                    }`}>
-                                        ✓
-                                    </span>
-                                    <span className={passwordForm.data.password.length >= 8 ? 'text-emerald-400 font-semibold' : ''}>
-                                        Minimum 8 characters
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold ${
-                                        passwordForm.data.password.length > 0 &&
-                                        passwordForm.data.password === passwordForm.data.password_confirmation
-                                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                                            : 'bg-slate-700/40 text-slate-400'
-                                    }`}>
-                                        ✓
-                                    </span>
-                                    <span className={
-                                        passwordForm.data.password.length > 0 &&
-                                        passwordForm.data.password === passwordForm.data.password_confirmation
-                                            ? 'text-emerald-400 font-semibold'
-                                            : ''
-                                    }>
-                                        Passwords match
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Footer Buttons */}
-                            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#1b5361]/60">
+                            {/* Buttons */}
+                            <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-slate-200">
                                 <button
                                     type="button"
                                     onClick={() => setShowPasswordModal(false)}
                                     disabled={passwordForm.processing}
-                                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#082033] border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-all cursor-pointer"
                                 >
                                     Cancel
                                 </button>
+
                                 <button
                                     type="submit"
                                     disabled={passwordForm.processing}
-                                    className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-[#031927] bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
                                 >
                                     {passwordForm.processing ? (
                                         <>
-                                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                            <span>Updating Password...</span>
+                                            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            <span>Saving...</span>
                                         </>
                                     ) : (
                                         <>
-                                            <KeyRound className="w-3.5 h-3.5" />
+                                            <Check className="w-4 h-4 stroke-[2.5]" />
                                             <span>Save New Password</span>
                                         </>
                                     )}

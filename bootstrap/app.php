@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => \App\Http\Middleware\AuthenticateAdmin::class,
             'admin.activity' => \App\Http\Middleware\LogAdminActivity::class,
+            'academy.auth' => \App\Http\Middleware\AuthenticateAcademyMember::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

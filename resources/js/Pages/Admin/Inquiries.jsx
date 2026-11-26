@@ -163,137 +163,137 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                 {/* 4 HIGH-IMPACT KPI STATS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                     {/* KPI 1: Total Messages */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-[#24dbc3]/50 hover:shadow-[0_10px_35px_rgba(36,219,195,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-[#24dbc3] before:to-[#42f1ce]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Total Inquiries
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-[#25dec0] group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Mail className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
+                                <Mail className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">
                                 {counts.total || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-[#24dbc3]/15 text-[#27dec9] border border-[#24dbc3]/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200 shrink-0">
                                 All Lifetime
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Contact Submissions</span>
-                            <span className="text-slate-300 font-mono text-[11px]">{counts.active || 0} active inbox</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Contact Submissions</span>
+                            <span className="text-slate-700 font-mono text-[11px] font-bold">{counts.active || 0} active inbox</span>
                         </div>
                     </div>
 
                     {/* KPI 2: Unread Messages */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-amber-500/50 hover:shadow-[0_10px_35px_rgba(245,158,11,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-amber-400 before:to-orange-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 border-l-4 border-l-[#f59e0b]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider font-mono truncate">
                                 Unread Attention
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Sparkles className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-xs shrink-0">
+                                <Sparkles className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-300 tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-600 font-mono tracking-tight">
                                 {counts.unread || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
                                 Needs Reply
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Direct Support Queue</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Direct Support Queue</span>
                             <button
                                 type="button"
                                 onClick={() => {
                                     setStatus('unread');
                                     applyFilters({ status: 'unread' });
                                 }}
-                                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>Filter Unread</span>
-                                <MessageSquare className="w-3 h-3" />
+                                <MessageSquare className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>
 
                     {/* KPI 3: Active Inbox */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-[#38bdf8]/50 hover:shadow-[0_10px_35px_rgba(56,189,248,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-[#38bdf8] before:to-[#0284c7]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Active Inquiries
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-[#38bdf8] group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <CheckCircle2 className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
+                                <CheckCircle2 className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">
                                 {counts.active || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200 shrink-0">
                                 Main Inbox
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Standard Pipeline</span>
-                            <span className="text-[#38bdf8] font-bold text-[11px]">Operational</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Standard Pipeline</span>
+                            <span className="text-[#0f766e] font-bold text-[11px]">Operational</span>
                         </div>
                     </div>
 
                     {/* KPI 4: Archived Inquiries */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-purple-500/50 hover:shadow-[0_10px_35px_rgba(168,85,247,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-purple-400 before:to-pink-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 border-l-4 border-l-purple-500">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono truncate">
                                 Archived Inquiries
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Archive className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-xs shrink-0">
+                                <Archive className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-purple-700 font-mono tracking-tight">
                                 {counts.archived || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200 shrink-0">
                                 Archived
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Archived Records</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Archived Records</span>
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('archived')}
-                                className="text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-purple-700 hover:text-purple-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>View Archive</span>
-                                <RotateCcw className="w-3 h-3" />
+                                <RotateCcw className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* View Tabs: Active | Archived | All */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#1b5361]/60">
-                    <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 text-xs font-semibold shadow-inner">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+                    <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/90 border border-slate-200 text-xs font-semibold shadow-inner">
                         <button
                             type="button"
                             onClick={() => handleViewChange('active')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'active'
-                                    ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold shadow-[0_2px_12px_rgba(36,219,195,0.25)]'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-[#0f766e] text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Active Messages ({counts.active || 0})
@@ -303,8 +303,8 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                             onClick={() => handleViewChange('archived')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'archived'
-                                    ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/20'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-amber-500 text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Archived ({counts.archived || 0})
@@ -314,21 +314,21 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                             onClick={() => handleViewChange('all')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'all'
-                                    ? 'bg-[#0c2638] text-white font-extrabold border border-[#276472]/80 shadow-md'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-slate-800 text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             All ({counts.total || 0})
                         </button>
                     </div>
 
-                    <div className="text-xs text-slate-400">
-                        Showing <strong className="text-white">{inquiryList.length}</strong> of <strong className="text-white">{inquiries.total || 0}</strong> messages
+                    <div className="text-xs text-slate-500">
+                        Showing <strong className="text-slate-900">{inquiryList.length}</strong> of <strong className="text-slate-900">{inquiries.total || 0}</strong> messages
                     </div>
                 </div>
 
                 {/* Filter & Search Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#061726]/90 p-4 rounded-2xl border border-[#1b5361]/60 shadow-[0_12px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
                     <form onSubmit={handleSearch} className="flex-1 relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
@@ -336,7 +336,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                             placeholder="Search by sender name, email, subject, or message content..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30 transition-all"
+                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all"
                         />
                         {search && (
                             <button
@@ -345,7 +345,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     setSearch('');
                                     applyFilters({ search: '' });
                                 }}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0.5"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent border-0 cursor-pointer p-0.5"
                             >
                                 <X className="w-3.5 h-3.5" />
                             </button>
@@ -353,7 +353,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </form>
 
                     {/* Status Filter Pills */}
-                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/70 self-start sm:self-auto shrink-0">
+                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200 self-start sm:self-auto shrink-0">
                         <button
                             type="button"
                             onClick={() => {
@@ -361,7 +361,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 applyFilters({ status: '' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === '' ? 'bg-[#0c2638] text-white font-bold border border-[#276472]/60 shadow-sm' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === '' ? 'bg-white text-slate-900 font-bold border border-slate-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             All Status
@@ -373,7 +373,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 applyFilters({ status: 'unread' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === 'unread' ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === 'unread' ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Unread ({counts.unread || 0})
@@ -385,7 +385,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 applyFilters({ status: 'read' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === 'read' ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === 'read' ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Read
@@ -395,9 +395,9 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
                 {/* Floating Bottom Bulk Action Toolbar */}
                 {selectedIds.length > 0 && (
-                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-[#061726]/95 backdrop-blur-xl border border-[#24dbc3]/40 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-[0_20px_60px_rgba(0,0,0,0.7)] animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex items-center gap-2 text-xs font-bold text-[#27dec9]">
-                            <span className="w-6 h-6 rounded-lg bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-black flex items-center justify-center text-xs shadow-md">
+                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-white/95 backdrop-blur-xl border border-teal-300 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#0f766e]">
+                            <span className="w-6 h-6 rounded-lg bg-[#0f766e] text-white font-black flex items-center justify-center text-xs shadow-xs">
                                 {selectedIds.length}
                             </span>
                             <span>inquiry/inquiries selected</span>
@@ -408,7 +408,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 <button
                                     type="button"
                                     onClick={handleBulkRestore}
-                                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                                 >
                                     <RotateCcw className="w-3.5 h-3.5" />
                                     <span>Restore</span>
@@ -417,7 +417,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 <button
                                     type="button"
                                     onClick={handleBulkArchive}
-                                    className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                                 >
                                     <Archive className="w-3.5 h-3.5" />
                                     <span>Archive</span>
@@ -427,7 +427,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                             <button
                                 type="button"
                                 onClick={handleBulkDelete}
-                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                             >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 <span>Delete</span>
@@ -436,7 +436,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                             <button
                                 type="button"
                                 onClick={() => setSelectedIds([])}
-                                className="px-2.5 py-1.5 rounded-xl bg-[#082033] text-slate-300 hover:text-white text-xs border border-[#1e4e5b]/80 cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 text-xs border border-slate-300 cursor-pointer"
                             >
                                 Deselect
                             </button>
@@ -444,19 +444,18 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </div>
                 )}
 
-                {/* 1. DESKTOP TABLE VIEW (Medium screens & above) */}
-                <div className="hidden md:block rounded-2xl bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden relative">
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                {/* 1. DESKTOP TABLE VIEW (Clean White Table) */}
+                <div className="hidden md:block rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden relative">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs min-w-[850px]">
-                            <thead className="bg-[#082033]/95 text-slate-300 uppercase tracking-wider font-bold text-[11px] border-b border-[#1b5361]/70">
+                            <thead className="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold text-[11px] border-b border-slate-200">
                                 <tr>
                                     <th className="py-4 px-4 w-12 text-center">
                                         <input
                                             type="checkbox"
                                             checked={inquiryList.length > 0 && selectedIds.length === inquiryList.length}
                                             onChange={handleSelectAll}
-                                            className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer"
+                                            className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e] cursor-pointer"
                                         />
                                     </th>
                                     <th className="py-4 px-4">Status</th>
@@ -467,13 +466,13 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     <th className="py-4 px-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1b5361]/40 text-slate-300">
+                            <tbody className="divide-y divide-slate-100 text-slate-700">
                                 {inquiryList.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="py-16 text-center text-slate-500">
-                                            <Mail className="w-10 h-10 mx-auto mb-3 opacity-30 text-[#25dec0]" />
-                                            <span className="text-sm font-semibold block text-slate-300">No inquiries matching criteria found.</span>
-                                            <span className="text-xs text-slate-400 mt-1 block">Try clearing search or switching between Active and Archived tabs.</span>
+                                        <td colSpan="7" className="py-16 text-center text-slate-400">
+                                            <Mail className="w-10 h-10 mx-auto mb-3 opacity-30 text-slate-400" />
+                                            <span className="text-sm font-semibold block text-slate-700">No inquiries matching criteria found.</span>
+                                            <span className="text-xs text-slate-500 mt-1 block">Try clearing search or switching between Active and Archived tabs.</span>
                                         </td>
                                     </tr>
                                 ) : (
@@ -494,10 +493,10 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                                 key={inq.id}
                                                 className={`transition-colors ${
                                                     isSelected
-                                                        ? 'bg-[#15cbb7]/15'
+                                                        ? 'bg-teal-50/50'
                                                         : inq.is_read
-                                                        ? 'hover:bg-[#0c2638]/70'
-                                                        : 'bg-[#092b3a]/60 hover:bg-[#0c2638]/90'
+                                                        ? 'hover:bg-slate-50/70'
+                                                        : 'bg-teal-50/30 hover:bg-teal-50/60'
                                                 }`}
                                             >
                                                 <td className="py-4 px-4 text-center">
@@ -505,24 +504,24 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                                         type="checkbox"
                                                         checked={isSelected}
                                                         onChange={() => handleToggleSelect(inq.id)}
-                                                        className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer"
+                                                        className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e] cursor-pointer"
                                                     />
                                                 </td>
 
                                                 <td className="py-4 px-4 whitespace-nowrap">
                                                     {inq.is_archived ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-500/30">
-                                                            <Archive className="w-3 h-3 text-amber-400" />
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">
+                                                            <Archive className="w-3 h-3 text-slate-500" />
                                                             <span>Archived</span>
                                                         </span>
                                                     ) : !inq.is_read ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/40">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-[#24dbc3] animate-pulse" />
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-teal-50 text-[#0f766e] border border-teal-200">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-[#0f766e] animate-pulse" />
                                                             <span>NEW</span>
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#0c2436] text-slate-400 border border-[#1e4e5b]/40">
-                                                            <Check className="w-3 h-3 text-emerald-400" />
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                                                            <Check className="w-3 h-3 text-emerald-600" />
                                                             <span>Read</span>
                                                         </span>
                                                     )}
@@ -530,29 +529,29 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
                                                 <td className="py-4 px-4">
                                                     <div className="flex items-center gap-2.5">
-                                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-sm shrink-0">
+                                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                                                             {senderInitial}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <span className="font-bold text-white block truncate">
+                                                            <span className="font-bold text-slate-900 block truncate text-xs">
                                                                 {inq.name}
                                                             </span>
-                                                            <span className="text-[#25dec0] font-mono text-[11px] block truncate">
+                                                            <span className="text-[#0f766e] font-mono text-[11px] block truncate">
                                                                 {inq.email}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </td>
 
-                                                <td className="py-4 px-4 font-semibold text-slate-200 max-w-[200px] truncate">
-                                                    {inq.subject || <span className="text-slate-500 italic">General Inquiry</span>}
+                                                <td className="py-4 px-4 font-semibold text-slate-800 max-w-[200px] truncate text-xs">
+                                                    {inq.subject || <span className="text-slate-400 italic">General Inquiry</span>}
                                                 </td>
 
-                                                <td className="py-4 px-4 text-slate-300 max-w-[240px] truncate italic">
+                                                <td className="py-4 px-4 text-slate-500 max-w-[240px] truncate italic text-xs">
                                                     "{snippet}"
                                                 </td>
 
-                                                <td className="py-4 px-4 whitespace-nowrap text-slate-400 font-mono text-[11px]">
+                                                <td className="py-4 px-4 whitespace-nowrap text-slate-500 font-mono text-[11px]">
                                                     {dateStr}
                                                 </td>
 
@@ -560,28 +559,28 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                                     <div className="flex items-center justify-end gap-1.5">
                                                         <button
                                                             onClick={() => openViewModal(inq)}
-                                                            className="p-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white transition-colors border border-[#1e4e5b]/70 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 cursor-pointer"
                                                             title="Read message"
                                                         >
                                                             <BookOpen className="w-3.5 h-3.5" />
                                                         </button>
                                                         <button
                                                             onClick={() => openReplyModal(inq)}
-                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#27dec9] transition-colors border border-[#24dbc3]/30 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] transition-colors border border-teal-200 cursor-pointer"
                                                             title="Reply via email"
                                                         >
                                                             <Reply className="w-3.5 h-3.5" />
                                                         </button>
                                                         <button
                                                             onClick={() => toggleRead(inq.id)}
-                                                            className="p-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-400 hover:text-white transition-colors border border-[#1e4e5b]/70 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors border border-slate-200 cursor-pointer"
                                                             title={inq.is_read ? 'Mark as Unread' : 'Mark as Read'}
                                                         >
-                                                            <CheckCircle2 className={`w-3.5 h-3.5 ${inq.is_read ? 'text-[#25dec0]' : 'text-slate-500'}`} />
+                                                            <CheckCircle2 className={`w-3.5 h-3.5 ${inq.is_read ? 'text-[#0f766e]' : 'text-slate-300'}`} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(inq.id, inq.name)}
-                                                            className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/30 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors border border-rose-200 cursor-pointer"
                                                             title="Delete permanently"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
@@ -598,9 +597,9 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
                     {/* Pagination */}
                     {inquiries.links && inquiries.links.length > 3 && (
-                        <div className="py-4 px-6 border-t border-[#1b5361]/60 flex items-center justify-between text-xs text-slate-400 bg-[#082033]/80">
+                        <div className="py-4 px-6 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 bg-slate-50/70">
                             <div>
-                                Showing <strong className="text-white">{inquiries.from || 0}</strong> to <strong className="text-white">{inquiries.to || 0}</strong> of <strong className="text-white">{inquiries.total || 0}</strong> entries
+                                Showing <strong className="text-slate-900">{inquiries.from || 0}</strong> to <strong className="text-slate-900">{inquiries.to || 0}</strong> of <strong className="text-slate-900">{inquiries.total || 0}</strong> entries
                             </div>
                             <div className="flex items-center gap-1">
                                 {inquiries.links.map((link, idx) => (
@@ -608,10 +607,10 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                         key={idx}
                                         disabled={!link.url}
                                         onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
-                                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors border-0 cursor-pointer ${
+                                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors border cursor-pointer ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-bold shadow'
-                                                : 'bg-[#061726] text-slate-400 hover:text-white disabled:opacity-30'
+                                                ? 'bg-[#0f766e] text-white font-bold border-[#0f766e] shadow-xs'
+                                                : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 disabled:opacity-40'
                                         }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -624,8 +623,8 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                 {/* 2. MOBILE CARD VIEW (Small screens < 768px) */}
                 <div className="md:hidden space-y-3">
                     {inquiryList.length === 0 ? (
-                        <div className="rounded-2xl bg-[#061726]/90 border border-[#1b5361]/60 p-8 text-center text-slate-400 text-xs shadow-xl">
-                            <Mail className="w-8 h-8 mx-auto mb-2 opacity-30 text-[#25dec0]" />
+                        <div className="rounded-2xl bg-white border border-slate-200 p-8 text-center text-slate-500 text-xs shadow-xs">
+                            <Mail className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
                             <span>No inquiries matching criteria found.</span>
                         </div>
                     ) : (
@@ -644,46 +643,46 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     key={inq.id}
                                     className={`p-4 rounded-2xl border transition-all ${
                                         isSelected
-                                            ? 'bg-[#15cbb7]/15 border-[#24dbc3]/60 shadow-lg'
+                                            ? 'bg-teal-50/50 border-teal-300 shadow-sm'
                                             : inq.is_read
-                                            ? 'bg-[#061726]/90 border-[#1b5361]/60'
-                                            : 'bg-gradient-to-r from-[#092b3a]/90 to-[#061726]/90 border-[#24dbc3]/40'
+                                            ? 'bg-white border-slate-200/90 shadow-xs'
+                                            : 'bg-teal-50/30 border-teal-200 shadow-xs'
                                     }`}
                                 >
-                                    <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#1b5361]/60">
+                                    <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
                                         <div className="flex items-center gap-2.5 min-w-0">
                                             <input
                                                 type="checkbox"
                                                 checked={isSelected}
                                                 onChange={() => handleToggleSelect(inq.id)}
-                                                className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer shrink-0"
+                                                className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e] cursor-pointer shrink-0"
                                             />
                                             <div className="min-w-0">
-                                                <span className="font-bold text-white text-sm block truncate">
+                                                <span className="font-bold text-slate-900 text-sm block truncate">
                                                     {inq.name}
                                                 </span>
-                                                <span className="text-[#25dec0] font-mono text-[11px] block truncate">
+                                                <span className="text-[#0f766e] font-mono text-[11px] block truncate">
                                                     {inq.email}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {!inq.is_read ? (
-                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/40 shrink-0">
+                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-teal-50 text-[#0f766e] border border-teal-200 shrink-0">
                                                 NEW
                                             </span>
                                         ) : (
-                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#0c2436] text-slate-400 border border-[#1e4e5b]/40 shrink-0">
+                                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
                                                 Read
                                             </span>
                                         )}
                                     </div>
 
                                     <div className="py-3 space-y-2">
-                                        <div className="inline-block px-2.5 py-1 rounded-lg bg-[#082033] border border-[#1e4e5b]/70 text-xs font-semibold text-[#27dec9]">
+                                        <div className="inline-block px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-[#0f766e]">
                                             {inq.subject || 'General Inquiry'}
                                         </div>
-                                        <p className="text-xs text-slate-300 line-clamp-2 italic mb-0">
+                                        <p className="text-xs text-slate-600 line-clamp-2 italic mb-0">
                                             "{inq.message}"
                                         </p>
                                         <div className="text-[11px] text-slate-400 font-mono">
@@ -691,18 +690,18 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                         </div>
                                     </div>
 
-                                    <div className="pt-3 border-t border-[#1b5361]/60 flex items-center justify-between gap-2">
+                                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-1.5">
                                             <button
                                                 onClick={() => openViewModal(inq)}
-                                                className="px-3 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 text-xs font-semibold flex items-center gap-1 border border-[#1e4e5b]/70 cursor-pointer"
+                                                className="px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1 border border-slate-200 cursor-pointer"
                                             >
                                                 <BookOpen className="w-3.5 h-3.5" />
                                                 <span>Read</span>
                                             </button>
                                             <button
                                                 onClick={() => openReplyModal(inq)}
-                                                className="px-3 py-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30 cursor-pointer"
+                                                className="px-3 py-1.5 rounded-lg bg-teal-50 text-[#0f766e] text-xs font-semibold flex items-center gap-1 border border-teal-200 cursor-pointer"
                                             >
                                                 <Reply className="w-3.5 h-3.5" />
                                                 <span>Reply</span>
@@ -711,7 +710,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
                                         <button
                                             onClick={() => handleDelete(inq.id, inq.name)}
-                                            className="p-2 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/30 cursor-pointer"
+                                            className="p-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 cursor-pointer"
                                             title="Delete"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
@@ -726,41 +725,39 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
             {/* MODAL 1: VIEW INQUIRY */}
             {selectedInquiry && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                        
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60">
-                            <span className="text-xs uppercase font-extrabold text-[#27dec9] tracking-wider flex items-center gap-1.5">
-                                <MessageSquare className="w-4 h-4 text-[#25dec0]" />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 shadow-2xl relative space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                            <span className="text-xs uppercase font-extrabold text-[#0f766e] tracking-wider flex items-center gap-1.5">
+                                <MessageSquare className="w-4 h-4 text-[#0f766e]" />
                                 Customer Inquiry Message
                             </span>
                             <button
                                 onClick={() => setSelectedInquiry(null)}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         <div className="space-y-3">
-                            <div className="p-3.5 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/70">
-                                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Sender Info</span>
-                                <div className="text-sm font-bold text-white mt-0.5">
-                                    {selectedInquiry.name} • <span className="text-[#25dec0] font-mono font-normal">{selectedInquiry.email}</span>
+                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider">Sender Info</span>
+                                <div className="text-sm font-bold text-slate-900 mt-0.5">
+                                    {selectedInquiry.name} &bull; <span className="text-[#0f766e] font-mono font-normal">{selectedInquiry.email}</span>
                                 </div>
                             </div>
 
-                            <div className="p-3.5 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/70">
-                                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Subject</span>
-                                <div className="text-sm text-white font-semibold mt-0.5">
+                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider">Subject</span>
+                                <div className="text-sm text-slate-900 font-semibold mt-0.5">
                                     {selectedInquiry.subject}
                                 </div>
                             </div>
 
-                            <div className="p-4 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/70">
-                                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider mb-1.5">Message Content</span>
-                                <p className="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed mb-0">
+                            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 block tracking-wider mb-1.5">Message Content</span>
+                                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed mb-0">
                                     {selectedInquiry.message}
                                 </p>
                             </div>
@@ -773,14 +770,14 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     setSelectedInquiry(null);
                                     openReplyModal(inq);
                                 }}
-                                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-[0_4px_18px_rgba(36,219,195,0.25)]"
+                                className="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-xs"
                             >
                                 <Reply className="w-3.5 h-3.5 stroke-[2.5]" />
                                 <span>Reply to Sender</span>
                             </button>
                             <button
                                 onClick={() => setSelectedInquiry(null)}
-                                className="px-4 py-2.5 rounded-xl bg-[#082033] text-slate-300 hover:text-white text-xs font-semibold cursor-pointer border border-[#1e4e5b]/80"
+                                className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold cursor-pointer border border-slate-300"
                             >
                                 Close
                             </button>
@@ -791,23 +788,21 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
             {/* MODAL 2: REPLY TO INQUIRY */}
             {replyInquiry && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-xl p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                        
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-xl p-6 sm:p-7 shadow-2xl relative space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
-                                <h3 className="text-base font-bold text-white mb-0 flex items-center gap-2">
-                                    <Reply className="w-4 h-4 text-[#25dec0]" />
+                                <h3 className="text-base font-bold text-slate-900 mb-0 flex items-center gap-2">
+                                    <Reply className="w-4 h-4 text-[#0f766e]" />
                                     <span>Compose Official Email Reply</span>
                                 </h3>
-                                <p className="text-[11px] text-slate-400 mb-0 mt-0.5">
-                                    Sent directly to <strong className="text-[#25dec0] font-mono">{replyInquiry.email}</strong> via INFINITE SMTP
+                                <p className="text-[11px] text-slate-500 mb-0 mt-0.5">
+                                    Sent directly to <strong className="text-[#0f766e] font-mono">{replyInquiry.email}</strong> via INFINITE SMTP
                                 </p>
                             </div>
                             <button
                                 onClick={() => setReplyInquiry(null)}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -815,7 +810,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
                         <form onSubmit={handleSendReply} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Email Subject
                                 </label>
                                 <input
@@ -823,12 +818,12 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     required
                                     value={replySubject}
                                     onChange={(e) => setReplySubject(e.target.value)}
-                                    className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30 transition-colors"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-colors"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Reply Body Message
                                 </label>
                                 <textarea
@@ -836,7 +831,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                     rows={8}
                                     value={replyMessage}
                                     onChange={(e) => setReplyMessage(e.target.value)}
-                                    className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl p-3.5 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30 transition-colors font-sans leading-relaxed"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-colors font-sans leading-relaxed"
                                 />
                             </div>
 
@@ -844,14 +839,14 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                                 <button
                                     type="button"
                                     onClick={() => setReplyInquiry(null)}
-                                    className="px-4 py-2.5 rounded-xl bg-[#082033] text-slate-400 hover:text-white text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer"
+                                    className="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold border border-slate-300 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmittingReply}
-                                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold text-xs flex items-center gap-2 transition-all cursor-pointer border-0 shadow-[0_4px_20px_rgba(36,219,195,0.25)] disabled:opacity-50"
+                                    className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-0 shadow-xs disabled:opacity-50"
                                 >
                                     <Send className="w-3.5 h-3.5 stroke-[2.5]" />
                                     <span>{isSubmittingReply ? 'Dispatching Email...' : 'Send Reply'}</span>

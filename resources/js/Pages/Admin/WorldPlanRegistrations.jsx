@@ -159,10 +159,10 @@ export default function WorldPlanRegistrations({
         );
     };
 
-    // Bulk actions
+    // Bulk Actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected registration(s)? They will remain saved in the database.`)) {
+        if (confirm(`Archive ${selectedIds.length} selected registration(s)?`)) {
             router.post('/admin/world-plan/bulk-archive', { ids: selectedIds }, {
                 onSuccess: () => setSelectedIds([]),
             });
@@ -178,17 +178,18 @@ export default function WorldPlanRegistrations({
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selectedIds.length} selected registration(s) from the database? This action cannot be reversed.`)) {
+        if (confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selectedIds.length} registration(s)? This will also erase associated receipt attachments.`)) {
             router.post('/admin/world-plan/bulk-delete', { ids: selectedIds }, {
                 onSuccess: () => setSelectedIds([]),
             });
         }
     };
 
-    // Single item actions
     const handleDelete = (id, name) => {
-        if (confirm(`Permanently delete the registration record for "${name}"?`)) {
-            router.delete(`/admin/world-plan/${id}`, { preserveScroll: true });
+        if (confirm(`Are you sure you want to delete the registration of "${name}"?`)) {
+            router.delete(`/admin/world-plan/${id}`, {
+                preserveScroll: true,
+            });
         }
     };
 
@@ -246,37 +247,37 @@ export default function WorldPlanRegistrations({
             <Head title="World Plan Registrations | INFINITE Admin" />
 
             <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
-                {/* 4 HIGH-IMPACT KPI STATS */}
+                {/* 4 HIGH-IMPACT KPI STATS (Clean White Cards with System Palette Accents) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                     {/* KPI 1: Pending Applications */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-amber-500/50 hover:shadow-[0_10px_35px_rgba(245,158,11,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-amber-400 before:to-orange-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 border-l-4 border-l-[#f59e0b]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider font-mono truncate">
                                 Pending Verification
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <FileText className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-xs shrink-0">
+                                <FileText className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-300 tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-600 font-mono tracking-tight">
                                 {counts.pending || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
                                 Needs Action
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Payment Proof Submissions</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Payment Proof Submissions</span>
                             <button
                                 type="button"
                                 onClick={() => {
                                     setStatus('Pending');
                                     applyFilters({ status: 'Pending' });
                                 }}
-                                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-[#0f766e] hover:text-[#115e59] font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>Filter Pending</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -285,34 +286,34 @@ export default function WorldPlanRegistrations({
                     </div>
 
                     {/* KPI 2: Approved Members */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-emerald-500/50 hover:shadow-[0_10px_35px_rgba(16,185,129,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-emerald-400 before:to-teal-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-emerald-400/80 transition-all duration-300 border-l-4 border-l-[#10b981]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider font-mono truncate">
                                 Approved Members
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <CheckCircle className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs shrink-0">
+                                <CheckCircle className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-emerald-400 tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-emerald-600 font-mono tracking-tight">
                                 {counts.approved || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
                                 Verified
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Onboarded Global Partners</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Onboarded Global Partners</span>
                             <button
                                 type="button"
                                 onClick={() => {
                                     setStatus('Approved');
                                     applyFilters({ status: 'Approved' });
                                 }}
-                                className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>View Verified</span>
                                 <ChevronRight className="w-3.5 h-3.5" />
@@ -321,57 +322,57 @@ export default function WorldPlanRegistrations({
                     </div>
 
                     {/* KPI 3: Total Registrations */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-[#38bdf8]/50 hover:shadow-[0_10px_35px_rgba(56,189,248,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-[#38bdf8] before:to-[#0284c7]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Total Registrations
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-[#38bdf8] group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Globe className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
+                                <Globe className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">
                                 {counts.total || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200 shrink-0">
                                 Lifetime Total
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">All Portal Submissions</span>
-                            <span className="text-[#38bdf8] font-mono text-[11px]">{counts.active || 0} active</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">All Portal Submissions</span>
+                            <span className="text-[#0f766e] font-mono font-bold text-[11px]">{counts.active || 0} active</span>
                         </div>
                     </div>
 
                     {/* KPI 4: Archived Applications */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-purple-500/50 hover:shadow-[0_10px_35px_rgba(168,85,247,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-purple-400 before:to-pink-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 border-l-4 border-l-purple-500">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono truncate">
                                 Archived Records
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Archive className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-xs shrink-0">
+                                <Archive className="w-5 h-5" />
                             </div>
                         </div>
 
                         <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-purple-700 font-mono tracking-tight">
                                 {counts.archived || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-800 border border-purple-200 shrink-0">
                                 Archived
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Archived Pipeline</span>
+                        <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Archived Pipeline</span>
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('archived')}
-                                className="text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-purple-700 hover:text-purple-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>View Archive</span>
                                 <RotateCcw className="w-3.5 h-3.5" />
@@ -381,15 +382,15 @@ export default function WorldPlanRegistrations({
                 </div>
 
                 {/* View Tabs Header */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-[#1b5361]/60">
-                    <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-[#082033]/90 border border-[#1e4e5b]/70 text-xs font-semibold shadow-inner">
+                <div className="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-slate-200">
+                    <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/90 border border-slate-200 text-xs font-semibold shadow-inner">
                         <button
                             type="button"
                             onClick={() => handleViewChange('active')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'active'
-                                    ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold shadow-[0_2px_12px_rgba(36,219,195,0.25)]'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-[#0f766e] text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Active Applications ({counts.active || 0})
@@ -399,8 +400,8 @@ export default function WorldPlanRegistrations({
                             onClick={() => handleViewChange('archived')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'archived'
-                                    ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md shadow-amber-500/20'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-amber-500 text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Archived ({counts.archived || 0})
@@ -410,21 +411,21 @@ export default function WorldPlanRegistrations({
                             onClick={() => handleViewChange('all')}
                             className={`px-3.5 sm:px-4 py-2 rounded-xl transition-all cursor-pointer border-0 ${
                                 currentView === 'all'
-                                    ? 'bg-[#0c2638] text-white font-extrabold border border-[#276472]/80 shadow-md'
-                                    : 'text-slate-300 hover:text-white bg-transparent'
+                                    ? 'bg-slate-800 text-white font-extrabold shadow-sm'
+                                    : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             All ({counts.total || 0})
                         </button>
                     </div>
 
-                    <div className="text-xs text-slate-400">
-                        Showing <strong className="text-white">{regList.length}</strong> of <strong className="text-white">{registrations.total || 0}</strong> records
+                    <div className="text-xs text-slate-500">
+                        Showing <strong className="text-slate-900">{regList.length}</strong> of <strong className="text-slate-900">{registrations.total || 0}</strong> records
                     </div>
                 </div>
 
                 {/* Filter & Search Bar */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#061726]/90 p-4 rounded-2xl border border-[#1b5361]/60 shadow-[0_12px_35px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-xs">
                     <form onSubmit={handleSearch} className="flex-1 relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
@@ -432,7 +433,7 @@ export default function WorldPlanRegistrations({
                             placeholder="Search by applicant name, username, email, package, or country..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30 transition-all"
+                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all"
                         />
                         {search && (
                             <button
@@ -441,7 +442,7 @@ export default function WorldPlanRegistrations({
                                     setSearch('');
                                     applyFilters({ search: '' });
                                 }}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0.5"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent border-0 cursor-pointer p-0.5"
                             >
                                 <X className="w-3.5 h-3.5" />
                             </button>
@@ -449,7 +450,7 @@ export default function WorldPlanRegistrations({
                     </form>
 
                     {/* Status Filters */}
-                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#082033]/90 border border-[#1e4e5b]/70 self-start sm:self-auto shrink-0 flex-wrap">
+                    <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200 self-start sm:self-auto shrink-0 flex-wrap">
                         <button
                             type="button"
                             onClick={() => {
@@ -457,7 +458,7 @@ export default function WorldPlanRegistrations({
                                 applyFilters({ status: '' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                !status ? 'bg-[#0c2638] text-white font-bold border border-[#276472]/60 shadow-sm' : 'text-slate-400 hover:text-white bg-transparent'
+                                !status ? 'bg-white text-slate-900 font-bold border border-slate-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             All Status
@@ -469,7 +470,7 @@ export default function WorldPlanRegistrations({
                                 applyFilters({ status: 'Pending' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === 'Pending' ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === 'Pending' ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Pending ({counts.pending || 0})
@@ -481,7 +482,7 @@ export default function WorldPlanRegistrations({
                                 applyFilters({ status: 'Approved' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === 'Approved' ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === 'Approved' ? 'bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Approved ({counts.approved || 0})
@@ -493,7 +494,7 @@ export default function WorldPlanRegistrations({
                                 applyFilters({ status: 'Rejected' });
                             }}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                status === 'Rejected' ? 'bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40' : 'text-slate-400 hover:text-white bg-transparent'
+                                status === 'Rejected' ? 'bg-rose-100 text-rose-800 font-bold border border-rose-300 shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                             }`}
                         >
                             Rejected ({counts.rejected || 0})
@@ -503,9 +504,9 @@ export default function WorldPlanRegistrations({
 
                 {/* Floating Bulk Action Bar */}
                 {selectedIds.length > 0 && (
-                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-[#061726]/95 backdrop-blur-xl border border-[#24dbc3]/40 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-[0_20px_60px_rgba(0,0,0,0.7)] animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex items-center gap-2 text-xs font-bold text-[#27dec9]">
-                            <span className="w-6 h-6 rounded-lg bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-black flex items-center justify-center text-xs shadow-md">
+                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-white/95 backdrop-blur-xl border border-teal-300 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+                        <div className="flex items-center gap-2 text-xs font-bold text-[#0f766e]">
+                            <span className="w-6 h-6 rounded-lg bg-[#0f766e] text-white font-black flex items-center justify-center text-xs shadow-xs">
                                 {selectedIds.length}
                             </span>
                             <span>registration(s) selected</span>
@@ -516,7 +517,7 @@ export default function WorldPlanRegistrations({
                                 <button
                                     type="button"
                                     onClick={handleBulkRestore}
-                                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                                 >
                                     <RotateCcw className="w-3.5 h-3.5" />
                                     <span>Restore</span>
@@ -525,7 +526,7 @@ export default function WorldPlanRegistrations({
                                 <button
                                     type="button"
                                     onClick={handleBulkArchive}
-                                    className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                    className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                                 >
                                     <Archive className="w-3.5 h-3.5" />
                                     <span>Archive</span>
@@ -535,7 +536,7 @@ export default function WorldPlanRegistrations({
                             <button
                                 type="button"
                                 onClick={handleBulkDelete}
-                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow cursor-pointer"
+                                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all border-0 shadow-xs cursor-pointer"
                             >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 <span>Delete</span>
@@ -544,7 +545,7 @@ export default function WorldPlanRegistrations({
                             <button
                                 type="button"
                                 onClick={() => setSelectedIds([])}
-                                className="px-2.5 py-1.5 rounded-xl bg-[#082033] text-slate-300 hover:text-white text-xs border border-[#1e4e5b]/80 cursor-pointer"
+                                className="px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 hover:text-slate-900 text-xs border border-slate-300 cursor-pointer"
                             >
                                 Deselect
                             </button>
@@ -552,19 +553,18 @@ export default function WorldPlanRegistrations({
                     </div>
                 )}
 
-                {/* 1. DESKTOP TABLE VIEW (Medium screens & above) */}
-                <div className="hidden md:block rounded-2xl bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden relative">
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
+                {/* 1. DESKTOP TABLE VIEW (Clean White Table) */}
+                <div className="hidden md:block rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden relative">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs min-w-[950px]">
-                            <thead className="bg-[#082033]/95 text-slate-300 uppercase tracking-wider font-bold text-[11px] border-b border-[#1b5361]/70">
+                            <thead className="bg-slate-50 text-slate-700 uppercase tracking-wider font-bold text-[11px] border-b border-slate-200">
                                 <tr>
                                     <th className="py-4 px-4 w-12 text-center">
                                         <input
                                             type="checkbox"
                                             checked={regList.length > 0 && selectedIds.length === regList.length}
                                             onChange={handleSelectAll}
-                                            className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer"
+                                            className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e] cursor-pointer"
                                         />
                                     </th>
                                     <th className="py-4 px-4">Applicant</th>
@@ -575,13 +575,13 @@ export default function WorldPlanRegistrations({
                                     <th className="py-4 px-4 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1b5361]/40 text-slate-300">
+                            <tbody className="divide-y divide-slate-100 text-slate-700">
                                 {regList.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="py-16 text-center text-slate-500">
-                                            <Globe className="w-10 h-10 mx-auto mb-3 opacity-30 text-[#38bdf8]" />
-                                            <span className="text-sm font-semibold block text-slate-300">No applications matching criteria found.</span>
-                                            <span className="text-xs text-slate-400 mt-1 block">Try clearing search or switching between Active and Archived views.</span>
+                                        <td colSpan="7" className="py-16 text-center text-slate-400">
+                                            <Globe className="w-10 h-10 mx-auto mb-3 opacity-30 text-slate-400" />
+                                            <span className="text-sm font-semibold block text-slate-700">No applications matching criteria found.</span>
+                                            <span className="text-xs text-slate-500 mt-1 block">Try clearing search or switching between Active and Archived views.</span>
                                         </td>
                                     </tr>
                                 ) : (
@@ -593,7 +593,7 @@ export default function WorldPlanRegistrations({
                                             <tr
                                                 key={reg.id}
                                                 className={`transition-colors ${
-                                                    isSelected ? 'bg-[#15cbb7]/15' : 'hover:bg-[#0c2638]/70'
+                                                    isSelected ? 'bg-teal-50/50' : 'hover:bg-slate-50/80'
                                                 }`}
                                             >
                                                 <td className="py-4 px-4 text-center">
@@ -601,28 +601,28 @@ export default function WorldPlanRegistrations({
                                                         type="checkbox"
                                                         checked={isSelected}
                                                         onChange={() => handleToggleSelect(reg.id)}
-                                                        className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] cursor-pointer"
+                                                        className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e] cursor-pointer"
                                                     />
                                                 </td>
 
                                                 {/* Applicant Info */}
                                                 <td className="py-4 px-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#008c89] to-[#25dec0] text-[#031927] flex items-center justify-center font-extrabold text-xs shadow-sm shrink-0">
+                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
                                                             {applicantInitial}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <div className="font-bold text-white text-xs block truncate">
+                                                            <div className="font-bold text-slate-900 text-xs block truncate">
                                                                 {reg.full_name || `${reg.first_name || ''} ${reg.last_name || ''}`.trim()}
                                                             </div>
-                                                            <div className="text-slate-400 text-[11px] font-mono truncate">
-                                                                @{reg.username} • {reg.email}
+                                                            <div className="text-slate-500 text-[11px] font-mono truncate">
+                                                                @{reg.username} &bull; {reg.email}
                                                             </div>
                                                             <div className="text-slate-400 text-[11px] flex items-center gap-1.5 mt-0.5">
-                                                                <span className="px-1.5 py-0.2 rounded bg-[#082033] text-slate-300 font-semibold text-[10px] border border-[#1e4e5b]/60">
+                                                                <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-semibold text-[10px] border border-slate-200">
                                                                     {reg.country || 'Global'}
                                                                 </span>
-                                                                <span>•</span>
+                                                                <span>&bull;</span>
                                                                 <span>{reg.contact_no}</span>
                                                             </div>
                                                         </div>
@@ -631,11 +631,11 @@ export default function WorldPlanRegistrations({
 
                                                 {/* Package & Product Set */}
                                                 <td className="py-4 px-4">
-                                                    <span className="px-2.5 py-1 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] border border-[#24dbc3]/30 font-bold block w-fit mb-1">
+                                                    <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-[#0f766e] border border-teal-200 font-bold block w-fit mb-1">
                                                         {reg.package_type}
                                                     </span>
                                                     {reg.product_set && (
-                                                        <div className="text-[11px] text-slate-400 max-w-[200px] truncate" title={reg.product_set}>
+                                                        <div className="text-[11px] text-slate-500 max-w-[200px] truncate" title={reg.product_set}>
                                                             Set: {reg.product_set}
                                                         </div>
                                                     )}
@@ -643,39 +643,39 @@ export default function WorldPlanRegistrations({
 
                                                 {/* Remittance & Proof */}
                                                 <td className="py-4 px-4">
-                                                    <div className="font-semibold text-slate-200 text-xs">
+                                                    <div className="font-semibold text-slate-900 text-xs">
                                                         {reg.amount_paid || 'Official Remittance'}
                                                     </div>
-                                                    <div className="text-[11px] text-slate-400">
-                                                        {reg.payment_method} • {reg.payment_date}
+                                                    <div className="text-[11px] text-slate-500">
+                                                        {reg.payment_method} &bull; {reg.payment_date}
                                                     </div>
                                                     <div className="mt-1.5 flex items-center gap-1.5">
                                                         {(reg.payment_proof_url || reg.payment_proof || reg.payment_receipt) ? (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => openProofModal(reg)}
-                                                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[11px] font-bold text-[#27dec9] border border-[#24dbc3]/30 transition-colors cursor-pointer"
+                                                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-teal-50 hover:bg-teal-100 text-[11px] font-bold text-[#0f766e] border border-teal-200 transition-colors cursor-pointer"
                                                             >
                                                                 {reg.is_pdf_receipt || reg.payment_proof?.toLowerCase().endsWith('.pdf') ? (
-                                                                    <FileText className="w-3 h-3 text-rose-400" />
+                                                                    <FileText className="w-3 h-3 text-rose-500" />
                                                                 ) : (
-                                                                    <Eye className="w-3 h-3 text-[#25dec0]" />
+                                                                    <Eye className="w-3 h-3 text-[#0f766e]" />
                                                                 )}
                                                                 <span>{reg.is_pdf_receipt || reg.payment_proof?.toLowerCase().endsWith('.pdf') ? 'View PDF' : 'View Proof'}</span>
                                                             </button>
                                                         ) : (
-                                                            <span className="text-slate-500 italic text-[11px]">No receipt file</span>
+                                                            <span className="text-slate-400 italic text-[11px]">No receipt file</span>
                                                         )}
                                                     </div>
                                                 </td>
 
                                                 {/* Consent */}
                                                 <td className="py-4 px-4">
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                                                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
                                                         <span>Agreed: {reg.agreed_terms || 'Yes'}</span>
                                                     </span>
-                                                    <div className="text-[10px] text-slate-500 mt-1">
+                                                    <div className="text-[10px] text-slate-400 mt-1">
                                                         Non-refundable
                                                     </div>
                                                 </td>
@@ -683,18 +683,18 @@ export default function WorldPlanRegistrations({
                                                 {/* Status */}
                                                 <td className="py-4 px-4 whitespace-nowrap">
                                                     {reg.is_archived ? (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-950/60 text-amber-300 border border-amber-500/30">
-                                                            <Archive className="w-3 h-3 text-amber-400" />
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-300">
+                                                            <Archive className="w-3 h-3 text-slate-500" />
                                                             <span>Archived</span>
                                                         </span>
                                                     ) : (
                                                         <span
-                                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                                                 reg.status === 'Approved'
-                                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                                                     : reg.status === 'Rejected'
-                                                                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                                                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                                                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
                                                             }`}
                                                         >
                                                             {reg.status}
@@ -707,7 +707,7 @@ export default function WorldPlanRegistrations({
                                                     <div className="flex items-center justify-end gap-1.5">
                                                         <button
                                                             onClick={() => setDetailsModalItem(reg)}
-                                                            className="p-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white transition-colors border border-[#1e4e5b]/70 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 cursor-pointer"
                                                             title="Inspect Application"
                                                         >
                                                             <FileText className="w-4 h-4" />
@@ -719,8 +719,8 @@ export default function WorldPlanRegistrations({
                                                                     setApproveModalItem(reg);
                                                                     setAdminNotes('');
                                                                 }}
-                                                                className="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors border border-emerald-500/30 cursor-pointer"
-                                                                title="Approve &amp; Send Congratulations Welcome"
+                                                                className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-600 transition-colors border border-emerald-200 cursor-pointer"
+                                                                title="Approve & Send Congratulations Welcome"
                                                             >
                                                                 <CheckCircle className="w-4 h-4" />
                                                             </button>
@@ -732,8 +732,8 @@ export default function WorldPlanRegistrations({
                                                                     setRejectModalItem(reg);
                                                                     setRejectionReason('');
                                                                 }}
-                                                                className="p-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 transition-colors border border-amber-500/30 cursor-pointer"
-                                                                title="Reject &amp; Send Notice"
+                                                                className="p-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 transition-colors border border-amber-200 cursor-pointer"
+                                                                title="Reject & Send Notice"
                                                             >
                                                                 <XCircle className="w-4 h-4" />
                                                             </button>
@@ -743,7 +743,7 @@ export default function WorldPlanRegistrations({
                                                             href={`/admin/world-plan/${reg.id}/invoice`}
                                                             target="_blank"
                                                             rel="noreferrer"
-                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#25dec0] transition-colors border border-[#24dbc3]/30 cursor-pointer inline-flex items-center justify-center"
+                                                            className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] transition-colors border border-teal-200 cursor-pointer inline-flex items-center justify-center"
                                                             title="Download Official Invoice (PDF)"
                                                         >
                                                             <Download className="w-4 h-4" />
@@ -752,7 +752,7 @@ export default function WorldPlanRegistrations({
                                                         <button
                                                             type="button"
                                                             onClick={() => openCredentialsModal(reg)}
-                                                            className="p-1.5 rounded-lg bg-[#24dbc3]/10 hover:bg-[#24dbc3]/20 text-[#25dec0] transition-colors border border-[#24dbc3]/30 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-[#0f766e] transition-colors border border-teal-200 cursor-pointer"
                                                             title="Send Portal Login Credentials"
                                                         >
                                                             <KeyRound className="w-4 h-4" />
@@ -760,7 +760,7 @@ export default function WorldPlanRegistrations({
 
                                                         <button
                                                             onClick={() => handleDelete(reg.id, reg.full_name || reg.username)}
-                                                            className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/30 cursor-pointer"
+                                                            className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors border border-rose-200 cursor-pointer"
                                                             title="Delete Permanently"
                                                         >
                                                             <Trash2 className="w-3.5 h-3.5" />
@@ -777,9 +777,9 @@ export default function WorldPlanRegistrations({
 
                     {/* Pagination */}
                     {registrations.links && registrations.links.length > 3 && (
-                        <div className="py-4 px-6 border-t border-[#1b5361]/60 flex items-center justify-between text-xs text-slate-400 bg-[#082033]/80">
+                        <div className="py-4 px-6 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 bg-slate-50/70">
                             <div>
-                                Showing <strong className="text-white">{registrations.from || 0}</strong> to <strong className="text-white">{registrations.to || 0}</strong> of <strong className="text-white">{registrations.total || 0}</strong> entries
+                                Showing <strong className="text-slate-900">{registrations.from || 0}</strong> to <strong className="text-slate-900">{registrations.to || 0}</strong> of <strong className="text-slate-900">{registrations.total || 0}</strong> entries
                             </div>
                             <div className="flex items-center gap-1">
                                 {registrations.links.map((link, idx) => (
@@ -787,10 +787,10 @@ export default function WorldPlanRegistrations({
                                         key={idx}
                                         disabled={!link.url}
                                         onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
-                                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors border-0 cursor-pointer ${
+                                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors border cursor-pointer ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-bold shadow'
-                                                : 'bg-[#061726] text-slate-400 hover:text-white disabled:opacity-30'
+                                                ? 'bg-[#0f766e] text-white font-bold border-[#0f766e] shadow-xs'
+                                                : 'bg-white text-slate-600 hover:text-slate-900 border-slate-200 disabled:opacity-40'
                                         }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -803,8 +803,8 @@ export default function WorldPlanRegistrations({
                 {/* 2. MOBILE CARD VIEW (Small screens < 768px) */}
                 <div className="md:hidden space-y-3">
                     {regList.length === 0 ? (
-                        <div className="rounded-2xl bg-[#061726]/90 border border-[#1b5361]/60 p-8 text-center text-slate-400 text-xs shadow-xl">
-                            <Globe className="w-8 h-8 mx-auto mb-2 opacity-30 text-[#38bdf8]" />
+                        <div className="rounded-2xl bg-white border border-slate-200 p-8 text-center text-slate-500 text-xs shadow-xs">
+                            <Globe className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
                             <span>No registrations matching criteria found.</span>
                         </div>
                     ) : (
@@ -816,33 +816,33 @@ export default function WorldPlanRegistrations({
                                     key={reg.id}
                                     className={`p-4 rounded-2xl border transition-all ${
                                         isSelected
-                                            ? 'bg-[#15cbb7]/15 border-[#24dbc3]/60 shadow-lg'
-                                            : 'bg-[#061726]/90 border-[#1b5361]/60'
+                                            ? 'bg-teal-50/50 border-teal-300 shadow-sm'
+                                            : 'bg-white border-slate-200/90 shadow-xs'
                                     }`}
                                 >
-                                    <div className="flex items-start justify-between gap-3 pb-3 border-b border-[#1b5361]/60">
+                                    <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
                                         <div className="flex items-center gap-2.5">
                                             <input
                                                 type="checkbox"
                                                 checked={isSelected}
                                                 onChange={() => handleToggleSelect(reg.id)}
-                                                className="w-4 h-4 rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3]"
+                                                className="w-4 h-4 rounded border-slate-300 bg-white text-[#0f766e] focus:ring-[#0f766e]"
                                             />
                                             <div>
-                                                <h4 className="font-bold text-white text-sm mb-0">
+                                                <h4 className="font-bold text-slate-900 text-sm mb-0">
                                                     {reg.full_name || `${reg.first_name || ''} ${reg.last_name || ''}`.trim()}
                                                 </h4>
-                                                <span className="text-[11px] text-slate-400 font-mono">@{reg.username}</span>
+                                                <span className="text-[11px] text-slate-500 font-mono">@{reg.username}</span>
                                             </div>
                                         </div>
 
                                         <span
                                             className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                                 reg.status === 'Approved'
-                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                                     : reg.status === 'Rejected'
-                                                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                                    : 'bg-amber-50 text-amber-700 border border-amber-200'
                                             }`}
                                         >
                                             {reg.status}
@@ -851,31 +851,31 @@ export default function WorldPlanRegistrations({
 
                                     <div className="py-3 space-y-2 text-xs">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">Package:</span>
-                                            <span className="font-bold text-[#25dec0]">{reg.package_type}</span>
+                                            <span className="text-slate-500">Package:</span>
+                                            <span className="font-bold text-[#0f766e]">{reg.package_type}</span>
                                         </div>
                                         {reg.product_set && (
                                             <div className="flex items-center justify-between">
-                                                <span className="text-slate-400">Set:</span>
-                                                <span className="text-white truncate max-w-[200px]">{reg.product_set}</span>
+                                                <span className="text-slate-500">Set:</span>
+                                                <span className="text-slate-800 font-medium truncate max-w-[200px]">{reg.product_set}</span>
                                             </div>
                                         )}
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">Remittance:</span>
-                                            <span className="text-slate-200">{reg.amount_paid} ({reg.payment_method})</span>
+                                            <span className="text-slate-500">Remittance:</span>
+                                            <span className="text-slate-800 font-medium">{reg.amount_paid} ({reg.payment_method})</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-slate-400">Country:</span>
-                                            <span className="text-slate-300">{reg.country || 'Philippines'}</span>
+                                            <span className="text-slate-500">Country:</span>
+                                            <span className="text-slate-700">{reg.country || 'Philippines'}</span>
                                         </div>
                                     </div>
 
-                                    <div className="pt-3 border-t border-[#1b5361]/60 flex items-center justify-between gap-2">
+                                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                                         <div className="flex items-center gap-1.5 flex-wrap">
                                             {(reg.payment_proof_url || reg.payment_proof) && (
                                                 <button
                                                     onClick={() => setProofModalItem(reg)}
-                                                    className="px-2.5 py-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30"
+                                                    className="px-2.5 py-1.5 rounded-lg bg-teal-50 text-[#0f766e] text-xs font-semibold flex items-center gap-1 border border-teal-200"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                     <span>Proof</span>
@@ -883,7 +883,7 @@ export default function WorldPlanRegistrations({
                                             )}
                                             <button
                                                 onClick={() => setDetailsModalItem(reg)}
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 text-xs font-semibold flex items-center gap-1 border border-[#1e4e5b]/70"
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1 border border-slate-200"
                                             >
                                                 <FileText className="w-3.5 h-3.5" />
                                                 <span>Details</span>
@@ -894,7 +894,7 @@ export default function WorldPlanRegistrations({
                                                         setApproveModalItem(reg);
                                                         setAdminNotes('');
                                                     }}
-                                                    className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-semibold flex items-center gap-1 border border-emerald-500/30"
+                                                    className="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold flex items-center gap-1 border border-emerald-200"
                                                 >
                                                     <CheckCircle className="w-3.5 h-3.5" />
                                                     <span>Approve</span>
@@ -904,7 +904,7 @@ export default function WorldPlanRegistrations({
                                                 href={`/admin/world-plan/${reg.id}/invoice`}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30"
+                                                className="px-2.5 py-1.5 rounded-lg bg-teal-50 text-[#0f766e] text-xs font-semibold flex items-center gap-1 border border-teal-200 no-underline"
                                             >
                                                 <Download className="w-3.5 h-3.5" />
                                                 <span>Invoice</span>
@@ -912,7 +912,7 @@ export default function WorldPlanRegistrations({
                                             <button
                                                 type="button"
                                                 onClick={() => openCredentialsModal(reg)}
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] text-xs font-semibold flex items-center gap-1 border border-[#24dbc3]/30 cursor-pointer"
+                                                className="px-2.5 py-1.5 rounded-lg bg-teal-50 text-[#0f766e] text-xs font-semibold flex items-center gap-1 border border-teal-200 cursor-pointer"
                                             >
                                                 <KeyRound className="w-3.5 h-3.5" />
                                                 <span>Credentials</span>
@@ -921,7 +921,7 @@ export default function WorldPlanRegistrations({
 
                                         <button
                                             onClick={() => handleDelete(reg.id, reg.full_name || reg.username)}
-                                            className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/30 cursor-pointer"
+                                            className="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 cursor-pointer"
                                             title="Delete"
                                         >
                                             <Trash2 className="w-3.5 h-3.5" />
@@ -934,78 +934,76 @@ export default function WorldPlanRegistrations({
                 </div>
             </div>
 
-            {/* MODAL 1: VIEW DETAILS */}
+            {/* MODAL 1: VIEW DETAILS (Clean White Modal) */}
             {detailsModalItem && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-7 shadow-2xl relative space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
-                                <h3 className="font-bold text-white text-base mb-0">World Plan Registration Details</h3>
-                                <span className="text-[11px] text-slate-400 mt-0.5 block">Record #{detailsModalItem.id} • Registered via infinite-limitless.com</span>
+                                <h3 className="font-bold text-slate-900 text-base mb-0">World Plan Registration Details</h3>
+                                <span className="text-[11px] text-slate-500 mt-0.5 block">Record #{detailsModalItem.id} &bull; Registered via infinite-limitless.com</span>
                             </div>
                             <button
                                 onClick={() => setDetailsModalItem(null)}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         <div className="space-y-4 text-xs">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#082033]/90 p-4 rounded-xl border border-[#1e4e5b]/70">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Username</div>
-                                    <div className="text-white font-bold text-sm mt-0.5">@{detailsModalItem.username}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Username</div>
+                                    <div className="text-slate-900 font-bold text-sm mt-0.5">@{detailsModalItem.username}</div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Full Name</div>
-                                    <div className="text-white font-bold text-sm mt-0.5">{detailsModalItem.full_name}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Full Name</div>
+                                    <div className="text-slate-900 font-bold text-sm mt-0.5">{detailsModalItem.full_name}</div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Email</div>
-                                    <div className="text-[#25dec0] font-mono font-medium mt-0.5">{detailsModalItem.email}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Email</div>
+                                    <div className="text-[#0f766e] font-mono font-medium mt-0.5">{detailsModalItem.email}</div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Contact No</div>
-                                    <div className="text-white font-medium mt-0.5">{detailsModalItem.contact_no}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Contact No</div>
+                                    <div className="text-slate-900 font-medium mt-0.5">{detailsModalItem.contact_no}</div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Country</div>
-                                    <div className="text-white font-medium mt-0.5">{detailsModalItem.country || 'Philippines'}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Country</div>
+                                    <div className="text-slate-900 font-medium mt-0.5">{detailsModalItem.country || 'Philippines'}</div>
                                 </div>
                                 <div>
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Sponsor / Referral</div>
-                                    <div className="text-[#25dec0] font-bold mt-0.5">@{detailsModalItem.sponsor || 'None'}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Sponsor / Referral</div>
+                                    <div className="text-[#0f766e] font-bold mt-0.5">@{detailsModalItem.sponsor || 'None'}</div>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Delivery / Shipping Address</div>
-                                    <div className="text-slate-300 mt-1 leading-relaxed">{detailsModalItem.address}</div>
+                                    <div className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Delivery / Shipping Address</div>
+                                    <div className="text-slate-700 mt-1 leading-relaxed">{detailsModalItem.address}</div>
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-[#092b3a]/90 rounded-xl border border-[#24dbc3]/30 space-y-2">
-                                <div className="text-[#25dec0] font-bold uppercase tracking-wider text-[10px]">Selected Package &amp; Payment</div>
+                            <div className="p-4 bg-teal-50/70 rounded-xl border border-teal-200 space-y-2">
+                                <div className="text-[#0f766e] font-bold uppercase tracking-wider text-[10px]">Selected Package &amp; Payment</div>
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-white font-bold">{detailsModalItem.package_type}</span>
-                                    <span className="text-[#42f1ce] font-bold">{detailsModalItem.amount_paid}</span>
+                                    <span className="text-slate-900 font-bold">{detailsModalItem.package_type}</span>
+                                    <span className="text-[#0f766e] font-bold">{detailsModalItem.amount_paid}</span>
                                 </div>
                                 {detailsModalItem.product_set && (
-                                    <div className="text-slate-300 text-[11px]">Selected Set: <strong>{detailsModalItem.product_set}</strong></div>
+                                    <div className="text-slate-700 text-[11px]">Selected Set: <strong>{detailsModalItem.product_set}</strong></div>
                                 )}
-                                <div className="text-slate-400 text-[11px]">
+                                <div className="text-slate-500 text-[11px]">
                                     Paid via <strong>{detailsModalItem.payment_method}</strong> on {detailsModalItem.payment_date}
                                 </div>
                             </div>
 
                             {/* Agreed Terms Badge */}
-                            <div className="p-3.5 bg-emerald-950/30 rounded-xl border border-emerald-500/30 text-emerald-300 text-[11px]">
+                            <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-800 text-[11px]">
                                 <div className="font-bold flex items-center gap-1.5">
-                                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
                                     <span>Non-Refundable Policy &amp; Data Privacy Accepted</span>
                                 </div>
-                                <div className="text-slate-400 text-[10px] mt-1">
+                                <div className="text-slate-500 text-[10px] mt-1">
                                     Consent Timestamp: {detailsModalItem.agreed_terms_at ? new Date(detailsModalItem.agreed_terms_at).toLocaleString() : 'Recorded upon registration'}
                                 </div>
                             </div>
@@ -1014,29 +1012,29 @@ export default function WorldPlanRegistrations({
                             {(detailsModalItem.payment_proof_url || detailsModalItem.payment_proof) && (
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
-                                        <div className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                                        <div className="text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
                                             Uploaded Bank Remittance Receipt
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => openProofModal(detailsModalItem)}
-                                            className="text-[#25dec0] hover:text-[#42f1ce] text-xs font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                            className="text-[#0f766e] hover:text-[#115e59] text-xs font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
                                         >
                                             <Eye className="w-3.5 h-3.5" /> Expand &amp; Inspect
                                         </button>
                                     </div>
                                     <div
                                         onClick={() => openProofModal(detailsModalItem)}
-                                        className="bg-[#082033]/90 p-2 rounded-xl border border-[#1e4e5b]/80 text-center cursor-pointer group hover:border-[#24dbc3]/50 transition-all relative overflow-hidden"
+                                        className="bg-slate-50 p-2 rounded-xl border border-slate-200 text-center cursor-pointer group hover:border-[#0f766e] transition-all relative overflow-hidden"
                                     >
                                         {detailsModalItem.is_pdf_receipt || detailsModalItem.payment_proof?.toLowerCase().endsWith('.pdf') ? (
                                             <div className="p-6 flex flex-col items-center justify-center gap-2">
-                                                <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center">
+                                                <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
                                                     <FileText className="w-6 h-6" />
                                                 </div>
-                                                <span className="text-xs font-bold text-slate-200">PDF Remittance Document</span>
-                                                <span className="text-[11px] text-slate-400 font-mono">{detailsModalItem.payment_proof}</span>
-                                                <span className="text-[11px] text-[#25dec0] font-semibold group-hover:underline mt-1">
+                                                <span className="text-xs font-bold text-slate-800">PDF Remittance Document</span>
+                                                <span className="text-[11px] text-slate-500 font-mono">{detailsModalItem.payment_proof}</span>
+                                                <span className="text-[11px] text-[#0f766e] font-semibold group-hover:text-[#115e59] mt-1">
                                                     Click to view / open PDF in viewer &rarr;
                                                 </span>
                                             </div>
@@ -1045,22 +1043,17 @@ export default function WorldPlanRegistrations({
                                                 <img
                                                     src={detailsModalItem.payment_proof_url}
                                                     alt="Proof of Payment"
-                                                    className="max-h-60 mx-auto rounded-lg object-contain group-hover:opacity-85 transition-opacity"
+                                                    className="max-h-60 mx-auto rounded-lg object-contain group-hover:opacity-90 transition-opacity"
                                                 />
-                                                <div className="absolute inset-0 bg-[#061726]/60 opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">
-                                                    <span className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold text-xs flex items-center gap-1.5 shadow-lg">
-                                                        <Eye className="w-3.5 h-3.5 stroke-[2.5]" /> Click to Zoom &amp; Inspect
-                                                    </span>
-                                                </div>
                                             </>
                                         )}
                                     </div>
-                                    <div className="flex items-center justify-between mt-1 text-[11px] text-slate-400">
+                                    <div className="flex items-center justify-between mt-1 text-[11px] text-slate-500">
                                         <span>File: {detailsModalItem.payment_proof}</span>
                                         <a
                                             href={`/storage/payment_proofs/${detailsModalItem.payment_proof}/download`}
                                             download
-                                            className="text-[#25dec0] hover:text-[#42f1ce] font-medium inline-flex items-center gap-1 no-underline"
+                                            className="text-[#0f766e] hover:text-[#115e59] font-medium inline-flex items-center gap-1"
                                             onClick={(e) => e.stopPropagation()}
                                         >
                                             <Download className="w-3 h-3" /> Download File
@@ -1070,12 +1063,12 @@ export default function WorldPlanRegistrations({
                             )}
 
                             {/* Actions in details modal */}
-                            <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-[#1b5361]/60 flex-wrap">
+                            <div className="flex justify-end items-center gap-2.5 pt-3 border-t border-slate-200 flex-wrap">
                                 <a
                                     href={`/admin/world-plan/${detailsModalItem.id}/invoice`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="bg-[#082033] hover:bg-[#0c2638] text-[#24dbc3] font-bold px-4 py-2 rounded-xl text-xs border border-[#24dbc3]/40 flex items-center gap-1.5 cursor-pointer shadow no-underline"
+                                    className="bg-slate-50 hover:bg-slate-100 text-[#0f766e] font-bold px-4 py-2 rounded-xl text-xs border border-slate-200 flex items-center gap-1.5 cursor-pointer shadow-xs no-underline"
                                 >
                                     <Download className="w-4 h-4" /> Download Invoice (PDF)
                                 </a>
@@ -1086,7 +1079,7 @@ export default function WorldPlanRegistrations({
                                         setDetailsModalItem(null);
                                         openCredentialsModal(target);
                                     }}
-                                    className="bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow"
+                                    className="bg-[#0f766e] hover:bg-[#115e59] text-white font-bold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
                                 >
                                     <KeyRound className="w-4 h-4" /> Send Credentials
                                 </button>
@@ -1097,7 +1090,7 @@ export default function WorldPlanRegistrations({
                                             setApproveModalItem(detailsModalItem);
                                             setAdminNotes('');
                                         }}
-                                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow"
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
                                     >
                                         <CheckCircle className="w-4 h-4" /> Approve Registration
                                     </button>
@@ -1109,7 +1102,7 @@ export default function WorldPlanRegistrations({
                                             setRejectModalItem(detailsModalItem);
                                             setRejectionReason('');
                                         }}
-                                        className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow"
+                                        className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-xl text-xs border-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
                                     >
                                         <XCircle className="w-4 h-4" /> Reject Registration
                                     </button>
@@ -1122,46 +1115,44 @@ export default function WorldPlanRegistrations({
 
             {/* MODAL 2: APPROVE REGISTRATION */}
             {approveModalItem && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-400 via-teal-400 to-[#18d8c5]" />
-
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
-                                <h3 className="font-bold text-white text-base mb-0">Approve World Plan Registration</h3>
-                                <span className="text-[11px] text-slate-400 mt-0.5 block">Applicant: {approveModalItem.full_name}</span>
+                                <h3 className="font-bold text-slate-900 text-base mb-0">Approve World Plan Registration</h3>
+                                <span className="text-[11px] text-slate-500 mt-0.5 block">Applicant: {approveModalItem.full_name}</span>
                             </div>
                             <button
                                 onClick={() => setApproveModalItem(null)}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
                         <form onSubmit={handleApproveSubmit} className="space-y-4 text-xs">
-                            <div className="p-3.5 bg-emerald-950/30 rounded-xl border border-emerald-500/25 text-slate-200">
-                                <div className="font-bold text-emerald-400 mb-1">Built-in Confirmation Response:</div>
-                                <p className="mb-0 text-slate-300 leading-relaxed">
+                            <div className="p-3.5 bg-emerald-50 rounded-xl border border-emerald-200 text-slate-700">
+                                <div className="font-bold text-emerald-800 mb-1">Built-in Confirmation Response:</div>
+                                <p className="mb-0 text-slate-600 leading-relaxed">
                                     "Your registration for World Plan containing package <strong>{approveModalItem.package_type}</strong> {approveModalItem.product_set ? `and product set: ${approveModalItem.product_set}` : ''} has been officially approved! Online 24/7 account setup and product dispatch allocation are now initiated."
                                 </p>
                             </div>
 
-                            <div className="p-3 bg-[#092b3a]/90 rounded-xl border border-[#24dbc3]/30 text-[#27dec9] text-[11px] space-y-1.5">
-                                <div className="font-bold text-white flex items-center gap-1.5">
-                                    <Sparkles className="w-3.5 h-3.5 text-[#24dbc3]" />
+                            <div className="p-3 bg-teal-50/70 rounded-xl border border-teal-200 text-[#0f766e] text-[11px] space-y-1.5">
+                                <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                                    <Sparkles className="w-3.5 h-3.5 text-[#0f766e]" />
                                     <span>Automated Attachments Included in Approval Email:</span>
                                 </div>
-                                <div className="text-emerald-300 pl-4">
+                                <div className="text-emerald-700 pl-4">
                                     &bull; <strong>Official Package Invoice &amp; Receipt (PDF):</strong> Complete itemized package breakdown, inclusions, and paid verification.
                                 </div>
-                                <div className="text-slate-300 pl-4">
+                                <div className="text-slate-600 pl-4">
                                     &bull; <strong>Welcome Certificate (image.png):</strong> Official INFINITE Congratulations flyer graphic.
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Optional Administrator Note (Included in approval email)
                                 </label>
                                 <textarea
@@ -1169,22 +1160,22 @@ export default function WorldPlanRegistrations({
                                     value={adminNotes}
                                     onChange={(e) => setAdminNotes(e.target.value)}
                                     placeholder="e.g. Welcome to the Infinite Family! Your tracking number will be provided shortly."
-                                    className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3]/30"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20"
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#1b5361]/60">
+                            <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-200">
                                 <button
                                     type="button"
                                     onClick={() => setApproveModalItem(null)}
-                                    className="px-4 py-2.5 bg-[#082033] text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer"
+                                    className="px-4 py-2.5 bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold border border-slate-300 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={processingAction}
-                                    className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:brightness-110 text-slate-950 font-extrabold rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                                    className="px-5 py-2.5 bg-[#0f766e] hover:bg-[#115e59] text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-xs disabled:opacity-50"
                                 >
                                     <CheckCircle className="w-4 h-4" />
                                     <span>{processingAction ? 'Sending Approval Email & Attachment...' : 'Confirm Approval & Dispatch Email'}</span>
@@ -1197,18 +1188,16 @@ export default function WorldPlanRegistrations({
 
             {/* MODAL 3: REJECT REGISTRATION */}
             {rejectModalItem && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                    <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-rose-500 via-rose-400 to-amber-500" />
-
-                        <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
-                                <h3 className="font-bold text-white text-base mb-0">Reject Registration</h3>
-                                <span className="text-[11px] text-slate-400 mt-0.5 block">Applicant: {rejectModalItem.full_name}</span>
+                                <h3 className="font-bold text-slate-900 text-base mb-0">Reject Registration</h3>
+                                <span className="text-[11px] text-slate-500 mt-0.5 block">Applicant: {rejectModalItem.full_name}</span>
                             </div>
                             <button
                                 onClick={() => setRejectModalItem(null)}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -1216,7 +1205,7 @@ export default function WorldPlanRegistrations({
 
                         <form onSubmit={handleRejectSubmit} className="space-y-4 text-xs">
                             <div>
-                                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                                     Reason for Disapproval *
                                 </label>
                                 <textarea
@@ -1225,22 +1214,22 @@ export default function WorldPlanRegistrations({
                                     value={rejectionReason}
                                     onChange={(e) => setRejectionReason(e.target.value)}
                                     placeholder="e.g. The remittance slip was blurry or the payment amount could not be verified with our bank deposit records. Please re-upload a clear receipt."
-                                    className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400/30"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-2.5 pt-2 border-t border-[#1b5361]/60">
+                            <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-200">
                                 <button
                                     type="button"
                                     onClick={() => setRejectModalItem(null)}
-                                    className="px-4 py-2.5 bg-[#082033] text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer"
+                                    className="px-4 py-2.5 bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold border border-slate-300 cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={processingAction}
-                                    className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-lg shadow-rose-500/20 disabled:opacity-50"
+                                    className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-xs disabled:opacity-50"
                                 >
                                     <XCircle className="w-4 h-4" />
                                     <span>{processingAction ? 'Sending Rejection Notice...' : 'Confirm Rejection'}</span>
@@ -1253,21 +1242,18 @@ export default function WorldPlanRegistrations({
 
             {/* MODAL 5: SEND LOGIN CREDENTIALS */}
             {credentialsModalItem && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-lg rounded-2xl sm:rounded-3xl bg-[#061726] border border-[#2c6973] shadow-[0_25px_70px_rgba(0,0,0,0.6)] p-5 sm:p-7 overflow-hidden text-left">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                        <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
-
-                        <div className="relative z-10 flex items-center justify-between pb-4 border-b border-[#1b5361]/60">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+                    <div className="relative w-full max-w-lg rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-7 text-left">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-[#24dbc3]/15 border border-[#24dbc3]/30 flex items-center justify-center text-[#25dec0] shadow-inner shrink-0">
+                                <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">
                                     <KeyRound className="w-5 h-5 stroke-[2.2]" />
                                 </div>
                                 <div>
-                                    <h3 className="text-base sm:text-lg font-bold text-white mb-0">
+                                    <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-0">
                                         Send Login Credentials
                                     </h3>
-                                    <p className="text-xs text-slate-400 mb-0">
+                                    <p className="text-xs text-slate-500 mb-0">
                                         Dispatch official portal credentials to client email
                                     </p>
                                 </div>
@@ -1280,20 +1266,20 @@ export default function WorldPlanRegistrations({
                                     }
                                 }}
                                 disabled={sendingCredentials}
-                                className="text-slate-400 hover:text-white bg-[#082033] p-1.5 rounded-xl border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-xl border border-slate-200 cursor-pointer disabled:opacity-50"
                             >
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSendCredentialsSubmit} className="relative z-10 mt-5 space-y-4">
+                        <form onSubmit={handleSendCredentialsSubmit} className="mt-5 space-y-4">
                             {/* 1. Client Email (Viewable Only, Not Editable) */}
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                                         <span>Client Email (Viewable Only)</span>
                                     </label>
-                                    <span className="text-[10px] text-amber-400 font-semibold flex items-center gap-1">
+                                    <span className="text-[10px] text-amber-600 font-semibold flex items-center gap-1">
                                         <Lock className="w-3 h-3" /> Locked &bull; Non-editable
                                     </span>
                                 </div>
@@ -1304,19 +1290,19 @@ export default function WorldPlanRegistrations({
                                         value={credentialsModalItem.email || ''}
                                         readOnly
                                         disabled
-                                        className="w-full bg-[#082033]/60 border border-[#1e4e5b]/60 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-300 font-medium cursor-not-allowed select-all"
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-600 font-medium cursor-not-allowed select-all"
                                     />
                                 </div>
-                                <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400">
-                                    <span>Recipient: <strong className="text-white">{credentialsModalItem.full_name || `${credentialsModalItem.first_name || ''} ${credentialsModalItem.last_name || ''}`.trim()}</strong></span>
-                                    <span className="text-[#25dec0] font-semibold">{credentialsModalItem.package_type}</span>
+                                <div className="mt-1 flex items-center justify-between text-[10px] text-slate-500">
+                                    <span>Recipient: <strong className="text-slate-900">{credentialsModalItem.full_name || `${credentialsModalItem.first_name || ''} ${credentialsModalItem.last_name || ''}`.trim()}</strong></span>
+                                    <span className="text-[#0f766e] font-semibold">{credentialsModalItem.package_type}</span>
                                 </div>
                             </div>
 
                             {/* 2. Username (Manually Editable) */}
                             <div>
-                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
-                                    Client Username <span className="text-[#25dec0]">*</span>
+                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700 block mb-1.5">
+                                    Client Username <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative">
                                     <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1326,26 +1312,23 @@ export default function WorldPlanRegistrations({
                                         onChange={(e) => setCredUsername(e.target.value)}
                                         required
                                         placeholder="Type client username..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-medium"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all font-medium"
                                     />
                                 </div>
-                                <p className="text-[10px] text-slate-400 mt-1 mb-0">
-                                    Pre-filled with registered username. You can manually type or customize it.
-                                </p>
                             </div>
 
                             {/* 3. Password (Manually Editable + Generator) */}
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
-                                        Client Password <span className="text-[#25dec0]">*</span>
+                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                                        Client Password <span className="text-rose-500">*</span>
                                     </label>
                                     <button
                                         type="button"
                                         onClick={generateRandomPassword}
-                                        className="text-[11px] font-bold text-[#25dec0] hover:text-[#42f1ce] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
+                                        className="text-[11px] font-bold text-[#0f766e] hover:text-[#115e59] flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0"
                                     >
-                                        <Sparkles className="w-3.5 h-3.5" />
+                                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                                         <span>Generate Password</span>
                                     </button>
                                 </div>
@@ -1357,45 +1340,42 @@ export default function WorldPlanRegistrations({
                                         onChange={(e) => setCredPassword(e.target.value)}
                                         required
                                         placeholder="Type or generate client portal password..."
-                                        className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowCredPassword(!showCredPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer p-0"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent border-0 cursor-pointer p-0"
                                         title={showCredPassword ? 'Hide password' : 'Show password'}
                                     >
                                         {showCredPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-400 mt-1 mb-0">
-                                    Manually type the client&apos;s password or click &apos;Generate Password&apos; above.
-                                </p>
                             </div>
 
                             {/* Direct Portal Notice */}
-                            <div className="p-3 rounded-xl bg-[#082033]/70 border border-[#1e4e5b]/70 flex items-center justify-between text-xs">
+                            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                                 <div className="flex items-center gap-2">
-                                    <Globe className="w-4 h-4 text-[#25dec0] shrink-0" />
-                                    <span className="text-slate-300 text-[11px]">Official Portal link in email:</span>
+                                    <Globe className="w-4 h-4 text-[#0f766e] shrink-0" />
+                                    <span className="text-slate-600 text-[11px]">Official Portal link in email:</span>
                                 </div>
-                                <span className="font-mono text-[11px] font-bold text-[#25dec0]">helloinfinity.net/iprosperity</span>
+                                <span className="font-mono text-[11px] font-bold text-[#0f766e]">helloinfinity.net/iprosperity</span>
                             </div>
 
                             {/* Footer Buttons */}
-                            <div className="pt-3 border-t border-[#1b5361]/60 flex items-center justify-end gap-2.5">
+                            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
                                 <button
                                     type="button"
                                     onClick={() => setCredentialsModalItem(null)}
                                     disabled={sendingCredentials}
-                                    className="px-4 py-2.5 bg-[#082033] text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer disabled:opacity-50"
+                                    className="px-4 py-2.5 bg-slate-100 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold border border-slate-300 cursor-pointer disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={sendingCredentials || !credUsername.trim() || !credPassword.trim()}
-                                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold text-xs flex items-center gap-2 shadow-[0_4px_15px_rgba(36,219,195,0.25)] transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs flex items-center gap-2 shadow-xs transition-all cursor-pointer border-0 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {sendingCredentials ? (
                                         <>
@@ -1422,38 +1402,36 @@ export default function WorldPlanRegistrations({
                 const directViewUrl = proofModalItem.payment_proof_url;
 
                 return (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#020d1b]/85 backdrop-blur-md animate-in fade-in">
-                        <div className="bg-[#061726]/98 border border-[#2c6973]/80 rounded-2xl sm:rounded-3xl w-full max-w-4xl p-4 sm:p-6 shadow-[0_25px_70px_rgba(0,0,0,0.7)] backdrop-blur-2xl relative overflow-hidden space-y-4 max-h-[95vh] flex flex-col">
-                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
+                        <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-4xl p-4 sm:p-6 shadow-2xl relative space-y-4 max-h-[95vh] flex flex-col">
                             {/* Header */}
-                            <div className="flex items-center justify-between pb-3 border-b border-[#1b5361]/60 shrink-0">
+                            <div className="flex items-center justify-between pb-3 border-b border-slate-200 shrink-0">
                                 <div className="space-y-0.5">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs uppercase font-extrabold text-[#27dec9] tracking-wider">
+                                        <span className="text-xs uppercase font-extrabold text-[#0f766e] tracking-wider">
                                             Remittance Receipt Inspector
                                         </span>
                                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                            isPdf ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-[#24dbc3]/20 text-[#27dec9] border border-[#24dbc3]/30'
+                                            isPdf ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-teal-50 text-[#0f766e] border border-teal-200'
                                         }`}>
                                             {isPdf ? 'PDF Document' : 'Image Photo'}
                                         </span>
                                     </div>
-                                    <div className="text-[12px] text-slate-300">
-                                        <span className="font-semibold text-white">{proofModalItem.full_name}</span>
-                                        <span className="text-slate-400"> (@{proofModalItem.username})</span>
-                                        <span className="text-slate-500 mx-1.5">•</span>
-                                        <span className="text-[#25dec0] font-mono font-bold">{proofModalItem.amount_paid || 'Remittance'}</span>
+                                    <div className="text-[12px] text-slate-600">
+                                        <span className="font-semibold text-slate-900">{proofModalItem.full_name}</span>
+                                        <span className="text-slate-500"> (@{proofModalItem.username})</span>
+                                        <span className="text-slate-300 mx-1.5">&bull;</span>
+                                        <span className="text-[#0f766e] font-mono font-bold">{proofModalItem.amount_paid || 'Remittance'}</span>
                                         {proofModalItem.payment_method && (
                                             <>
-                                                <span className="text-slate-500 mx-1.5">•</span>
-                                                <span className="text-slate-300">{proofModalItem.payment_method}</span>
+                                                <span className="text-slate-300 mx-1.5">&bull;</span>
+                                                <span className="text-slate-600">{proofModalItem.payment_method}</span>
                                             </>
                                         )}
                                         {proofModalItem.payment_date && (
                                             <>
-                                                <span className="text-slate-500 mx-1.5">•</span>
-                                                <span className="text-slate-400 font-mono">{proofModalItem.payment_date}</span>
+                                                <span className="text-slate-300 mx-1.5">&bull;</span>
+                                                <span className="text-slate-500 font-mono">{proofModalItem.payment_date}</span>
                                             </>
                                         )}
                                     </div>
@@ -1461,7 +1439,7 @@ export default function WorldPlanRegistrations({
                                 <button
                                     type="button"
                                     onClick={() => setProofModalItem(null)}
-                                    className="text-slate-400 hover:text-white bg-[#082033] hover:bg-[#0c2638] p-2 rounded-xl border border-[#1e4e5b]/80 cursor-pointer transition-colors"
+                                    className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-2 rounded-xl border border-slate-200 cursor-pointer transition-colors"
                                     title="Close viewer"
                                 >
                                     <X className="w-4 h-4" />
@@ -1469,7 +1447,7 @@ export default function WorldPlanRegistrations({
                             </div>
 
                             {/* Viewer Stage */}
-                            <div className="bg-[#082033]/90 p-2 sm:p-4 rounded-xl border border-[#1e4e5b]/70 text-center relative overflow-hidden flex-1 min-h-[350px] max-h-[65vh] flex items-center justify-center">
+                            <div className="bg-slate-50 p-2 sm:p-4 rounded-xl border border-slate-200 text-center relative overflow-hidden flex-1 min-h-[350px] max-h-[65vh] flex items-center justify-center">
                                 {isPdf ? (
                                     <div className="w-full h-full min-h-[500px] flex flex-col">
                                         <iframe
@@ -1480,24 +1458,24 @@ export default function WorldPlanRegistrations({
                                     </div>
                                 ) : proofImgError ? (
                                     <div className="p-8 text-center space-y-3">
-                                        <div className="w-12 h-12 mx-auto rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center">
+                                        <div className="w-12 h-12 mx-auto rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
                                             <FileText className="w-6 h-6" />
                                         </div>
-                                        <p className="text-sm font-semibold text-slate-300">Receipt Image Unavailable for Preview</p>
+                                        <p className="text-sm font-semibold text-slate-800">Receipt Image Unavailable for Preview</p>
                                         <p className="text-xs text-slate-500 font-mono">File: {proofModalItem.payment_proof}</p>
                                         <div className="pt-2 flex justify-center gap-2">
                                             <a
                                                 href={directViewUrl}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#24dbc3]/20 text-[#27dec9] text-xs font-bold hover:bg-[#24dbc3]/30 transition-colors no-underline"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-50 text-[#0f766e] text-xs font-bold hover:bg-teal-100 transition-colors no-underline"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5" /> Try Direct Link
                                             </a>
                                             <button
                                                 type="button"
                                                 onClick={() => setProofImgError(false)}
-                                                className="px-3 py-1.5 rounded-lg bg-[#082033] text-slate-300 text-xs font-semibold hover:bg-[#0c2638] border border-[#1e4e5b]/80 cursor-pointer"
+                                                className="px-3 py-1.5 rounded-lg bg-white text-slate-700 text-xs font-semibold hover:bg-slate-50 border border-slate-200 cursor-pointer"
                                             >
                                                 Retry Load
                                             </button>
@@ -1513,7 +1491,7 @@ export default function WorldPlanRegistrations({
                                                 transform: `scale(${proofZoom}) rotate(${proofRotation}deg)`,
                                                 transition: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)',
                                             }}
-                                            className="max-h-[55vh] max-w-full rounded-lg object-contain shadow-2xl cursor-zoom-in"
+                                            className="max-h-[55vh] max-w-full rounded-lg object-contain shadow-sm cursor-zoom-in"
                                             onClick={() => setProofZoom((z) => (z >= 2.5 ? 1 : +(z + 0.5).toFixed(1)))}
                                             title="Click to zoom in / reset"
                                         />
@@ -1531,7 +1509,7 @@ export default function WorldPlanRegistrations({
                                                 type="button"
                                                 title="Zoom In"
                                                 onClick={() => setProofZoom((z) => Math.min(3, +(z + 0.25).toFixed(2)))}
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white border border-[#1e4e5b]/80 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs flex items-center gap-1 cursor-pointer transition-colors"
                                             >
                                                 <ZoomIn className="w-3.5 h-3.5" />
                                                 <span className="text-[11px] font-mono">{Math.round(proofZoom * 100)}%</span>
@@ -1540,7 +1518,7 @@ export default function WorldPlanRegistrations({
                                                 type="button"
                                                 title="Zoom Out"
                                                 onClick={() => setProofZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))}
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white border border-[#1e4e5b]/80 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs flex items-center gap-1 cursor-pointer transition-colors"
                                             >
                                                 <ZoomOut className="w-3.5 h-3.5" />
                                             </button>
@@ -1548,7 +1526,7 @@ export default function WorldPlanRegistrations({
                                                 type="button"
                                                 title="Rotate 90 degrees clockwise"
                                                 onClick={() => setProofRotation((r) => (r + 90) % 360)}
-                                                className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white border border-[#1e4e5b]/80 text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                                className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs flex items-center gap-1 cursor-pointer transition-colors"
                                             >
                                                 <RotateCw className="w-3.5 h-3.5" />
                                                 <span className="hidden sm:inline text-[11px]">Rotate {proofRotation ? `(${proofRotation}°)` : ''}</span>
@@ -1558,7 +1536,7 @@ export default function WorldPlanRegistrations({
                                                     type="button"
                                                     title="Reset Zoom & Rotation"
                                                     onClick={() => { setProofZoom(1); setProofRotation(0); }}
-                                                    className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-amber-400 border border-[#1e4e5b]/80 text-[11px] font-semibold cursor-pointer transition-colors"
+                                                    className="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-[11px] font-semibold cursor-pointer transition-colors"
                                                 >
                                                     Reset
                                                 </button>
@@ -1570,7 +1548,7 @@ export default function WorldPlanRegistrations({
                                         target="_blank"
                                         rel="noreferrer"
                                         title="Open file in separate browser tab"
-                                        className="px-2.5 py-1.5 rounded-lg bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white border border-[#1e4e5b]/80 text-xs flex items-center gap-1 cursor-pointer transition-colors no-underline"
+                                        className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs flex items-center gap-1 cursor-pointer transition-colors no-underline"
                                     >
                                         <ExternalLink className="w-3.5 h-3.5" />
                                         <span className="text-[11px]">Open New Tab</span>
@@ -1582,7 +1560,7 @@ export default function WorldPlanRegistrations({
                                     <a
                                         href={downloadUrl}
                                         download
-                                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] hover:brightness-110 text-[#031927] font-extrabold text-xs flex items-center gap-1.5 no-underline shadow-[0_4px_15px_rgba(36,219,195,0.25)] transition-all cursor-pointer"
+                                        className="px-4 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs flex items-center gap-1.5 no-underline shadow-xs transition-all cursor-pointer"
                                     >
                                         <Download className="w-4 h-4 stroke-[2.5]" />
                                         <span>Download Receipt</span>
@@ -1590,7 +1568,7 @@ export default function WorldPlanRegistrations({
                                     <button
                                         type="button"
                                         onClick={() => setProofModalItem(null)}
-                                        className="px-4 py-2 rounded-xl bg-[#082033] hover:bg-[#0c2638] text-slate-300 hover:text-white text-xs font-semibold border border-[#1e4e5b]/80 cursor-pointer transition-colors"
+                                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer transition-colors"
                                     >
                                         Close
                                     </button>

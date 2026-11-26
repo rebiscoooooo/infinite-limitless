@@ -116,166 +116,163 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
 
             <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
                 {/* Top Header Card */}
-                <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 xl:p-8 bg-[#061726]/90 border border-[#2c6973]/75 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-                    <div className="absolute -top-24 -right-24 w-80 h-80 bg-[#15cbb7]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 bg-white border border-slate-200/90 shadow-xs overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
-                    <div className="relative z-10 space-y-1.5">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#24dbc3]/10 border border-[#24dbc3]/30 text-[#27dec9] text-xs font-semibold">
-                            <Sparkles className="w-3.5 h-3.5 text-[#25dec0] shrink-0" />
+                    <div className="space-y-1.5">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0f766e] text-xs font-semibold">
+                            <Sparkles className="w-3.5 h-3.5 text-[#0f766e] shrink-0" />
                             <span>System Security &amp; Compliance</span>
                         </div>
-                        <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                            <Shield className="w-6 h-6 text-[#25dec0]" />
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                            <Shield className="w-6 h-6 text-[#0f766e]" />
                             <span>Activity &amp; Audit Logs</span>
                         </h2>
-                        <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-500 max-w-xl leading-relaxed">
                             Chronological history of administrator operations, status updates, security events, and IP addresses.
                         </p>
                     </div>
 
-                    <div className="relative z-10 flex items-center gap-2 text-xs">
-                        <span className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 text-slate-300 font-semibold shadow-inner">
-                            <span className="w-2 h-2 rounded-full bg-[#25dec0] animate-pulse" />
+                    <div className="flex items-center gap-2 text-xs">
+                        <span className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-semibold shadow-xs">
+                            <span className="w-2 h-2 rounded-full bg-[#14b8a6] animate-pulse" />
                             <span>Logging Active</span>
                         </span>
                     </div>
                 </div>
 
                 {/* 4 Top KPI Stat Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                     {/* KPI 1: Total Logs */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-[#24dbc3]/50 hover:shadow-[0_10px_35px_rgba(36,219,195,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-[#24dbc3] before:to-[#42f1ce]">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#0f766e] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Total Audit Records
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-[#25dec0] group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <HardDrive className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-[#0f766e] shadow-xs">
+                                <HardDrive className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                                 {counts.total || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-[#24dbc3]/15 text-[#27dec9] border border-[#24dbc3]/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-[#0f766e] border border-teal-200">
                                 System Audit
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Security Trail</span>
-                            <span className="text-[#25dec0] font-mono text-[11px]">{counts.active || 0} active</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Security Trail</span>
+                            <span className="text-[#0f766e] font-mono text-[11px] font-semibold">{counts.active || 0} active</span>
                         </div>
                     </div>
 
                     {/* KPI 2: Active Logs */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-emerald-500/50 hover:shadow-[0_10px_35px_rgba(16,185,129,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-emerald-400 before:to-teal-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Active Audit Logs
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <CheckCircle2 className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-xs">
+                                <CheckCircle2 className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-emerald-400 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-emerald-600 tracking-tight">
                                 {counts.active || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 Live Logs
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Active Session Stream</span>
-                            <span className="text-emerald-400 font-bold text-[11px]">Monitoring</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Active Session Stream</span>
+                            <span className="text-emerald-700 font-bold text-[11px]">Monitoring</span>
                         </div>
                     </div>
 
                     {/* KPI 3: Today's Events */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-sky-500/50 hover:shadow-[0_10px_35px_rgba(56,189,248,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-sky-400 before:to-blue-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-sky-500 transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Today's Actions
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-sky-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Clock className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 shadow-xs">
+                                <Clock className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-sky-400 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-sky-700 tracking-tight">
                                 {counts.today || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                 Past 24h
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Realtime Activity</span>
-                            <span className="text-sky-400 font-bold text-[11px]">Recorded</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Realtime Activity</span>
+                            <span className="text-sky-700 font-bold text-[11px]">Recorded</span>
                         </div>
                     </div>
 
                     {/* KPI 4: Archived Entries */}
-                    <div className="rounded-2xl p-4 sm:p-5 xl:p-6 bg-[#061726]/90 border border-[#1b5361]/60 shadow-[0_10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden group hover:border-amber-500/50 hover:shadow-[0_10px_35px_rgba(245,158,11,0.1)] transition-all duration-300 before:absolute before:top-0 before:inset-x-0 before:h-1 before:bg-gradient-to-r before:from-amber-400 before:to-orange-500">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#f59e0b] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
-                            <span className="text-[10px] xl:text-[11px] font-extrabold text-slate-400 uppercase tracking-wider truncate">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Archived Entries
                             </span>
-                            <div className="w-9 h-9 xl:w-10 xl:h-10 rounded-xl bg-[#082033] border border-[#1e4e5b]/80 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform shadow-inner shrink-0">
-                                <Archive className="w-4 h-4 xl:w-5 xl:h-5" />
+                            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#f59e0b] shadow-xs">
+                                <Archive className="w-5 h-5" />
                             </div>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 flex items-baseline justify-between gap-2 flex-wrap">
-                            <div className="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-amber-400 tracking-wide">
+                        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+                            <div className="text-2xl sm:text-3xl font-black text-[#d97706] tracking-tight">
                                 {counts.archived || 0}
                             </div>
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] xl:text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                                 Archived
                             </span>
                         </div>
 
-                        <div className="mt-3 sm:mt-4 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[10px] xl:text-[11px]">Archived Records</span>
+                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span className="text-slate-500 text-[11px]">Archived Records</span>
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('archived')}
-                                className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
+                                className="text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 text-xs"
                             >
                                 <span>View Archive</span>
-                                <RotateCcw className="w-3.5 h-3.5" />
+                                <RotateCcw className="w-3 h-3" />
                             </button>
                         </div>
                     </div>
                 </div>
 
                 {/* Main Filter and Controls Container */}
-                <div className="relative rounded-2xl sm:rounded-3xl bg-[#061726]/90 border border-[#2c6973]/75 shadow-[0_15px_45px_rgba(0,0,0,0.4)] backdrop-blur-xl p-4 sm:p-6 lg:p-7 overflow-hidden space-y-4">
-                    <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[#18d8c5] via-[#42f1ce] to-[#17c9b9]" />
-
+                <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
                     {/* View Switcher Tabs */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#1b5361]/60">
-                        <div className="flex items-center gap-1.5 bg-[#082033]/90 p-1 rounded-xl border border-[#1e4e5b]/80 text-xs font-semibold">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 text-xs font-semibold">
                             <button
                                 type="button"
                                 onClick={() => handleViewChange('active')}
                                 className={`px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'active'
-                                        ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold shadow-sm'
-                                        : 'text-slate-400 hover:text-white bg-transparent'
+                                        ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 <span>Active Logs</span>
                                 <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    currentView === 'active' ? 'bg-[#031927]/20 text-[#031927]' : 'bg-[#061726] text-slate-300'
+                                    currentView === 'active' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                                 }`}>
                                     {counts.active || 0}
                                 </span>
@@ -285,14 +282,14 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                 onClick={() => handleViewChange('archived')}
                                 className={`px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'archived'
-                                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold shadow-sm'
-                                        : 'text-slate-400 hover:text-white bg-transparent'
+                                        ? 'bg-[#f59e0b] text-slate-900 font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <Archive className="w-3.5 h-3.5" />
                                 <span>Archived</span>
                                 <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    currentView === 'archived' ? 'bg-amber-500/30 text-amber-200' : 'bg-[#061726] text-slate-300'
+                                    currentView === 'archived' ? 'bg-slate-900/10 text-slate-950 font-bold' : 'bg-slate-200 text-slate-700'
                                 }`}>
                                     {counts.archived || 0}
                                 </span>
@@ -302,22 +299,22 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                 onClick={() => handleViewChange('all')}
                                 className={`px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 border-0 cursor-pointer ${
                                     currentView === 'all'
-                                        ? 'bg-white/15 text-white border border-white/25 font-bold shadow-sm'
-                                        : 'text-slate-400 hover:text-white bg-transparent'
+                                        ? 'bg-slate-800 text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <HardDrive className="w-3.5 h-3.5" />
                                 <span>All Logs</span>
                                 <span className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
-                                    currentView === 'all' ? 'bg-white/20 text-white' : 'bg-[#061726] text-slate-300'
+                                    currentView === 'all' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
                                 }`}>
                                     {counts.total || 0}
                                 </span>
                             </button>
                         </div>
 
-                        <div className="text-xs text-slate-400 font-medium">
-                            Displaying <strong className="text-white">{logList.length}</strong> log event(s)
+                        <div className="text-xs text-slate-500 font-medium">
+                            Displaying <strong className="text-slate-900">{logList.length}</strong> log event(s)
                         </div>
                     </div>
 
@@ -330,13 +327,13 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                 placeholder="Search action, administrator, IP address..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full bg-[#082033]/90 border border-[#1e4e5b]/80 rounded-xl pl-10 pr-9 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#24dbc3] focus:ring-1 focus:ring-[#24dbc3] transition-all"
+                                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-9 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all"
                             />
                             {search && (
                                 <button
                                     type="button"
                                     onClick={handleClearSearch}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -344,7 +341,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                         </form>
 
                         {/* Device Filter Buttons */}
-                        <div className="flex items-center gap-1.5 bg-[#082033]/90 p-1 rounded-xl border border-[#1e4e5b]/80 shrink-0">
+                        <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shrink-0">
                             <button
                                 type="button"
                                 onClick={() => {
@@ -352,7 +349,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                     applyFilters({ device: '' });
                                 }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all cursor-pointer ${
-                                    !device ? 'bg-white/15 text-white font-bold border border-white/20' : 'text-slate-400 hover:text-white bg-transparent'
+                                    !device ? 'bg-[#0f766e] text-white font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 All Devices
@@ -365,8 +362,8 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                 }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all flex items-center gap-1 cursor-pointer ${
                                     device === 'Desktop PC'
-                                        ? 'bg-[#24dbc3]/20 text-[#27dec9] font-bold border border-[#24dbc3]/40'
-                                        : 'text-slate-400 hover:text-white bg-transparent'
+                                        ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <Monitor className="w-3.5 h-3.5" />
@@ -380,8 +377,8 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                 }}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-0 transition-all flex items-center gap-1 cursor-pointer ${
                                     device === 'Mobile Phone'
-                                        ? 'bg-[#24dbc3]/20 text-[#27dec9] font-bold border border-[#24dbc3]/40'
-                                        : 'text-slate-400 hover:text-white bg-transparent'
+                                        ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
                                 }`}
                             >
                                 <Smartphone className="w-3.5 h-3.5" />
@@ -391,16 +388,16 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     </div>
 
                     {/* DESKTOP DATA TABLE (md:block) */}
-                    <div className="hidden md:block overflow-x-auto border border-[#1b5361]/60 rounded-xl bg-[#082033]/40">
+                    <div className="hidden md:block overflow-x-auto border border-slate-200/90 rounded-xl bg-white">
                         <table className="w-full text-left border-collapse text-xs min-w-[760px]">
                             <thead>
-                                <tr className="border-b border-[#1b5361]/80 bg-[#082033]/90 text-slate-300 uppercase tracking-wider font-bold text-[11px]">
+                                <tr className="border-b border-slate-200 bg-slate-50 text-slate-700 uppercase tracking-wider font-bold text-[11px]">
                                     <th className="p-3.5 w-12 text-center">
                                         <input
                                             type="checkbox"
                                             checked={logList.length > 0 && selectedIds.length === logList.length}
                                             onChange={handleSelectAll}
-                                            className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3]"
+                                            className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e]"
                                             title="Select all logs"
                                         />
                                     </th>
@@ -413,13 +410,13 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                     <th className="p-3.5 text-right">Status</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#1b5361]/40 text-slate-300">
+                            <tbody className="divide-y divide-slate-100 text-slate-700">
                                 {logList.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="p-12 text-center text-slate-400">
-                                            <ShieldAlert className="w-10 h-10 mx-auto mb-2 text-slate-500 opacity-60" />
-                                            <p className="text-sm font-bold text-white">No activity logs recorded</p>
-                                            <p className="text-xs text-slate-400 mt-1">Try adjusting your filters or search keywords</p>
+                                        <td colSpan={8} className="p-12 text-center text-slate-500">
+                                            <ShieldAlert className="w-10 h-10 mx-auto mb-2 text-slate-400 opacity-60" />
+                                            <p className="text-sm font-bold text-slate-800">No activity logs recorded</p>
+                                            <p className="text-xs text-slate-500 mt-1">Try adjusting your filters or search keywords</p>
                                         </td>
                                     </tr>
                                 ) : (
@@ -438,7 +435,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                             <tr
                                                 key={log.id}
                                                 className={`transition-colors ${
-                                                    isSelected ? 'bg-[#24dbc3]/10' : 'hover:bg-[#082033]/50'
+                                                    isSelected ? 'bg-teal-50/70 border-l-4 border-l-[#0f766e]' : 'hover:bg-slate-50/70'
                                                 }`}
                                             >
                                                 <td className="p-3.5 text-center">
@@ -446,57 +443,57 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                                         type="checkbox"
                                                         checked={isSelected}
                                                         onChange={() => handleToggleSelect(log.id)}
-                                                        className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3]"
+                                                        className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e]"
                                                     />
                                                 </td>
 
-                                                <td className="p-3.5 whitespace-nowrap text-slate-400 font-mono text-[11px]">
+                                                <td className="p-3.5 whitespace-nowrap text-slate-500 font-mono text-[11px]">
                                                     {dateStr}
                                                 </td>
 
                                                 <td className="p-3.5">
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-7 h-7 rounded-lg bg-[#24dbc3]/15 border border-[#24dbc3]/30 text-[#25dec0] flex items-center justify-center font-bold text-xs shrink-0">
+                                                        <div className="w-7 h-7 rounded-lg bg-teal-50 border border-teal-200 text-[#0f766e] flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                                                             {(log.admin_user || 'A').charAt(0).toUpperCase()}
                                                         </div>
-                                                        <span className="font-bold text-white text-xs">
+                                                        <span className="font-bold text-slate-900 text-xs">
                                                             {log.admin_user}
                                                         </span>
                                                     </div>
                                                 </td>
 
                                                 <td className="p-3.5">
-                                                    <span className="px-2.5 py-1 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] border border-[#24dbc3]/25 font-semibold inline-block text-[11px]">
+                                                    <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-[#0f766e] border border-teal-200 font-semibold inline-block text-[11px]">
                                                         {log.action_type}
                                                     </span>
                                                 </td>
 
                                                 <td className="p-3.5">
-                                                    <div className="flex items-center gap-2 text-slate-300">
+                                                    <div className="flex items-center gap-2 text-slate-700">
                                                         <DeviceIcon className="w-4 h-4 text-slate-400 shrink-0" />
                                                         <span>{log.device_type || 'Desktop PC'}</span>
                                                     </div>
                                                 </td>
 
-                                                <td className="p-3.5 max-w-xs truncate text-slate-400 text-[11px]">
+                                                <td className="p-3.5 max-w-xs truncate text-slate-500 text-[11px]">
                                                     {log.os_browser || 'Unknown Client'}
                                                 </td>
 
-                                                <td className="p-3.5 font-mono text-slate-300 text-[11px]">
-                                                    <span className="px-2 py-0.5 rounded bg-[#082033] border border-[#1e4e5b]/80 text-slate-300">
+                                                <td className="p-3.5 font-mono text-slate-700 text-[11px]">
+                                                    <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700">
                                                         {log.ip_address}
                                                     </span>
                                                 </td>
 
                                                 <td className="p-3.5 text-right whitespace-nowrap">
                                                     {log.archived_at ? (
-                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
-                                                            <Archive className="w-3 h-3" />
+                                                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
+                                                            <Archive className="w-3 h-3 text-[#f59e0b]" />
                                                             <span>Archived</span>
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                             <span>{log.status || 'Success'}</span>
                                                         </span>
                                                     )}
@@ -512,9 +509,9 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     {/* MOBILE TOUCH-FRIENDLY CARD VIEW (md:hidden) */}
                     <div className="md:hidden space-y-3">
                         {logList.length === 0 ? (
-                            <div className="p-8 text-center text-slate-400 bg-[#082033]/40 rounded-xl border border-[#1b5361]/60">
+                            <div className="p-8 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-200">
                                 <ShieldAlert className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                                <p className="text-sm font-bold text-white">No logs found</p>
+                                <p className="text-sm font-bold text-slate-800">No logs found</p>
                             </div>
                         ) : (
                             logList.map((log) => {
@@ -533,8 +530,8 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                         key={log.id}
                                         className={`p-4 rounded-xl border transition-all ${
                                             isSelected
-                                                ? 'bg-[#24dbc3]/10 border-[#24dbc3]/50'
-                                                : 'bg-[#082033]/60 border-[#1e4e5b]/60'
+                                                ? 'bg-teal-50/70 border-[#0f766e] shadow-md'
+                                                : 'bg-white border-slate-200/90 shadow-xs'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
@@ -543,42 +540,42 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                                     type="checkbox"
                                                     checked={isSelected}
                                                     onChange={() => handleToggleSelect(log.id)}
-                                                    className="rounded border-[#1e4e5b] bg-[#082033] text-[#24dbc3] focus:ring-[#24dbc3] shrink-0"
+                                                    className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e] shrink-0"
                                                 />
-                                                <span className="px-2.5 py-1 rounded-lg bg-[#24dbc3]/10 text-[#27dec9] border border-[#24dbc3]/25 font-bold text-xs">
+                                                <span className="px-2.5 py-1 rounded-lg bg-teal-50 text-[#0f766e] border border-teal-200 font-bold text-xs">
                                                     {log.action_type}
                                                 </span>
                                             </div>
 
                                             {log.archived_at ? (
-                                                <span className="text-[10px] font-bold text-amber-400">Archived</span>
+                                                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Archived</span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                     {log.status || 'Success'}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-400">
+                                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
                                             <div>
-                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Admin</div>
-                                                <div className="text-white font-medium truncate">{log.admin_user}</div>
+                                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Admin</div>
+                                                <div className="text-slate-900 font-medium truncate">{log.admin_user}</div>
                                             </div>
                                             <div>
-                                                <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Device</div>
-                                                <div className="flex items-center gap-1 text-slate-300 font-medium">
+                                                <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Device</div>
+                                                <div className="flex items-center gap-1 text-slate-700 font-medium">
                                                     <DeviceIcon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                                     <span className="truncate">{log.device_type || 'Desktop PC'}</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="mt-2 text-xs text-slate-400 truncate font-mono text-[11px]">
+                                        <div className="mt-2 text-xs text-slate-500 truncate font-mono text-[11px]">
                                             {log.os_browser || 'Unknown Client'}
                                         </div>
 
-                                        <div className="mt-3 pt-3 border-t border-[#1b5361]/60 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
                                             <span>IP: {log.ip_address}</span>
                                             <span>{dateStr}</span>
                                         </div>
@@ -590,11 +587,11 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
 
                     {/* Pagination */}
                     {logs.links && logs.links.length > 3 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#1b5361]/60 text-xs text-slate-400">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200 text-xs text-slate-500">
                             <div>
-                                Showing <strong className="text-white">{logs.from || 0}</strong> to{' '}
-                                <strong className="text-white">{logs.to || 0}</strong> of{' '}
-                                <strong className="text-white">{logs.total || 0}</strong> entries
+                                Showing <strong className="text-slate-900">{logs.from || 0}</strong> to{' '}
+                                <strong className="text-slate-900">{logs.to || 0}</strong> of{' '}
+                                <strong className="text-slate-900">{logs.total || 0}</strong> entries
                             </div>
                             <div className="flex items-center gap-1">
                                 {logs.links.map((link, idx) => (
@@ -604,8 +601,8 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                         onClick={() => link.url && router.get(link.url, {}, { preserveState: true })}
                                         className={`px-3 py-1.5 rounded-lg font-medium transition-all border-0 cursor-pointer ${
                                             link.active
-                                                ? 'bg-gradient-to-r from-[#24dbc3] to-[#29dfb4] text-[#031927] font-extrabold shadow-sm'
-                                                : 'bg-[#082033] border border-[#1e4e5b]/80 text-slate-300 hover:text-white disabled:opacity-30'
+                                                ? 'bg-[#0f766e] text-white font-bold shadow-xs'
+                                                : 'bg-white border border-slate-200 text-slate-700 hover:text-slate-900 disabled:opacity-30'
                                         }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
@@ -618,9 +615,9 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
 
             {/* FIXED BOTTOM FLOATING BULK ACTIONS TOOLBAR */}
             {selectedIds.length > 0 && (
-                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-[#061726]/95 backdrop-blur-xl border border-[#24dbc3]/40 rounded-2xl p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-slate-900 text-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-4 duration-200">
                     <div className="flex items-center gap-2.5">
-                        <span className="w-7 h-7 rounded-full bg-[#24dbc3] text-[#031927] font-black flex items-center justify-center text-xs shadow-md">
+                        <span className="w-7 h-7 rounded-full bg-[#14b8a6] text-slate-950 font-black flex items-center justify-center text-xs shadow-md">
                             {selectedIds.length}
                         </span>
                         <span className="text-xs sm:text-sm font-bold text-white">
@@ -642,7 +639,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                             <button
                                 type="button"
                                 onClick={handleBulkArchive}
-                                className="bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs border-0 shadow cursor-pointer transition-all"
+                                className="bg-[#f59e0b] hover:bg-amber-600 text-slate-950 font-bold rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-xs border-0 shadow cursor-pointer transition-all"
                             >
                                 <Archive className="w-3.5 h-3.5" />
                                 <span>Archive</span>
@@ -661,7 +658,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                         <button
                             type="button"
                             onClick={() => setSelectedIds([])}
-                            className="bg-[#082033] text-slate-300 hover:text-white rounded-xl px-2.5 py-1.5 text-xs border border-[#1e4e5b]/80 cursor-pointer transition-all"
+                            className="bg-slate-800 text-slate-300 hover:text-white rounded-xl px-2.5 py-1.5 text-xs border border-slate-700 cursor-pointer transition-all"
                         >
                             Cancel
                         </button>

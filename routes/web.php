@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AcademyAuthController;
+use App\Http\Controllers\Admin\AcademyAdminController;
 use App\Http\Controllers\Admin\ActivityLogAdminController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
@@ -63,6 +65,28 @@ Route::get('/flare-test-error', function () {
     throw new \Exception('Infinite System Test Exception: Laravel Flare & Ignition is successfully active and capturing application errors!');
 })->name('flare.test.error');
 
+// Legacy Club Academy Portal & Authentication Routes
+Route::get('/academy-register', [AcademyAuthController::class, 'showRegister'])->name('academy.register');
+Route::post('/academy-register', [AcademyAuthController::class, 'register'])->name('academy.register.submit');
+Route::get('/academy-verify', [AcademyAuthController::class, 'showVerify'])->name('academy.verify');
+Route::get('/academy-login', [AcademyAuthController::class, 'showLogin'])->name('academy.login');
+Route::post('/academy-login', [AcademyAuthController::class, 'login'])->name('academy.login.submit');
+Route::post('/academy-logout', [AcademyAuthController::class, 'logout'])->name('academy.logout');
+
+// Member Protected Portal
+Route::middleware('academy.auth')->group(function () {
+    Route::get('/academy-portal', [AcademyAuthController::class, 'showPortal'])->name('academy.portal');
+    Route::get('/academy-profile', [AcademyAuthController::class, 'showPortal'])->name('academy.profile');
+    Route::post('/academy-profile', [AcademyAuthController::class, 'updateProfile'])->name('academy.profile.update');
+});
+
+// Friendly aliases for requested /infinite-limitless/ paths
+Route::redirect('/infinite-limitless/academy-register', '/academy-register');
+Route::redirect('/infinite-limitless/academy-verify', '/academy-verify');
+Route::redirect('/infinite-limitless/academy-login', '/academy-login');
+Route::redirect('/infinite-limitless/academy-portal', '/academy-portal');
+Route::redirect('/infinite-limitless/admin/verify-academy', '/admin/verify-academy');
+
 // Legacy login redirect
 Route::get('/login', fn () => redirect()->route('admin.login'))->name('login');
 
@@ -114,6 +138,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/world-plan/{registration}/status', [WorldPlanAdminController::class, 'updateStatus'])->name('world-plan.status');
         Route::post('/world-plan/{registration}/send-credentials', [WorldPlanAdminController::class, 'sendCredentials'])->name('world-plan.send-credentials');
         Route::delete('/world-plan/{registration}', [WorldPlanAdminController::class, 'destroy'])->name('world-plan.destroy');
+
+        // Legacy Club Academy Members & Verification
+        Route::get('/verify-academy', [AcademyAdminController::class, 'index'])->name('academy.index');
+        Route::patch('/verify-academy/{member}/status', [AcademyAdminController::class, 'updateStatus'])->name('academy.status');
+        Route::match(['put', 'patch'], '/verify-academy/{member}', [AcademyAdminController::class, 'update'])->name('academy.update');
+        Route::delete('/verify-academy/{member}', [AcademyAdminController::class, 'destroy'])->name('academy.destroy');
+        Route::post('/verify-academy/announcements', [AcademyAdminController::class, 'storeAnnouncement'])->name('academy.announcements.store');
+        Route::patch('/verify-academy/announcements/{announcement}/toggle', [AcademyAdminController::class, 'toggleAnnouncement'])->name('academy.announcements.toggle');
+        Route::delete('/verify-academy/announcements/{announcement}', [AcademyAdminController::class, 'deleteAnnouncement'])->name('academy.announcements.destroy');
 
         // Administrator Users Management & Creation
         Route::get('/admins', [AdminUserController::class, 'index'])->name('admins.index');

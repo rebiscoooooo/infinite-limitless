@@ -60,6 +60,36 @@
     <!-- Original System Stylesheet -->
     <link rel="stylesheet" href="/assets/css/styles.css">
 
+    <!-- Global Clean UI Overrides: Hide Scrollbars, Remove Harsh Button Borders & Underlines -->
+    <style>
+        html, body, *, *::before, *::after {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        ::-webkit-scrollbar,
+        *::-webkit-scrollbar,
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+        }
+        button,
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"] {
+            border-style: none;
+            outline: none;
+        }
+        a, button, span, label, p {
+            text-decoration: none !important;
+        }
+        a:hover, button:hover {
+            text-decoration: none !important;
+        }
+    </style>
+
     <!-- Scripts & Styles with Resilient Fallback -->
     @php
         $viteManifestPath = public_path('build/manifest.json');

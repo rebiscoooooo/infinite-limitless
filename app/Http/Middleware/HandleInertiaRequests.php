@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => Auth::guard('admin')->user()->role,
                     'last_login' => Auth::guard('admin')->user()->last_login,
                 ] : null,
+                'academy' => Auth::guard('academy')->user() ? Auth::guard('academy')->user()->toSharedArray() : null,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
