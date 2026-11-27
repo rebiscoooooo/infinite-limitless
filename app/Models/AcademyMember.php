@@ -73,10 +73,48 @@ class AcademyMember extends Authenticatable
 
         static::creating(function ($member) {
             if (empty($member->member_id)) {
-                $lastId = static::withTrashed()->max('id') ?? 0;
-                $member->member_id = 'LCA-' . str_pad((string) ($lastId + 1), 5, '0', STR_PAD_LEFT);
+                $member->member_id = static::generateMemberIdFromEmail($member->email);
             }
         });
+    }
+
+    /**
+     * Generate a unique uppercase Member ID derived from the email's local part
+     * (everything before "@domain.com"), e.g. "jrsaturno66@gmail.com" -> "JRSATURNO66".
+     */
+    public static function generateMemberIdFromEmail(?string $email, ?int $ignoreId = null): string
+    {
+        $trimmed = trim((string) $email);
+        $localPart = str_contains($trimmed, '@')
+            ? strstr($trimmed, '@', true)
+            : $trimmed;
+
+        $clean = strtoupper(trim((string) $localPart));
+        $clean = preg_replace('/[^A-Z0-9._-]/', '', $clean) ?? '';
+        $clean = trim($clean, '._-');
+
+        if ($clean === '') {
+            $nextNum = (int) (static::withTrashed()->max('id') ?? 0) + 1;
+            $clean = 'MEMBER' . str_pad((string) $nextNum, 5, '0', STR_PAD_LEFT);
+        }
+
+        $maxLen = 30;
+        $base = substr($clean, 0, $maxLen);
+        $candidate = $base;
+        $counter = 2;
+
+        while (
+            static::withTrashed()
+                ->when($ignoreId !== null, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->where('member_id', $candidate)
+                ->exists()
+        ) {
+            $suffix = '-' . $counter;
+            $candidate = substr($base, 0, $maxLen - strlen($suffix)) . $suffix;
+            $counter++;
+        }
+
+        return $candidate;
     }
 
     public function getFullNameAttribute(): string
@@ -181,16 +219,16 @@ class AcademyMember extends Authenticatable
 
         $map = [
             '+63' => ['flag' => '🇵🇭', 'country' => 'Philippines', 'code' => 'PH'],
-            '+1'  => ['flag' => '🇺🇸', 'country' => 'United States', 'code' => 'US'],
+            '+1' => ['flag' => '🇺🇸', 'country' => 'United States', 'code' => 'US'],
             '+44' => ['flag' => '🇬🇧', 'country' => 'United Kingdom', 'code' => 'GB'],
             '+61' => ['flag' => '🇦🇺', 'country' => 'Australia', 'code' => 'AU'],
             '+65' => ['flag' => '🇸🇬', 'country' => 'Singapore', 'code' => 'SG'],
             '+81' => ['flag' => '🇯🇵', 'country' => 'Japan', 'code' => 'JP'],
             '+82' => ['flag' => '🇰🇷', 'country' => 'South Korea', 'code' => 'KR'],
-            '+971'=> ['flag' => '🇦🇪', 'country' => 'United Arab Emirates', 'code' => 'AE'],
-            '+966'=> ['flag' => '🇸🇦', 'country' => 'Saudi Arabia', 'code' => 'SA'],
-            '+852'=> ['flag' => '🇭🇰', 'country' => 'Hong Kong', 'code' => 'HK'],
-            '+886'=> ['flag' => '🇹🇼', 'country' => 'Taiwan', 'code' => 'TW'],
+            '+971' => ['flag' => '🇦🇪', 'country' => 'United Arab Emirates', 'code' => 'AE'],
+            '+966' => ['flag' => '🇸🇦', 'country' => 'Saudi Arabia', 'code' => 'SA'],
+            '+852' => ['flag' => '🇭🇰', 'country' => 'Hong Kong', 'code' => 'HK'],
+            '+886' => ['flag' => '🇹🇼', 'country' => 'Taiwan', 'code' => 'TW'],
             '+60' => ['flag' => '🇲🇾', 'country' => 'Malaysia', 'code' => 'MY'],
             '+62' => ['flag' => '🇮🇩', 'country' => 'Indonesia', 'code' => 'ID'],
             '+66' => ['flag' => '🇹🇭', 'country' => 'Thailand', 'code' => 'TH'],
@@ -201,9 +239,9 @@ class AcademyMember extends Authenticatable
             '+33' => ['flag' => '🇫🇷', 'country' => 'France', 'code' => 'FR'],
             '+39' => ['flag' => '🇮🇹', 'country' => 'Italy', 'code' => 'IT'],
             '+34' => ['flag' => '🇪🇸', 'country' => 'Spain', 'code' => 'ES'],
-            '+226'=> ['flag' => '🇧🇫', 'country' => 'Burkina Faso', 'code' => 'BF'],
-            '+675'=> ['flag' => '🇵🇬', 'country' => 'Papua New Guinea', 'code' => 'PG'],
-            '+234'=> ['flag' => '🇳🇬', 'country' => 'Nigeria', 'code' => 'NG'],
+            '+226' => ['flag' => '🇧🇫', 'country' => 'Burkina Faso', 'code' => 'BF'],
+            '+675' => ['flag' => '🇵🇬', 'country' => 'Papua New Guinea', 'code' => 'PG'],
+            '+234' => ['flag' => '🇳🇬', 'country' => 'Nigeria', 'code' => 'NG'],
             '+27' => ['flag' => '🇿🇦', 'country' => 'South Africa', 'code' => 'ZA'],
             '+55' => ['flag' => '🇧🇷', 'country' => 'Brazil', 'code' => 'BR'],
             '+52' => ['flag' => '🇲🇽', 'country' => 'Mexico', 'code' => 'MX'],
@@ -213,16 +251,16 @@ class AcademyMember extends Authenticatable
             '+46' => ['flag' => '🇸🇪', 'country' => 'Sweden', 'code' => 'SE'],
             '+47' => ['flag' => '🇳🇴', 'country' => 'Norway', 'code' => 'NO'],
             '+45' => ['flag' => '🇩🇰', 'country' => 'Denmark', 'code' => 'DK'],
-            '+353'=> ['flag' => '🇮🇪', 'country' => 'Ireland', 'code' => 'IE'],
-            '+351'=> ['flag' => '🇵🇹', 'country' => 'Portugal', 'code' => 'PT'],
+            '+353' => ['flag' => '🇮🇪', 'country' => 'Ireland', 'code' => 'IE'],
+            '+351' => ['flag' => '🇵🇹', 'country' => 'Portugal', 'code' => 'PT'],
             '+48' => ['flag' => '🇵🇱', 'country' => 'Poland', 'code' => 'PL'],
             '+30' => ['flag' => '🇬🇷', 'country' => 'Greece', 'code' => 'GR'],
             '+90' => ['flag' => '🇹🇷', 'country' => 'Turkey', 'code' => 'TR'],
             '+20' => ['flag' => '🇪🇬', 'country' => 'Egypt', 'code' => 'EG'],
-            '+974'=> ['flag' => '🇶🇦', 'country' => 'Qatar', 'code' => 'QA'],
-            '+965'=> ['flag' => '🇰🇼', 'country' => 'Kuwait', 'code' => 'KW'],
-            '+968'=> ['flag' => '🇴🇲', 'country' => 'Oman', 'code' => 'OM'],
-            '+973'=> ['flag' => '🇧🇭', 'country' => 'Bahrain', 'code' => 'BH'],
+            '+974' => ['flag' => '🇶🇦', 'country' => 'Qatar', 'code' => 'QA'],
+            '+965' => ['flag' => '🇰🇼', 'country' => 'Kuwait', 'code' => 'KW'],
+            '+968' => ['flag' => '🇴🇲', 'country' => 'Oman', 'code' => 'OM'],
+            '+973' => ['flag' => '🇧🇭', 'country' => 'Bahrain', 'code' => 'BH'],
         ];
 
         return $map[$clean] ?? ['flag' => '🌐', 'country' => 'International', 'code' => 'INTL', 'dial' => $clean];
@@ -300,7 +338,7 @@ class AcademyMember extends Authenticatable
         // 2. Active rank requirements grouped by tier
         $activeReqsByTier = AcademyRankRequirement::where('is_active', true)
             ->get(['id', 'rank_tier', 'target_value'])
-            ->groupBy(fn ($r) => strtolower(trim((string) $r->rank_tier)));
+            ->groupBy(fn($r) => strtolower(trim((string) $r->rank_tier)));
 
         // 3. Verified requirement progress records for this member
         $verifiedProgressMap = $this->requirementProgress()
@@ -398,11 +436,11 @@ class AcademyMember extends Authenticatable
     {
         $rank = $this->rank_tier ?? 'Rookie';
         $trainings = AcademyTraining::where(function ($q) use ($rank) {
-                $q->where(function ($sub) use ($rank) {
-                    $sub->where('rank_tier', $rank)
-                        ->whereNull('target_member_id');
-                })->orWhere('target_member_id', $this->id);
-            })
+            $q->where(function ($sub) use ($rank) {
+                $sub->where('rank_tier', $rank)
+                    ->whereNull('target_member_id');
+            })->orWhere('target_member_id', $this->id);
+        })
             ->where('is_published', true)
             ->orderBy('order')
             ->get();

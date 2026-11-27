@@ -90,7 +90,39 @@ class AcademyPortalTest extends TestCase
 
         $member = AcademyMember::where('email', 'alexander.mercer@example.com')->first();
         $this->assertNotNull($member);
-        $this->assertStringStartsWith('LCA-', $member->member_id);
+        $this->assertEquals('ALEXANDER.MERCER', $member->member_id);
+    }
+
+    public function test_member_id_is_generated_from_uppercase_email_prefix_and_handles_collisions(): void
+    {
+        $first = AcademyMember::create([
+            'first_name' => 'Jay-Ar',
+            'last_name' => 'De Guzman',
+            'phone_country_code' => '+63',
+            'phone_number' => '9610308393',
+            'email' => 'jrsaturno66@gmail.com',
+            'password' => 'Secret1234!',
+            'address' => 'Manila',
+            'status' => 'Pending',
+            'rank_tier' => 'Rookie',
+        ]);
+
+        $this->assertEquals('JRSATURNO66', $first->member_id);
+
+        // Second user with identical local part on a different domain receives a unique suffix
+        $second = AcademyMember::create([
+            'first_name' => 'Another',
+            'last_name' => 'User',
+            'phone_country_code' => '+63',
+            'phone_number' => '9610308394',
+            'email' => 'jrsaturno66@yahoo.com',
+            'password' => 'Secret1234!',
+            'address' => 'Manila',
+            'status' => 'Pending',
+            'rank_tier' => 'Rookie',
+        ]);
+
+        $this->assertEquals('JRSATURNO66-2', $second->member_id);
     }
 
     /**

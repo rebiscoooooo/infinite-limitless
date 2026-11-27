@@ -48,10 +48,10 @@ class AcademyAdminController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('member_id', 'like', "%{$search}%")
-                  ->orWhere('phone_number', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('member_id', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%");
             });
         }
 
@@ -77,13 +77,13 @@ class AcademyAdminController extends Controller
         $grouped = AcademyMember::selectRaw('status, rank_tier, COUNT(*) as total')
             ->groupBy('status', 'rank_tier')
             ->get();
-        $countStatus = fn (string $s) => (int) $grouped->where('status', $s)->sum('total');
-        $countTier = fn (string $t) => (int) $grouped->where('status', 'Approved')->where('rank_tier', $t)->sum('total');
+        $countStatus = fn(string $s) => (int) $grouped->where('status', $s)->sum('total');
+        $countTier = fn(string $t) => (int) $grouped->where('status', 'Approved')->where('rank_tier', $t)->sum('total');
 
         // Eligibility scan is expensive (loops every approved member) – cache briefly
         $eligibleCount = Cache::remember('academy_eligible_count', 15, function () {
             return AcademyMember::where('status', 'Approved')->get()
-                ->filter(fn ($m) => $m->progressSnapshot()['promotion']['is_eligible'])
+                ->filter(fn($m) => $m->progressSnapshot()['promotion']['is_eligible'])
                 ->count();
         });
         $pendingReflectionsCount = AcademyTrainingProgress::where('status', 'submitted')->count();
@@ -116,13 +116,13 @@ class AcademyAdminController extends Controller
                 $rank = $training?->rank_tier ?? $member?->rank_tier ?? 'Rookie';
 
                 $levelTrainingIds = AcademyTraining::where(function ($q) use ($rank, $member) {
-                        $q->where(function ($sub) use ($rank) {
-                            $sub->where('rank_tier', $rank)->whereNull('target_member_id');
-                        });
-                        if ($member) {
-                            $q->orWhere('target_member_id', $member->id);
-                        }
-                    })
+                    $q->where(function ($sub) use ($rank) {
+                        $sub->where('rank_tier', $rank)->whereNull('target_member_id');
+                    });
+                    if ($member) {
+                        $q->orWhere('target_member_id', $member->id);
+                    }
+                })
                     ->where('is_published', true)
                     ->orderBy('order')
                     ->orderBy('id')
@@ -605,6 +605,13 @@ class AcademyAdminController extends Controller
         ]);
 
         $previousTier = $member->rank_tier;
+        $previousEmail = strtolower(trim((string) $member->email));
+        $newEmail = strtolower(trim((string) $validated['email']));
+
+        if ($newEmail !== $previousEmail || empty($member->member_id) || str_starts_with(strtoupper((string) $member->member_id), 'LCA-')) {
+            $validated['member_id'] = AcademyMember::generateMemberIdFromEmail($validated['email'], $member->id);
+        }
+
         $member->update($validated);
 
         // If rank tier changed, initialize progression for the new tier while preserving all previous tier progress & points
