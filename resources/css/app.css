@@ -30,9 +30,26 @@
   }
 
   /* Cross-browser touch & interaction polish */
-  a, button, input, select, textarea, label {
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+  }
+
+  /* Hide native Edge/IE/WebKit password reveal & clear icons so only our custom toggle displays */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none !important;
+  }
+
+  input[type="password"]::-webkit-credentials-auto-fill-button,
+  input[type="password"]::-webkit-contacts-auto-fill-button {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   /* Smooth momentum scrolling on iOS Safari for scrollable panels & tables */
@@ -52,7 +69,11 @@
      HIDE SCROLLBAR GLOBALLY IN ALL BROWSERS & CONTAINERS
      Keeps full scrolling functionality without visible bars
      ======================================================== */
-  html, body, *, *::before, *::after {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
@@ -85,10 +106,16 @@
     outline-offset: 2px;
   }
 
-  a, button, span, label, p {
+  a,
+  button,
+  span,
+  label,
+  p {
     text-decoration: none !important;
   }
-  a:hover, button:hover {
+
+  a:hover,
+  button:hover {
     text-decoration: none !important;
   }
 }
@@ -136,8 +163,13 @@
 
 /* Infinite Marquee Animation */
 @keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
@@ -168,6 +200,7 @@
   #mainNav .navbar-collapse:not(.show) {
     display: none !important;
   }
+
   #mainNav .navbar-collapse.show {
     display: block !important;
     visibility: visible !important;
@@ -316,8 +349,8 @@
 }
 
 /* Subtle horizontal row separation inside tables without boxy borders */
-.admin-console tbody tr + tr,
-.academy-console tbody tr + tr {
+.admin-console tbody tr+tr,
+.academy-console tbody tr+tr {
   box-shadow: inset 0 1px 0 0 #f1f5f9;
 }
 
@@ -327,10 +360,10 @@
 }
 
 /* Clean subtle framing ONLY for form inputs, dropdowns, textareas & upload dropzones */
-.admin-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
 .admin-console select,
 .admin-console textarea,
-.academy-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.academy-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
 .academy-console select,
 .academy-console textarea {
   border: 1px solid #e2e8f0 !important;
@@ -367,7 +400,3 @@
 .portal-dropzone {
   border: 1.5px dashed #cbd5e1 !important;
 }
-
-
-
-

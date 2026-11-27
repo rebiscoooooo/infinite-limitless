@@ -666,14 +666,15 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                         value={passwordForm.data.current_password}
                                         onChange={(e) => passwordForm.setData('current_password', e.target.value)}
                                         placeholder="Enter your current password..."
-                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowCurrentPass(!showCurrentPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
+                                        aria-label={showCurrentPass ? 'Hide current password' : 'Show current password'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                     >
-                                        {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showCurrentPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                             </div>
@@ -701,14 +702,15 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                         value={passwordForm.data.password}
                                         onChange={(e) => passwordForm.setData('password', e.target.value)}
                                         placeholder="At least 8 characters..."
-                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowNewPass(!showNewPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
+                                        aria-label={showNewPass ? 'Hide new password' : 'Show new password'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                     >
-                                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showNewPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                             </div>
@@ -726,14 +728,15 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                         value={passwordForm.data.password_confirmation}
                                         onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
                                         placeholder="Re-type new password..."
-                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 focus:border-[#0f766e] rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#0f766e] transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPass(!showConfirmPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 p-0"
+                                        aria-label={showConfirmPass ? 'Hide password confirmation' : 'Show password confirmation'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                     >
-                                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showConfirmPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                             </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import AcademyLayout from '../../Layouts/AcademyLayout';
 import CountryFlag from '../../Components/CountryFlag';
+import ProfilePhotoCropperModal from '../../Components/ProfilePhotoCropperModal';
 import { COUNTRY_DIAL_MAP, getCountryInfo } from '../../Utils/academyBadges';
 import {
     Camera,
@@ -16,6 +17,7 @@ import {
     Globe,
     ShieldCheck,
     X,
+    Crop,
 } from 'lucide-react';
 
 export default function Settings({
@@ -25,6 +27,9 @@ export default function Settings({
 }) {
     const fileInputRef = useRef(null);
     const [photoPreviewUrl, setPhotoPreviewUrl] = useState(null);
+    const [rawPhotoFile, setRawPhotoFile] = useState(null);
+    const [pendingCropFile, setPendingCropFile] = useState(null);
+    const [showCropModal, setShowCropModal] = useState(false);
     const [showCurrentPass, setShowCurrentPass] = useState(false);
     const [showNewPass, setShowNewPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
@@ -67,11 +72,33 @@ export default function Settings({
 
     const handleFileSelect = (e) => {
         const file = e.target.files?.[0] || null;
-        form.setData('profile_picture', file);
+        if (file) {
+            setPendingCropFile(file);
+            setShowCropModal(true);
+        }
+        e.target.value = '';
+    };
+
+    const handleCropApply = (croppedFile) => {
+        if (pendingCropFile) {
+            setRawPhotoFile(pendingCropFile);
+        }
+        form.setData('profile_picture', croppedFile);
+        setShowCropModal(false);
+        setPendingCropFile(null);
+    };
+
+    const handleReopenCrop = () => {
+        const source = rawPhotoFile || form.data.profile_picture;
+        if (!source) return;
+        setPendingCropFile(source);
+        setShowCropModal(true);
     };
 
     const handleClearSelectedPhoto = () => {
         form.setData('profile_picture', null);
+        setRawPhotoFile(null);
+        setPendingCropFile(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
@@ -210,14 +237,39 @@ export default function Settings({
                                             onChange={handleFileSelect}
                                             className="hidden"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] text-xs font-bold cursor-pointer"
-                                        >
-                                            <Camera className="w-4 h-4" />
-                                            <span>{photoPreviewUrl ? 'Choose Different Photo' : 'Change Profile Photo'}</span>
-                                        </button>
+                                        <div className="flex flex-wrap items-center justify-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] text-xs font-bold cursor-pointer border-0"
+                                            >
+                                                <Camera className="w-4 h-4" />
+                                                <span>{photoPreviewUrl ? 'Choose Different Photo' : 'Change Profile Photo'}</span>
+                                            </button>
+                                            {photoPreviewUrl && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleReopenCrop}
+                                                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer border-0"
+                                                >
+                                                    <Crop className="w-3.5 h-3.5 text-[#0f766e]" />
+                                                    <span>Crop / Reposition</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        <ProfilePhotoCropperModal
+                                            isOpen={showCropModal}
+                                            imageFile={pendingCropFile}
+                                            onClose={() => {
+                                                setShowCropModal(false);
+                                                setPendingCropFile(null);
+                                            }}
+                                            onApply={handleCropApply}
+                                            onReplacePhoto={() => fileInputRef.current?.click()}
+                                            title="Crop & Position Profile Photo"
+                                            subtitle="Drag to reposition, zoom to resize, or rotate your portrait."
+                                        />
 
                                         {photoPreviewUrl && (
                                             <p className="text-[11px] font-semibold text-amber-700 mb-0">
@@ -413,15 +465,15 @@ export default function Settings({
                                                     onChange={(e) => form.setData('current_password', e.target.value)}
                                                     placeholder="Enter current password..."
                                                     autoComplete="current-password"
-                                                    className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-10 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
+                                                    className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-11 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowCurrentPass(!showCurrentPass)}
                                                     aria-label={showCurrentPass ? 'Hide current password' : 'Show current password'}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent p-0 cursor-pointer"
+                                                    className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                                 >
-                                                    {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                    {showCurrentPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                                 </button>
                                             </div>
                                         </div>
@@ -438,15 +490,15 @@ export default function Settings({
                                                         onChange={(e) => form.setData('new_password', e.target.value)}
                                                         placeholder="At least 8 characters..."
                                                         autoComplete="new-password"
-                                                        className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-10 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
+                                                        className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-11 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowNewPass(!showNewPass)}
                                                         aria-label={showNewPass ? 'Hide new password' : 'Show new password'}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent p-0 cursor-pointer"
+                                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                                     >
-                                                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                        {showNewPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                                     </button>
                                                 </div>
                                             </div>
@@ -462,15 +514,15 @@ export default function Settings({
                                                         onChange={(e) => form.setData('new_password_confirmation', e.target.value)}
                                                         placeholder="Re-enter new password..."
                                                         autoComplete="new-password"
-                                                        className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-10 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
+                                                        className="w-full h-10 bg-slate-50 rounded-xl pl-3.5 pr-11 text-xs font-mono text-slate-900 placeholder-slate-400 focus:outline-none"
                                                     />
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowConfirmPass(!showConfirmPass)}
                                                         aria-label={showConfirmPass ? 'Hide password confirmation' : 'Show password confirmation'}
-                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent p-0 cursor-pointer"
+                                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                                     >
-                                                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                        {showConfirmPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                                     </button>
                                                 </div>
                                             </div>

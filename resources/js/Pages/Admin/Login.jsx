@@ -171,15 +171,15 @@ export default function Login() {
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full rounded-xl border border-slate-300 bg-slate-50 focus:bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20"
+                                        className="w-full rounded-xl border border-slate-300 bg-slate-50 focus:bg-white py-2.5 pl-10 pr-11 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                        className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 transition-colors hover:text-slate-700 cursor-pointer border-0 bg-transparent outline-none shadow-none"
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 transition-colors hover:text-[#0f766e] cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none"
                                     >
-                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                             </div>

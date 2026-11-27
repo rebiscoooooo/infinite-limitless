@@ -1043,14 +1043,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={createForm.data.password}
                                             onChange={(e) => createForm.setData('password', e.target.value)}
                                             placeholder="••••••••"
-                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-9 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-11 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowCreatePass(!showCreatePass)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
+                                            aria-label={showCreatePass ? 'Hide password' : 'Show password'}
+                                            className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                         >
-                                            {showCreatePass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                            {showCreatePass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                         </button>
                                     </div>
                                     {createForm.errors.password && (
@@ -1063,21 +1064,22 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         Confirm Password <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                        <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                                         <input
                                             type={showCreateConfirmPass ? 'text' : 'password'}
                                             required
                                             value={createForm.data.password_confirmation}
                                             onChange={(e) => createForm.setData('password_confirmation', e.target.value)}
                                             placeholder="••••••••"
-                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-9 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
+                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-11 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e] focus:bg-white"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowCreateConfirmPass(!showCreateConfirmPass)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
+                                            aria-label={showCreateConfirmPass ? 'Hide confirm password' : 'Show confirm password'}
+                                            className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                         >
-                                            {showCreateConfirmPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                            {showCreateConfirmPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                         </button>
                                     </div>
                                 </div>
@@ -1240,14 +1242,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={editForm.data.password}
                                             onChange={(e) => editForm.setData('password', e.target.value)}
                                             placeholder="New Password"
-                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
+                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-10 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowEditPass(!showEditPass)}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
+                                            aria-label={showEditPass ? 'Hide password' : 'Show password'}
+                                            className="absolute inset-y-0 right-1 w-8 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                         >
-                                            {showEditPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                            {showEditPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                     <div className="relative">
@@ -1256,14 +1259,15 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                             value={editForm.data.password_confirmation}
                                             onChange={(e) => editForm.setData('password_confirmation', e.target.value)}
                                             placeholder="Confirm Password"
-                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-8 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
+                                            className="w-full bg-white border border-slate-300 rounded-xl pl-3 pr-10 py-2 text-xs text-slate-900 focus:outline-none focus:border-[#0f766e]"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowEditConfirmPass(!showEditConfirmPass)}
-                                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
+                                            aria-label={showEditConfirmPass ? 'Hide confirm password' : 'Show confirm password'}
+                                            className="absolute inset-y-0 right-1 w-8 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 p-0 cursor-pointer transition-colors"
                                         >
-                                            {showEditConfirmPass ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                            {showEditConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </div>
@@ -1415,15 +1419,16 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={resetPassForm.data.password}
                                         onChange={(e) => resetPassForm.setData('password', e.target.value)}
                                         placeholder="Enter or generate new password..."
-                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowResetPass(!showResetPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0"
+                                        aria-label={showResetPass ? 'Hide password' : 'Show password'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 cursor-pointer p-0 transition-colors"
                                         title={showResetPass ? 'Hide password' : 'Show password'}
                                     >
-                                        {showResetPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showResetPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                                 {resetPassForm.errors.password && (
@@ -1448,15 +1453,16 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                         value={resetPassForm.data.password_confirmation}
                                         onChange={(e) => resetPassForm.setData('password_confirmation', e.target.value)}
                                         placeholder="Confirm new password..."
-                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 focus:bg-white transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowResetConfirmPass(!showResetConfirmPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0"
+                                        aria-label={showResetConfirmPass ? 'Hide password' : 'Show password'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 cursor-pointer p-0 transition-colors"
                                         title={showResetConfirmPass ? 'Hide password' : 'Show password'}
                                     >
-                                        {showResetConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showResetConfirmPass ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                                 {resetPassForm.errors.password_confirmation && (

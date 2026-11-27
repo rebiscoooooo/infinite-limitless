@@ -193,7 +193,7 @@ export default function Login() {
                                     required
                                     autoFocus
                                 />
-                                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                         </div>
 
@@ -209,17 +209,17 @@ export default function Login() {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     placeholder="Enter your account password"
-                                    className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
+                                    className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl pl-10 pr-11 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
                                     required
                                 />
-                                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 cursor-pointer border-0 bg-transparent outline-none shadow-none"
+                                    className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none transition-colors"
                                 >
-                                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                    {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                 </button>
                             </div>
                             {errors.password && <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.password}</p>}

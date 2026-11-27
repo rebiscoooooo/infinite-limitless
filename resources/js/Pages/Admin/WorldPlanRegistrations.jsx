@@ -1340,15 +1340,16 @@ export default function WorldPlanRegistrations({
                                         onChange={(e) => setCredPassword(e.target.value)}
                                         required
                                         placeholder="Type or generate client portal password..."
-                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all font-mono"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-11 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 transition-all font-mono"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowCredPassword(!showCredPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 bg-transparent border-0 cursor-pointer p-0"
+                                        aria-label={showCredPassword ? 'Hide password' : 'Show password'}
+                                        className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] bg-transparent border-0 cursor-pointer p-0 transition-colors"
                                         title={showCredPassword ? 'Hide password' : 'Show password'}
                                     >
-                                        {showCredPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                        {showCredPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                     </button>
                                 </div>
                             </div>

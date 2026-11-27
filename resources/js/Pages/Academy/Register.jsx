@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import ProfilePhotoCropperModal from '../../Components/ProfilePhotoCropperModal';
 import {
     GraduationCap,
     User,
@@ -20,10 +21,14 @@ import {
     CheckCircle2,
     Shield,
     Award,
+    Crop,
 } from 'lucide-react';
 
 export default function Register({ countryCodes = [] }) {
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [rawPhotoFile, setRawPhotoFile] = useState(null);
+    const [pendingCropFile, setPendingCropFile] = useState(null);
+    const [showCropModal, setShowCropModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
@@ -72,16 +77,36 @@ export default function Register({ countryCodes = [] }) {
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
-            setData('profile_picture', file);
-            const objectUrl = URL.createObjectURL(file);
-            setPreviewUrl(objectUrl);
+            setPendingCropFile(file);
+            setShowCropModal(true);
         }
+        // Reset input so re-selecting the same photo triggers onChange cleanly
+        e.target.value = '';
+    };
+
+    const handleCropApply = (croppedFile) => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        if (pendingCropFile) {
+            setRawPhotoFile(pendingCropFile);
+        }
+        setData('profile_picture', croppedFile);
+        setPreviewUrl(URL.createObjectURL(croppedFile));
+        setShowCropModal(false);
+        setPendingCropFile(null);
+    };
+
+    const handleReopenCrop = () => {
+        const source = rawPhotoFile || data.profile_picture;
+        if (!source) return;
+        setPendingCropFile(source);
+        setShowCropModal(true);
     };
 
     const handleRemovePhoto = () => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
         setData('profile_picture', null);
+        setRawPhotoFile(null);
+        setPendingCropFile(null);
         setPreviewUrl(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -246,20 +271,30 @@ export default function Register({ countryCodes = [] }) {
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                                 {/* Preview Circle */}
                                 <div className="relative">
-                                    <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex items-center justify-center overflow-hidden shadow-xs group-hover:border-[#0f766e] transition-all">
+                                    <button
+                                        type="button"
+                                        onClick={() => (previewUrl ? handleReopenCrop() : fileInputRef.current?.click())}
+                                        title={previewUrl ? 'Click to crop or reposition photo' : 'Click to upload profile picture'}
+                                        className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 bg-white flex items-center justify-center overflow-hidden shadow-xs group-hover:border-[#0f766e] transition-all cursor-pointer p-0 relative"
+                                    >
                                         {previewUrl ? (
-                                            <img
-                                                src={previewUrl}
-                                                alt="Preview"
-                                                className="w-full h-full object-cover"
-                                            />
+                                            <>
+                                                <img
+                                                    src={previewUrl}
+                                                    alt="Preview"
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <span className="absolute inset-x-0 bottom-0 bg-slate-900/65 text-white text-[10px] font-bold py-1 flex items-center justify-center gap-1 opacity-0 hover:opacity-100 transition-opacity">
+                                                    <Crop className="w-3 h-3" /> Adjust
+                                                </span>
+                                            </>
                                         ) : (
                                             <div className="flex flex-col items-center text-slate-400">
                                                 <Camera className="w-8 h-8 text-slate-300 mb-1" />
                                                 <span className="text-[11px] font-medium">No photo yet</span>
                                             </div>
                                         )}
-                                    </div>
+                                    </button>
                                     {previewUrl && (
                                         <button
                                             type="button"
@@ -282,16 +317,28 @@ export default function Register({ countryCodes = [] }) {
                                         onChange={handleFileChange}
                                         className="hidden"
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs"
-                                    >
-                                        <Upload className="w-4 h-4" />
-                                        {previewUrl ? 'Change Profile Picture' : 'Upload Profile Picture'}
-                                    </button>
+                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs border-0"
+                                        >
+                                            <Upload className="w-4 h-4" />
+                                            {previewUrl ? 'Change Photo' : 'Upload Profile Picture'}
+                                        </button>
+                                        {previewUrl && (
+                                            <button
+                                                type="button"
+                                                onClick={handleReopenCrop}
+                                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-teal-50 text-[#0f766e] border border-teal-200 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-xs"
+                                            >
+                                                <Crop className="w-3.5 h-3.5" />
+                                                <span>Crop &amp; Reposition</span>
+                                            </button>
+                                        )}
+                                    </div>
                                     <p className="text-[11px] text-slate-500">
-                                        Recommended clear portrait photo (Max 5MB file size).
+                                        Upload a clear portrait photo — you can crop, zoom, rotate, and reposition before submitting.
                                     </p>
                                     {errors.profile_picture && (
                                         <p className="text-xs text-rose-600 font-semibold flex items-center justify-center sm:justify-start gap-1.5 mt-1">
@@ -417,7 +464,7 @@ export default function Register({ countryCodes = [] }) {
                                             className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
                                             required
                                         />
-                                        <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                                        <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                     </div>
                                     {errors.email && <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.email}</p>}
                                 </div>
@@ -457,15 +504,16 @@ export default function Register({ countryCodes = [] }) {
                                             value={data.password}
                                             onChange={(e) => setData('password', e.target.value)}
                                             placeholder="Minimum 8 characters"
-                                            className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
+                                            className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-4 pr-11 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none"
+                                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                            className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none transition-colors"
                                         >
-                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                         </button>
                                     </div>
                                     {errors.password && <p className="text-xs text-rose-600 mt-1 font-semibold">{errors.password}</p>}
@@ -481,15 +529,16 @@ export default function Register({ countryCodes = [] }) {
                                             value={data.password_confirmation}
                                             onChange={(e) => setData('password_confirmation', e.target.value)}
                                             placeholder="Re-enter password"
-                                            className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-4 pr-10 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
+                                            className="w-full bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-4 pr-11 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors outline-none"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none"
+                                            aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                                            className="absolute inset-y-0 right-1.5 w-9 flex items-center justify-center text-slate-400 hover:text-[#0f766e] cursor-pointer border-0 bg-transparent p-0 outline-none shadow-none transition-colors"
                                         >
-                                            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            {showConfirmPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                                         </button>
                                     </div>
                                     {errors.password_confirmation && (
@@ -627,6 +676,20 @@ export default function Register({ countryCodes = [] }) {
                     </form>
                 </div>
             </main>
+
+            {/* Profile Picture Crop, Resize & Reposition Modal */}
+            <ProfilePhotoCropperModal
+                isOpen={showCropModal}
+                imageFile={pendingCropFile}
+                onClose={() => {
+                    setShowCropModal(false);
+                    setPendingCropFile(null);
+                }}
+                onApply={handleCropApply}
+                onReplacePhoto={() => fileInputRef.current?.click()}
+                title="Crop & Position Profile Picture"
+                subtitle="Drag to center your face, zoom to resize, or rotate to fit your official Academy ID."
+            />
 
             {/* Clean White Terms and Conditions Modal */}
             {showTermsModal && (
