@@ -193,7 +193,46 @@ export const RANK_THEMES = {
     },
 };
 
+/**
+ * Rank-based gradient palette (profile hero, commandments, sidebar identity card).
+ * Class strings are written in full so Tailwind can detect them.
+ */
+const RANK_GRADIENTS = {
+    rookie: {
+        heroGradient: 'from-slate-800 via-slate-600 to-zinc-500',
+        softGradient: 'from-slate-100 via-slate-50 to-white',
+        solid: 'bg-slate-700',
+        solidText: 'text-slate-700',
+    },
+    elite: {
+        heroGradient: 'from-blue-800 via-cyan-600 to-sky-500',
+        softGradient: 'from-sky-100 via-cyan-50 to-white',
+        solid: 'bg-blue-600',
+        solidText: 'text-blue-700',
+    },
+    master: {
+        heroGradient: 'from-amber-800 via-amber-600 to-yellow-500',
+        softGradient: 'from-amber-100 via-yellow-50 to-white',
+        solid: 'bg-amber-600',
+        solidText: 'text-amber-700',
+    },
+    'grand master': {
+        heroGradient: 'from-purple-900 via-violet-700 to-fuchsia-500',
+        softGradient: 'from-purple-100 via-fuchsia-50 to-white',
+        solid: 'bg-purple-600',
+        solidText: 'text-purple-700',
+    },
+    legend: {
+        heroGradient: 'from-red-800 via-rose-600 to-amber-500',
+        softGradient: 'from-rose-100 via-amber-50 to-white',
+        solid: 'bg-rose-600',
+        solidText: 'text-rose-700',
+    },
+};
+
 export function getRankTheme(rank = 'Rookie') {
     const key = String(rank).toLowerCase().trim();
-    return RANK_THEMES[key] || RANK_THEMES.rookie;
+    const base = RANK_THEMES[key] || RANK_THEMES.rookie;
+    const gradients = RANK_GRADIENTS[key] || RANK_GRADIENTS.rookie;
+    return { ...base, ...gradients };
 }

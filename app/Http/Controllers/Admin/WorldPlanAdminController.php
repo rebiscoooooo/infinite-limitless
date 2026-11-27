@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RealtimeController;
 use App\Mail\WorldPlanCredentialsMail;
 use App\Mail\WorldPlanStatusUpdatedMail;
 use App\Models\ActivityLog;
@@ -92,6 +93,7 @@ class WorldPlanAdminController extends Controller
 
         $registration->update($updateData);
         Cache::forget('public_executive_tiers_v2');
+        RealtimeController::flushSnapshotCache();
 
         $mailSent = false;
         $mailError = null;
@@ -214,6 +216,7 @@ class WorldPlanAdminController extends Controller
         $name = $registration->full_name;
         $registration->delete();
         Cache::forget('public_executive_tiers_v2');
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
@@ -239,6 +242,8 @@ class WorldPlanAdminController extends Controller
         ]);
 
         $count = WorldPlanRegistration::whereIn('id', $validated['ids'])->update(['archived_at' => now()]);
+        Cache::forget('public_executive_tiers_v2');
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
@@ -264,6 +269,8 @@ class WorldPlanAdminController extends Controller
         ]);
 
         $count = WorldPlanRegistration::whereIn('id', $validated['ids'])->update(['archived_at' => null]);
+        Cache::forget('public_executive_tiers_v2');
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully restored {$count} World Plan registration(s).");
     }
@@ -279,6 +286,8 @@ class WorldPlanAdminController extends Controller
         ]);
 
         $count = WorldPlanRegistration::whereIn('id', $validated['ids'])->delete();
+        Cache::forget('public_executive_tiers_v2');
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',

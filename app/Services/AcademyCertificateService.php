@@ -121,8 +121,8 @@ class AcademyCertificateService
         $member = $certificate->member;
         $rank = $certificate->rank_tier ?? 'Rookie';
 
-        // Load logo as base64 for reliable crisp DomPDF rendering
-        $logoPath = public_path('assets/image/academy/logo-chrome-trimmed.png');
+        // Load new transparent white logo (crisp on dark navy certificate) as base64 for reliable DomPDF rendering
+        $logoPath = public_path('assets/image/academy/logo-white-trimmed.png');
         if (!file_exists($logoPath)) {
             $logoPath = public_path('assets/image/academy/logo-black-trimmed.png');
         }

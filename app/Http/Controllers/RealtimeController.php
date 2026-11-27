@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademyAnnouncement;
 use App\Models\AcademyCertificate;
+use App\Models\AcademyCommandment;
 use App\Models\AcademyMember;
 use App\Models\AcademyMemberRequirementProgress;
 use App\Models\AcademyRankRequirement;
@@ -332,6 +333,17 @@ class RealtimeController extends Controller
             ]));
         }
 
+        // Commandments fingerprint
+        $commandmentsHash = 'none';
+        if (Schema::hasTable('academy_commandments')) {
+            $cmdAgg = AcademyCommandment::selectRaw('COUNT(*) as total, SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_cnt, MAX(updated_at) as max_updated')->first();
+            $commandmentsHash = md5(implode('|', [
+                (int) ($cmdAgg->total ?? 0),
+                (int) ($cmdAgg->active_cnt ?? 0),
+                (string) ($cmdAgg->max_updated ?? ''),
+            ]));
+        }
+
         $masterHash = md5(implode('|', [
             $membersHash,
             $reflectionsHash,
@@ -339,6 +351,7 @@ class RealtimeController extends Controller
             $requirementsHash,
             $announcementsHash,
             $certificatesHash,
+            $commandmentsHash,
         ]));
 
         return [
@@ -363,6 +376,7 @@ class RealtimeController extends Controller
             ],
             'trainings_hash' => $trainingsHash,
             'requirements_hash' => $requirementsHash,
+            'commandments_hash' => $commandmentsHash,
             'announcements' => [
                 'active_count' => $announcementsCount,
                 'latest_id' => $latestAnnouncement?->id,

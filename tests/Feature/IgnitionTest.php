@@ -44,6 +44,9 @@ class IgnitionTest extends TestCase
 
     public function test_app_renders_safely_even_if_vite_manifest_entry_is_missing(): void
     {
+        // Ignore any active local Vite dev server `public/hot` file during automated testing
+        \Illuminate\Support\Facades\Vite::useHotFile(storage_path('framework/testing-no-hot'));
+
         // Public home page rendering should succeed with HTTP 200
         $response = $this->get('/');
         $response->assertStatus(200);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import {
-    Shield,
     Lock,
     User,
     ArrowRight,
@@ -74,18 +73,15 @@ export default function Login() {
             {/* Top Navigation Bar with Live PHT Clock */}
             <header className="w-full bg-white/80 backdrop-blur-md border-b border-slate-200/90 z-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2.5 no-underline group">
-                        <div className="w-9 h-9 rounded-xl bg-[#0f766e] flex items-center justify-center text-white shadow-xs group-hover:bg-[#115e59] transition-colors">
-                            <Shield className="w-5 h-5" />
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-base font-black tracking-tight text-slate-900 font-mono leading-none">
-                                INFINITE<span className="text-[#0f766e]">.</span>
-                            </span>
-                            <span className="text-[10px] font-bold tracking-[0.2em] text-[#0f766e] uppercase">
-                                Executive Console
-                            </span>
-                        </div>
+                    <Link href="/" className="flex flex-col items-start justify-center no-underline group shrink-0">
+                        <img
+                            src="/assets/image/logo.webp"
+                            alt="INFINITE — Live Limitless"
+                            className="h-7 sm:h-8 w-auto object-contain transition-opacity group-hover:opacity-85"
+                        />
+                        <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.22em] text-[#0f766e] uppercase leading-none mt-1">
+                            Executive Console
+                        </span>
                     </Link>
 
                     {/* Live PHT Clock Pill (Reference Style) */}

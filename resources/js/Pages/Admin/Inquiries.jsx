@@ -163,7 +163,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                 {/* 4 HIGH-IMPACT KPI STATS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                     {/* KPI 1: Total Messages */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Total Inquiries
@@ -189,7 +189,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </div>
 
                     {/* KPI 2: Unread Messages */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 border-l-4 border-l-[#f59e0b]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider font-mono truncate">
                                 Unread Attention
@@ -225,7 +225,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </div>
 
                     {/* KPI 3: Active Inbox */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Active Inquiries
@@ -251,7 +251,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </div>
 
                     {/* KPI 4: Archived Inquiries */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 border-l-4 border-l-purple-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#a855f7,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono truncate">
                                 Archived Inquiries

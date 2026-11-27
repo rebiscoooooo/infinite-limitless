@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademyAnnouncement;
 use App\Models\AcademyCertificate;
+use App\Models\AcademyCommandment;
 use App\Models\AcademyMember;
 use App\Models\AcademyMemberRequirementProgress;
 use App\Models\AcademyRankRequirement;
@@ -293,6 +294,8 @@ class AcademyAuthController extends Controller
             $status = $prog ? $prog->status : 'not_started';
             $previousApproved = ($status === 'approved');
 
+            $rawAttachments = is_array($t->attachments) ? $t->attachments : [];
+
             $sequentialTrainings[] = [
                 'id' => $t->id,
                 'order' => $t->order,
@@ -307,6 +310,10 @@ class AcademyAuthController extends Controller
                 'content_tl' => $t->content_tl,
                 'duration_minutes' => $t->duration_minutes,
                 'video_url' => $t->video_url,
+                'attachments_count' => count($rawAttachments),
+                'attachments' => $isUnlocked
+                    ? $t->getFormattedAttachments('academy.trainings.attachments.download')
+                    : [],
                 'reflection_prompt' => $t->getLocalizedPrompt($lang),
                 'reflection_prompt_en' => $t->reflection_prompt_en,
                 'reflection_prompt_tl' => $t->reflection_prompt_tl,
@@ -383,6 +390,7 @@ class AcademyAuthController extends Controller
             'sequentialTrainings' => $this->buildSequentialTrainings($member),
             'certificates' => $this->buildCertificates($member),
             'announcements' => $this->buildAnnouncements(20),
+            'commandmentsByTier' => AcademyCommandment::groupedForPortal(),
         ]));
     }
 
@@ -466,7 +474,9 @@ class AcademyAuthController extends Controller
         $member = Auth::guard('academy')->user()->fresh();
         $shell = $this->buildPortalShell($member, $certService);
 
-        return Inertia::render('Academy/RankMatrix', $shell['props']);
+        return Inertia::render('Academy/RankMatrix', array_merge($shell['props'], [
+            'commandmentsByTier' => AcademyCommandment::groupedForPortal(),
+        ]));
     }
 
     /**
@@ -548,6 +558,86 @@ class AcademyAuthController extends Controller
         RealtimeController::flushAcademyCache();
 
         return back()->with('success', 'Your reflection for "' . $training->getLocalizedTitle($member->preferred_language ?? 'en') . '" has been submitted for administrative review.');
+    }
+
+    /**
+     * Download or inline-preview an attachment belonging to an unlocked training module.
+     */
+    public function downloadTrainingAttachment(Request $request, AcademyTraining $training, string $attachmentId)
+    {
+        /** @var AcademyMember $member */
+        $member = Auth::guard('academy')->user();
+
+        if (!$training->is_published) {
+            abort(403, 'This training module is not available.');
+        }
+
+        // Check if member already completed/approved this training (even from a prior tier)
+        $alreadyApproved = AcademyTrainingProgress::where('member_id', $member->id)
+            ->where('training_id', $training->id)
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$alreadyApproved) {
+            // Verify training belongs to this member (target_member_id or current rank tier)
+            if ($training->target_member_id !== null) {
+                if ((int) $training->target_member_id !== (int) $member->id) {
+                    abort(403, 'This training module is not assigned to your account.');
+                }
+            } elseif ($training->rank_tier !== $member->rank_tier) {
+                abort(403, 'This training does not belong to your current rank curriculum.');
+            }
+
+            // Verify sequential unlock (first module or previous module approved)
+            $orderedTrainings = AcademyTraining::where(function ($q) use ($member) {
+                    $q->where(function ($sub) use ($member) {
+                        $sub->where('rank_tier', $member->rank_tier)
+                            ->whereNull('target_member_id');
+                    })->orWhere('target_member_id', $member->id);
+                })
+                ->where('is_published', true)
+                ->orderBy('order')
+                ->get()
+                ->values();
+
+            $currentIndex = $orderedTrainings->search(fn ($t) => (int) $t->id === (int) $training->id);
+            if ($currentIndex === false) {
+                abort(403, 'This training module is not accessible.');
+            }
+
+            if ($currentIndex > 0) {
+                $prevTraining = $orderedTrainings->get($currentIndex - 1);
+                $prevApproved = $prevTraining && AcademyTrainingProgress::where('member_id', $member->id)
+                    ->where('training_id', $prevTraining->id)
+                    ->where('status', 'approved')
+                    ->exists();
+
+                if (!$prevApproved) {
+                    abort(403, 'This training module is currently locked. Complete and get approval for the previous module first.');
+                }
+            }
+        }
+
+        $attachment = $training->findAttachment($attachmentId);
+        if (!$attachment || empty($attachment['path']) || !Storage::disk('public')->exists($attachment['path'])) {
+            abort(404, 'Attachment not found.');
+        }
+
+        $safeName = str_replace(['"', "\r", "\n"], '', (string) ($attachment['name'] ?? basename($attachment['path'])));
+        $ext = strtolower((string) ($attachment['extension'] ?? pathinfo($safeName, PATHINFO_EXTENSION)));
+        $canPreview = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'], true);
+
+        if ($request->boolean('inline') && $canPreview) {
+            $fullPath = Storage::disk('public')->path($attachment['path']);
+            $mime = !empty($attachment['mime']) ? $attachment['mime'] : (mime_content_type($fullPath) ?: 'application/octet-stream');
+
+            return response()->file($fullPath, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => 'inline; filename="' . $safeName . '"',
+            ]);
+        }
+
+        return Storage::disk('public')->download($attachment['path'], $safeName);
     }
 
     /**
@@ -656,7 +746,7 @@ class AcademyAuthController extends Controller
                 $snap = $m->progressSnapshot();
                 $train = $snap['training'];
                 $reqs = $snap['requirements'];
-                $score = ($train['completed'] * 15) + ($reqs['completed'] * 20) + $reqs['percentage'];
+                $points = $snap['points'];
 
                 return [
                     'id' => $m->id,
@@ -669,29 +759,33 @@ class AcademyAuthController extends Controller
                     'training_completed' => $train['completed'],
                     'training_total' => $train['total'],
                     'training_pct' => $train['percentage'],
+                    'lifetime_trainings_completed' => $points['lifetime_trainings_completed'],
                     'requirements_completed' => $reqs['completed'],
                     'requirements_total' => $reqs['total'],
                     'requirements_pct' => $reqs['percentage'],
-                    'score' => $score,
+                    'lifetime_requirements_completed' => $points['lifetime_requirements_completed'],
+                    'score' => $points['total'],
+                    'previous_tiers_points' => $points['previous_tiers'],
+                    'current_tier_points' => $points['current_tier'],
                 ];
             })->all();
         });
         $mapped = collect($mapped);
 
-        // 1. Overall
+        // 1. Overall (Cumulative lifetime score across all tiers — never resets on promotion)
         $overall = $mapped->sortByDesc('score')->values()->take(10)->map(function ($item, $idx) {
             $item['rank_position'] = $idx + 1;
             return $item;
         });
 
-        // 2. Training Completion
-        $training = $mapped->sortByDesc('training_completed')->values()->take(10)->map(function ($item, $idx) {
+        // 2. Training Completion (Cumulative lifetime approved trainings, tie-break by total score)
+        $training = $mapped->sortByDesc(fn ($item) => ($item['lifetime_trainings_completed'] * 100000) + $item['score'])->values()->take(10)->map(function ($item, $idx) {
             $item['rank_position'] = $idx + 1;
             return $item;
         });
 
-        // 3. Requirements Completion
-        $requirements = $mapped->sortByDesc('requirements_pct')->values()->take(10)->map(function ($item, $idx) {
+        // 3. Requirements Completion (Cumulative lifetime verified requirements, tie-break by % and score)
+        $requirements = $mapped->sortByDesc(fn ($item) => ($item['lifetime_requirements_completed'] * 100000) + ($item['requirements_pct'] * 100) + $item['score'])->values()->take(10)->map(function ($item, $idx) {
             $item['rank_position'] = $idx + 1;
             return $item;
         });
@@ -703,11 +797,26 @@ class AcademyAuthController extends Controller
             return $item;
         });
 
+        // 5. Full ranking per tier — every member can browse the leaderboard of ALL tiers, regardless of own rank
+        $tierNames = ['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'];
+        $tiers = [];
+        $tierCounts = [];
+        foreach ($tierNames as $tierName) {
+            $tierRows = $mapped->filter(fn ($row) => strcasecmp($row['rank_tier'], $tierName) === 0);
+            $tierCounts[$tierName] = $tierRows->count();
+            $tiers[$tierName] = $tierRows->sortByDesc('score')->values()->take(10)->map(function ($item, $idx) {
+                $item['rank_position'] = $idx + 1;
+                return $item;
+            })->values()->all();
+        }
+
         return [
             'overall' => $overall,
             'training' => $training,
             'requirements' => $requirements,
             'rank_based' => $rankBased,
+            'tiers' => $tiers,
+            'tier_counts' => $tierCounts,
             'current_member_rank' => $currentRank,
         ];
     }

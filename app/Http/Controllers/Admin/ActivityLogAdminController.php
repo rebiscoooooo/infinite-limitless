@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RealtimeController;
 use App\Models\ActivityLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,6 +69,7 @@ class ActivityLogAdminController extends Controller
         ]);
 
         $count = ActivityLog::whereIn('id', $validated['ids'])->update(['archived_at' => now()]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully archived {$count} activity audit log(s).");
     }
@@ -83,6 +85,7 @@ class ActivityLogAdminController extends Controller
         ]);
 
         $count = ActivityLog::whereIn('id', $validated['ids'])->update(['archived_at' => null]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully restored {$count} activity audit log(s).");
     }
@@ -98,6 +101,7 @@ class ActivityLogAdminController extends Controller
         ]);
 
         $count = ActivityLog::whereIn('id', $validated['ids'])->delete();
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Permanently deleted {$count} activity audit log(s) from database.");
     }

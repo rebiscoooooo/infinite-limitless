@@ -25,7 +25,7 @@
         <!-- Header Banner with System Palette -->
         <div style="background: radial-gradient(ellipse at 50% 0%, #0d2a45 0%, #061726 100%); padding: 38px 25px; text-align: center; border-bottom: 1px solid rgba(36, 219, 195, 0.2);">
             <div style="margin-bottom: 14px;">
-                <img src="{{ asset('assets/image/academy/logo-chrome-trimmed.png') }}" alt="Legacy Club PH" style="height: 48px; width: auto; display: inline-block;" />
+                <img src="{{ asset('assets/image/academy/logo-white-trimmed.png') }}" alt="Legacy Club PH" style="height: 52px; width: auto; display: inline-block;" />
             </div>
             <div style="font-size: 11px; font-weight: 800; color: #24dbc3; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 6px;">
                 INFINITE &bull; LIVE LIMITLESS
@@ -104,7 +104,7 @@
                             <td style="padding: 7px 0; color: #64748b;">Country:</td>
                             <td style="padding: 7px 0; color: #cbd5e1;">
                                 <span style="font-size: 16px; vertical-align: middle;">{{ $member->country_info['flag'] ?? '🌐' }}</span>
-                                {{ $member->country_info['name'] ?? 'International' }} ({{ $member->phone_country_code }})
+                                {{ $member->country_info['country'] ?? $member->country_info['name'] ?? 'International' }} ({{ $member->phone_country_code }})
                             </td>
                         </tr>
                         <tr>

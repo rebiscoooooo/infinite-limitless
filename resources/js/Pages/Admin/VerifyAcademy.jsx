@@ -36,7 +36,26 @@ import {
     Send,
     Download,
     Upload,
+    ScrollText,
+    Paperclip,
 } from 'lucide-react';
+
+const formatFileSize = (bytes = 0) => {
+    if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(1)} MB`;
+    if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${bytes} B`;
+};
+
+const getAttachmentBadgeStyle = (ext = '') => {
+    const clean = String(ext).toLowerCase();
+    if (clean === 'pdf') return 'bg-rose-50 text-rose-700';
+    if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(clean)) return 'bg-sky-50 text-sky-700';
+    if (['doc', 'docx', 'rtf', 'odt', 'txt'].includes(clean)) return 'bg-blue-50 text-blue-700';
+    if (['xls', 'xlsx', 'csv', 'ods'].includes(clean)) return 'bg-emerald-50 text-emerald-700';
+    if (['ppt', 'pptx', 'odp'].includes(clean)) return 'bg-amber-50 text-amber-700';
+    if (clean === 'zip') return 'bg-violet-50 text-violet-700';
+    return 'bg-slate-100 text-slate-600';
+};
 
 export default function VerifyAcademy({
     members,
@@ -44,12 +63,13 @@ export default function VerifyAcademy({
     pendingReflections = [],
     rankRequirements = [],
     rankTrainings = [],
+    rankCommandments = [],
     announcements = [],
     certificates = [],
     filters = {},
     availableTiers = [],
 }) {
-    const [activeTab, setActiveTab] = useState('members'); // 'members' | 'reflections' | 'requirements' | 'curriculum' | 'announcements' | 'certificates'
+    const [activeTab, setActiveTab] = useState('members'); // 'members' | 'reflections' | 'requirements' | 'curriculum' | 'commandments' | 'announcements' | 'certificates'
     const [searchQuery, setSearchQuery] = useState(filters.q || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
     const [selectedTier, setSelectedTier] = useState(filters.rank_tier || '');
@@ -73,6 +93,9 @@ export default function VerifyAcademy({
     const [editingTraining, setEditingTraining] = useState(null);
     const [showCreateRequirement, setShowCreateRequirement] = useState(false);
     const [editingRequirement, setEditingRequirement] = useState(null);
+    const [showCreateCommandment, setShowCreateCommandment] = useState(false);
+    const [editingCommandment, setEditingCommandment] = useState(null);
+    const [commandmentTierFilter, setCommandmentTierFilter] = useState('All');
 
     // Filter submit
     const handleFilterSubmit = (e) => {
@@ -167,6 +190,8 @@ export default function VerifyAcademy({
         reflection_prompt_en: '',
         reflection_prompt_tl: '',
         is_published: true,
+        attachments: [],
+        remove_attachments: [],
     });
 
     const requirementDefForm = useForm({
@@ -179,6 +204,16 @@ export default function VerifyAcademy({
         target_value: 1,
         unit: 'Personal Sponsors',
         order: 1,
+        is_active: true,
+    });
+
+    const commandmentForm = useForm({
+        rank_tier: 'Rookie',
+        order: 1,
+        title_en: '',
+        title_tl: '',
+        description_en: '',
+        description_tl: '',
         is_active: true,
     });
 
@@ -403,12 +438,13 @@ export default function VerifyAcademy({
             viewMember || approveMember || rejectMember || editMember || deleteMember ||
             promoteMemberModal || reviewReflectionModal || requirementMemberModal ||
             trainingMemberModal || uploadCertificateModal || showCreateAnnouncement ||
-            showCreateTraining || showCreateRequirement
+            showCreateTraining || showCreateRequirement || showCreateCommandment
         );
         if (!hasModal) return;
         const onKeyDown = (e) => {
             if (e.key !== 'Escape') return;
             if (uploadCertificateModal) setUploadCertificateModal(null);
+            else if (showCreateCommandment) { setShowCreateCommandment(false); setEditingCommandment(null); }
             else if (showCreateTraining) { setShowCreateTraining(false); setEditingTraining(null); }
             else if (showCreateRequirement) { setShowCreateRequirement(false); setEditingRequirement(null); }
             else if (showCreateAnnouncement) setShowCreateAnnouncement(false);
@@ -424,7 +460,7 @@ export default function VerifyAcademy({
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [viewMember, approveMember, rejectMember, editMember, deleteMember, promoteMemberModal, reviewReflectionModal, requirementMemberModal, trainingMemberModal, uploadCertificateModal, showCreateAnnouncement, showCreateTraining, showCreateRequirement]);
+    }, [viewMember, approveMember, rejectMember, editMember, deleteMember, promoteMemberModal, reviewReflectionModal, requirementMemberModal, trainingMemberModal, uploadCertificateModal, showCreateAnnouncement, showCreateTraining, showCreateRequirement, showCreateCommandment]);
 
     const handleCertificateUploadSubmit = (e) => {
         e.preventDefault();
@@ -484,6 +520,7 @@ export default function VerifyAcademy({
 
     const openCreateTraining = (targetMember = null) => {
         setEditingTraining(null);
+        trainingForm.clearErrors();
         trainingForm.setData({
             rank_tier: targetMember ? (targetMember.rank_tier || 'Rookie') : 'Rookie',
             target_member_id: targetMember ? targetMember.id : '',
@@ -499,6 +536,8 @@ export default function VerifyAcademy({
             reflection_prompt_en: '',
             reflection_prompt_tl: '',
             is_published: true,
+            attachments: [],
+            remove_attachments: [],
         });
         setShowCreateTraining(true);
     };
@@ -522,6 +561,7 @@ export default function VerifyAcademy({
 
     const openEditTraining = (t) => {
         setEditingTraining(t);
+        trainingForm.clearErrors();
         trainingForm.setData({
             rank_tier: t.rank_tier || 'Rookie',
             target_member_id: t.target_member_id || '',
@@ -537,14 +577,53 @@ export default function VerifyAcademy({
             reflection_prompt_en: t.reflection_prompt_en || '',
             reflection_prompt_tl: t.reflection_prompt_tl || '',
             is_published: t.is_published ?? true,
+            attachments: [],
+            remove_attachments: [],
         });
         setShowCreateTraining(true);
+    };
+
+    const handleTrainingAttachmentsChange = (e) => {
+        const picked = Array.from(e.target.files || []);
+        if (!picked.length) return;
+        const current = Array.isArray(trainingForm.data.attachments) ? trainingForm.data.attachments : [];
+        const existingKeys = new Set(current.map((f) => `${f.name}_${f.size}_${f.lastModified}`));
+        const merged = [...current];
+        picked.forEach((file) => {
+            const key = `${file.name}_${file.size}_${file.lastModified}`;
+            if (!existingKeys.has(key)) {
+                merged.push(file);
+                existingKeys.add(key);
+            }
+        });
+        trainingForm.setData('attachments', merged);
+        e.target.value = '';
+    };
+
+    const removeStagedTrainingAttachment = (index) => {
+        const next = (trainingForm.data.attachments || []).filter((_, i) => i !== index);
+        trainingForm.setData('attachments', next);
+    };
+
+    const toggleRemoveExistingAttachment = (attachmentId) => {
+        const current = trainingForm.data.remove_attachments || [];
+        const exists = current.includes(attachmentId);
+        trainingForm.setData(
+            'remove_attachments',
+            exists ? current.filter((id) => id !== attachmentId) : [...current, attachmentId]
+        );
     };
 
     const handleTrainingSubmit = (e) => {
         e.preventDefault();
         if (editingTraining) {
-            trainingForm.put(`/admin/verify-academy/trainings/${editingTraining.id}`, {
+            trainingForm.transform((data) => ({
+                ...data,
+                is_published: data.is_published ? 1 : 0,
+                _method: 'PUT',
+            }));
+            trainingForm.post(`/admin/verify-academy/trainings/${editingTraining.id}`, {
+                forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => {
                     setShowCreateTraining(false);
@@ -553,7 +632,12 @@ export default function VerifyAcademy({
                 },
             });
         } else {
+            trainingForm.transform((data) => ({
+                ...data,
+                is_published: data.is_published ? 1 : 0,
+            }));
             trainingForm.post('/admin/verify-academy/trainings', {
+                forceFormData: true,
                 preserveScroll: true,
                 onSuccess: () => {
                     setShowCreateTraining(false);
@@ -588,6 +672,75 @@ export default function VerifyAcademy({
     const handleDeleteRequirement = (r) => {
         if (confirm(`Are you sure you want to delete requirement "${r.title_en}" (${r.code})?`)) {
             router.delete(`/admin/verify-academy/requirements/${r.id}`, { preserveScroll: true });
+        }
+    };
+
+    const getNextCommandmentOrder = (tier) => {
+        const tierItems = rankCommandments.filter((c) => c.rank_tier === tier);
+        if (tierItems.length === 0) return 1;
+        return Math.max(...tierItems.map((c) => Number(c.order) || 0)) + 1;
+    };
+
+    const openCreateCommandment = (defaultTier = 'Rookie') => {
+        const tier = defaultTier === 'All' ? 'Rookie' : defaultTier;
+        setEditingCommandment(null);
+        commandmentForm.clearErrors();
+        commandmentForm.setData({
+            rank_tier: tier,
+            order: getNextCommandmentOrder(tier),
+            title_en: '',
+            title_tl: '',
+            description_en: '',
+            description_tl: '',
+            is_active: true,
+        });
+        setShowCreateCommandment(true);
+    };
+
+    const openEditCommandment = (cmd) => {
+        setEditingCommandment(cmd);
+        commandmentForm.clearErrors();
+        commandmentForm.setData({
+            rank_tier: cmd.rank_tier || 'Rookie',
+            order: cmd.order || 1,
+            title_en: cmd.title_en || '',
+            title_tl: cmd.title_tl || '',
+            description_en: cmd.description_en || '',
+            description_tl: cmd.description_tl || '',
+            is_active: cmd.is_active ?? true,
+        });
+        setShowCreateCommandment(true);
+    };
+
+    const handleCommandmentSubmit = (e) => {
+        e.preventDefault();
+        if (editingCommandment) {
+            commandmentForm.put(`/admin/verify-academy/commandments/${editingCommandment.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowCreateCommandment(false);
+                    setEditingCommandment(null);
+                    commandmentForm.reset();
+                },
+            });
+        } else {
+            commandmentForm.post('/admin/verify-academy/commandments', {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowCreateCommandment(false);
+                    commandmentForm.reset();
+                },
+            });
+        }
+    };
+
+    const handleToggleCommandment = (cmd) => {
+        router.patch(`/admin/verify-academy/commandments/${cmd.id}/toggle`, {}, { preserveScroll: true });
+    };
+
+    const handleDeleteCommandment = (cmd) => {
+        if (confirm(`Delete commandment "${cmd.title_en}" from ${cmd.rank_tier} tier?`)) {
+            router.delete(`/admin/verify-academy/commandments/${cmd.id}`, { preserveScroll: true });
         }
     };
 
@@ -762,6 +915,22 @@ export default function VerifyAcademy({
 
                     <button
                         type="button"
+                        onClick={() => setActiveTab('commandments')}
+                        className={`px-4 py-2 rounded-xl transition-all border-0 cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                            activeTab === 'commandments'
+                                ? 'bg-white text-slate-900 shadow-sm'
+                                : 'text-slate-600 hover:text-slate-900 bg-transparent'
+                        }`}
+                    >
+                        <ScrollText className="w-4 h-4 text-indigo-600" />
+                        <span>Tier Commandments</span>
+                        <span className="px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-mono font-bold">
+                            {rankCommandments.length}
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
                         onClick={() => setActiveTab('announcements')}
                         className={`px-4 py-2 rounded-xl transition-all border-0 cursor-pointer flex items-center gap-2 whitespace-nowrap ${
                             activeTab === 'announcements'
@@ -885,7 +1054,7 @@ export default function VerifyAcademy({
                                                                     {m.avatar_url ? (
                                                                         <img src={m.avatar_url} alt={m.full_name} className="w-full h-full object-cover" />
                                                                     ) : (
-                                                                        <img src="/assets/image/academy/logo-black-trimmed.png" alt="LC" className="w-5 h-5 object-contain opacity-40" />
+                                                                        <img src="/assets/image/academy/logo-black-trimmed.png?v=2" alt="LC" className="w-5 h-5 object-contain opacity-40" />
                                                                     )}
                                                                 </div>
                                                                 <div>
@@ -1268,6 +1437,31 @@ export default function VerifyAcademy({
                                         <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 line-clamp-3">
                                             {t.description_en}
                                         </div>
+
+                                        {Array.isArray(t.attachments) && t.attachments.length > 0 && (
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                                                    <Paperclip className="w-3 h-3 text-cyan-600" />
+                                                    <span>{t.attachments.length} {t.attachments.length === 1 ? 'Attachment' : 'Attachments'}</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {t.attachments.map((att) => (
+                                                        <a
+                                                            key={att.id}
+                                                            href={att.download_url}
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-cyan-50 text-slate-700 hover:text-cyan-800 text-[11px] font-medium transition-colors no-underline max-w-full"
+                                                            title={`Download ${att.name} (${att.size_label})`}
+                                                        >
+                                                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase font-mono shrink-0 ${getAttachmentBadgeStyle(att.extension)}`}>
+                                                                {att.extension || 'FILE'}
+                                                            </span>
+                                                            <span className="truncate max-w-[160px]">{att.name}</span>
+                                                            <Download className="w-3 h-3 shrink-0 text-slate-400" />
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-mono">
@@ -1306,6 +1500,198 @@ export default function VerifyAcademy({
                                     </div>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ============================================================== */}
+                {/* TAB 4B: TIER COMMANDMENTS MANAGER */}
+                {/* ============================================================== */}
+                {activeTab === 'commandments' && (
+                    <div className="space-y-6">
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-3">
+                            <div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 font-mono">
+                                    Code of Conduct per Rank Level
+                                </span>
+                                <h3 className="text-lg sm:text-xl font-black text-slate-900 uppercase font-mono mt-0.5">
+                                    Tier Commandments ({rankCommandments.length})
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-1 mb-0">
+                                    Add, edit, hide, or delete commandments for each Academy rank tier. Changes sync to all member portals immediately.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => openCreateCommandment(commandmentTierFilter)}
+                                className="px-4 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold uppercase tracking-wider shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                            >
+                                <Plus className="w-4 h-4" /> Add Commandment
+                            </button>
+                        </div>
+
+                        {/* Tier Filter Pills */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            {['All', 'Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'].map((tierOption) => {
+                                const active = commandmentTierFilter === tierOption;
+                                const tierCount = tierOption === 'All'
+                                    ? rankCommandments.length
+                                    : rankCommandments.filter((c) => c.rank_tier === tierOption).length;
+                                return (
+                                    <button
+                                        key={tierOption}
+                                        type="button"
+                                        onClick={() => setCommandmentTierFilter(tierOption)}
+                                        className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                                            active
+                                                ? 'bg-[#0f766e] text-white shadow-sm'
+                                                : 'bg-white text-slate-600 hover:bg-teal-50 hover:text-[#0f766e]'
+                                        }`}
+                                    >
+                                        <span>{tierOption === 'All' ? 'All Tiers' : tierOption}</span>
+                                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${
+                                            active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                                        }`}>
+                                            {tierCount}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Grouped Tier Lists */}
+                        <div className="space-y-6">
+                            {['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend']
+                                .filter((t) => commandmentTierFilter === 'All' || commandmentTierFilter === t)
+                                .map((tierName) => {
+                                    const tierDetails = getTierDetails(tierName);
+                                    const items = rankCommandments
+                                        .filter((c) => c.rank_tier === tierName)
+                                        .sort((a, b) => (a.order - b.order) || (a.id - b.id));
+
+                                    return (
+                                        <div key={tierName} className="rounded-3xl bg-white p-5 sm:p-6 space-y-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-11 h-11 rounded-2xl bg-slate-50 p-1.5 flex items-center justify-center shrink-0">
+                                                        <img
+                                                            src={tierDetails.badge_image}
+                                                            alt={tierName}
+                                                            className="w-full h-full object-contain"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <h4 className="text-sm sm:text-base font-black text-slate-900 uppercase font-mono mb-0">
+                                                                {tierDetails.name} Tier Commandments
+                                                            </h4>
+                                                            <span className="px-2 py-0.5 rounded-full bg-teal-50 text-[#0f766e] text-[10px] font-mono font-bold">
+                                                                {items.filter((i) => i.is_active).length} Active / {items.length} Total
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-[11px] text-slate-500">{tierDetails.title}</div>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openCreateCommandment(tierName)}
+                                                    className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-[#0f766e] text-xs font-bold flex items-center gap-1.5 cursor-pointer shrink-0"
+                                                >
+                                                    <Plus className="w-3.5 h-3.5" />
+                                                    <span>Add for {tierName}</span>
+                                                </button>
+                                            </div>
+
+                                            {items.length === 0 ? (
+                                                <div className="p-8 rounded-2xl bg-slate-50 text-center space-y-2">
+                                                    <ScrollText className="w-7 h-7 text-slate-300 mx-auto" />
+                                                    <p className="text-xs font-bold text-slate-600 mb-0">
+                                                        No commandments configured for {tierName} yet.
+                                                    </p>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openCreateCommandment(tierName)}
+                                                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0f766e] text-white text-xs font-bold cursor-pointer mt-1"
+                                                    >
+                                                        <Plus className="w-3.5 h-3.5" /> Add First Commandment
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                                                    {items.map((cmd) => (
+                                                        <div
+                                                            key={cmd.id}
+                                                            className={`p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all ${
+                                                                cmd.is_active ? 'bg-slate-50/90' : 'bg-slate-100/70 opacity-70'
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-start gap-3">
+                                                                <span className="w-8 h-8 rounded-xl bg-[#0f766e] text-white font-mono font-black text-xs flex items-center justify-center shrink-0">
+                                                                    #{cmd.order}
+                                                                </span>
+                                                                <div className="min-w-0 flex-1 space-y-1">
+                                                                    <div className="text-sm font-black text-slate-900 leading-snug break-words">
+                                                                        {cmd.title_en}
+                                                                    </div>
+                                                                    {cmd.title_tl && cmd.title_tl !== cmd.title_en && (
+                                                                        <div className="text-[11px] font-semibold text-[#0f766e] italic break-words">
+                                                                            FIL: {cmd.title_tl}
+                                                                        </div>
+                                                                    )}
+                                                                    {cmd.description_en && (
+                                                                        <p className="text-xs text-slate-600 leading-relaxed mb-0 whitespace-pre-line break-words">
+                                                                            {cmd.description_en}
+                                                                        </p>
+                                                                    )}
+                                                                    {cmd.description_tl && cmd.description_tl !== cmd.description_en && (
+                                                                        <p className="text-[11px] text-slate-500 leading-relaxed italic mb-0 whitespace-pre-line break-words">
+                                                                            FIL: {cmd.description_tl}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex items-center justify-between gap-2 pt-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleToggleCommandment(cmd)}
+                                                                    className={`px-3 py-1 rounded-xl text-[11px] font-bold cursor-pointer ${
+                                                                        cmd.is_active
+                                                                            ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+                                                                            : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                                                                    }`}
+                                                                >
+                                                                    {cmd.is_active ? 'Active' : 'Hidden'}
+                                                                </button>
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => openEditCommandment(cmd)}
+                                                                        className="px-2.5 py-1.5 rounded-lg bg-white hover:bg-teal-50 text-slate-600 hover:text-[#0f766e] text-xs font-bold flex items-center gap-1 cursor-pointer shadow-xs"
+                                                                        title="Edit commandment"
+                                                                    >
+                                                                        <Edit className="w-3.5 h-3.5" />
+                                                                        <span>Edit</span>
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleDeleteCommandment(cmd)}
+                                                                        className="p-1.5 rounded-lg bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 cursor-pointer shadow-xs"
+                                                                        title="Delete commandment"
+                                                                        aria-label="Delete commandment"
+                                                                    >
+                                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                         </div>
                     </div>
                 )}
@@ -1544,7 +1930,14 @@ export default function VerifyAcademy({
                         <div className="space-y-3 text-xs">
                             <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                                 <div className="font-bold text-slate-900">{reviewReflectionModal.member_name} ({reviewReflectionModal.member_code})</div>
-                                <div className="text-slate-500 font-mono mt-0.5">Module #{reviewReflectionModal.training_order}: {reviewReflectionModal.training_title}</div>
+                                <div className="text-slate-500 font-mono mt-0.5 flex items-center gap-2 flex-wrap">
+                                    <span>Module #{reviewReflectionModal.training_order}: {reviewReflectionModal.training_title}</span>
+                                    {reviewReflectionModal.is_last_module && (
+                                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase">
+                                            Final Module
+                                        </span>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
@@ -1565,28 +1958,30 @@ export default function VerifyAcademy({
                                 />
                             </div>
 
-                            {/* Option to provide custom edited certificate */}
-                            <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2">
-                                <label className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                                    <Award className="w-4 h-4 text-amber-600 shrink-0" />
-                                    <span>Provide Custom Certificate (Optional - PDF or Image)</span>
-                                </label>
-                                <p className="text-[11px] text-amber-800 leading-relaxed">
-                                    Bago mo i-approve ang huling training ng member, maaari kang mag-attach dito ng iyong in-edit na certificate. Agad itong maico-confer at mai-email sa user pagka-approve!
-                                </p>
-                                <input
-                                    type="file"
-                                    accept=".pdf,.png,.jpg,.jpeg,.webp"
-                                    onChange={(e) => reviewForm.setData('certificate_file', e.target.files?.[0] || null)}
-                                    className="w-full text-xs text-slate-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0f766e] file:text-white file:cursor-pointer"
-                                />
-                                {reviewForm.data.certificate_file && (
-                                    <div className="text-[11px] font-bold text-[#0f766e] flex items-center gap-1.5 pt-1">
-                                        <Check className="w-3.5 h-3.5 shrink-0" />
-                                        <span className="truncate">File attached: {reviewForm.data.certificate_file.name}</span>
-                                    </div>
-                                )}
-                            </div>
+                            {/* Show custom certificate upload ONLY when reviewing the final module of the level */}
+                            {reviewReflectionModal.is_last_module && (
+                                <div className="p-3.5 rounded-2xl bg-amber-50/70 space-y-2">
+                                    <label className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                                        <Award className="w-4 h-4 text-amber-600 shrink-0" />
+                                        <span>Provide Custom Certificate (Optional &mdash; PDF or Image)</span>
+                                    </label>
+                                    <p className="text-[11px] text-amber-800 leading-relaxed mb-0">
+                                        Before approving this member&apos;s final training module for this level, you may attach your customized certificate here. Upon approval, it will be conferred immediately and emailed directly to the member.
+                                    </p>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.png,.jpg,.jpeg,.webp"
+                                        onChange={(e) => reviewForm.setData('certificate_file', e.target.files?.[0] || null)}
+                                        className="w-full text-xs text-slate-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0f766e] file:text-white file:cursor-pointer"
+                                    />
+                                    {reviewForm.data.certificate_file && (
+                                        <div className="text-[11px] font-bold text-[#0f766e] flex items-center gap-1.5 pt-1">
+                                            <Check className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">File attached: {reviewForm.data.certificate_file.name}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="pt-2 flex flex-wrap justify-end gap-2.5 border-t border-slate-100">
                                 <button
@@ -1602,7 +1997,11 @@ export default function VerifyAcademy({
                                     disabled={reviewForm.processing}
                                     className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-black uppercase tracking-wider shadow-sm border-0 cursor-pointer disabled:opacity-50"
                                 >
-                                    {reviewForm.processing ? 'Approving...' : 'Approve & Unlock Next'}
+                                    {reviewForm.processing
+                                        ? 'Approving...'
+                                        : reviewReflectionModal.is_last_module
+                                            ? 'Approve & Complete Level'
+                                            : 'Approve & Unlock Next'}
                                 </button>
                             </div>
                         </form>
@@ -1614,11 +2013,17 @@ export default function VerifyAcademy({
             {/* MODAL: VIEW DETAILS */}
             {/* ============================================================== */}
             {viewMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => setViewMember(null)}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                             <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 uppercase font-mono">
-                                <img src="/assets/image/academy/logo-black-trimmed.png" alt="Legacy Club" className="w-5 h-5 object-contain" />
+                                <img src="/assets/image/academy/logo-black-trimmed.png?v=2" alt="Legacy Club" className="w-5 h-5 object-contain" />
                                 Member Details: {viewMember.full_name}
                             </h3>
                             <button onClick={() => setViewMember(null)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
@@ -1632,7 +2037,7 @@ export default function VerifyAcademy({
                                     {viewMember.avatar_url ? (
                                         <img src={viewMember.avatar_url} alt={viewMember.full_name} className="w-full h-full object-cover" />
                                     ) : (
-                                        <img src="/assets/image/academy/logo-black-trimmed.png" alt="LC" className="w-8 h-8 object-contain opacity-40" />
+                                        <img src="/assets/image/academy/logo-black-trimmed.png?v=2" alt="LC" className="w-8 h-8 object-contain opacity-40" />
                                     )}
                                 </div>
                                 <div>
@@ -1678,8 +2083,14 @@ export default function VerifyAcademy({
             {/* MODAL: APPROVE WITH RANK SELECTION */}
             {/* ============================================================== */}
             {approveMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => { if (!approveForm.processing) setApproveMember(null); }}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-teal-50/50">
                             <div>
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#0f766e] font-mono">Phase 2 Verification</span>
@@ -1990,8 +2401,14 @@ export default function VerifyAcademy({
             {/* MODAL: CREATE / EDIT REQUIREMENT CRITERIA */}
             {/* ============================================================== */}
             {showCreateRequirement && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => { if (!requirementDefForm.processing) { setShowCreateRequirement(false); setEditingRequirement(null); } }}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                             <h3 className="text-base font-bold text-slate-900 uppercase font-mono flex items-center gap-2">
                                 <CheckSquare className="w-5 h-5 text-amber-600" />
@@ -2038,7 +2455,7 @@ export default function VerifyAcademy({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div className="col-span-1">
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Code *</label>
                                     <input
@@ -2156,8 +2573,14 @@ export default function VerifyAcademy({
             {/* MODAL: CREATE / EDIT TRAINING MODULE */}
             {/* ============================================================== */}
             {showCreateTraining && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => { if (!trainingForm.processing) { setShowCreateTraining(false); setEditingTraining(null); } }}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-2xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                             <h3 className="text-base font-bold text-slate-900 uppercase font-mono flex items-center gap-2">
                                 <BookOpen className="w-5 h-5 text-cyan-600" />
@@ -2208,7 +2631,7 @@ export default function VerifyAcademy({
                                 </select>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Rank Tier *</label>
                                     <select
@@ -2249,7 +2672,7 @@ export default function VerifyAcademy({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Title (English) *</label>
                                     <input
@@ -2274,7 +2697,7 @@ export default function VerifyAcademy({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Summary (English)</label>
                                     <textarea
@@ -2319,7 +2742,169 @@ export default function VerifyAcademy({
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Video URL <span className="font-normal text-slate-400">(Optional — YouTube, Vimeo, Google Drive, or MP4)</span>
+                                </label>
+                                <input
+                                    type="url"
+                                    value={trainingForm.data.video_url}
+                                    onChange={(e) => trainingForm.setData('video_url', e.target.value)}
+                                    placeholder="https://www.youtube.com/watch?v=..."
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
+                                />
+                            </div>
+
+                            {/* Training Attachments Uploader & Manager */}
+                            <div className="space-y-2.5">
+                                <div className="flex items-center justify-between gap-2">
+                                    <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                        <Paperclip className="w-3.5 h-3.5 text-cyan-600" />
+                                        <span>Training Materials &amp; Attachments</span>
+                                    </label>
+                                    <span className="text-[10px] font-mono text-slate-400">
+                                        PDF, Images, Docs, Slides, Sheets, ZIP &bull; Max 15 MB/file
+                                    </span>
+                                </div>
+
+                                {/* Existing saved attachments (when editing) */}
+                                {editingTraining && Array.isArray(editingTraining.attachments) && editingTraining.attachments.length > 0 && (
+                                    <div className="space-y-1.5 p-3 rounded-2xl bg-slate-50">
+                                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                                            Current Attached Files ({editingTraining.attachments.length})
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            {editingTraining.attachments.map((att) => {
+                                                const markedForRemoval = (trainingForm.data.remove_attachments || []).includes(att.id);
+                                                return (
+                                                    <div
+                                                        key={att.id}
+                                                        className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white transition-all ${
+                                                            markedForRemoval ? 'opacity-55 bg-rose-50/70' : ''
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase font-mono shrink-0 ${getAttachmentBadgeStyle(att.extension)}`}>
+                                                                {att.extension || 'FILE'}
+                                                            </span>
+                                                            <span className={`text-xs font-semibold truncate ${markedForRemoval ? 'line-through text-rose-700' : 'text-slate-800'}`} title={att.name}>
+                                                                {att.name}
+                                                            </span>
+                                                            <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                                                                ({att.size_label})
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 shrink-0">
+                                                            {att.can_preview && !markedForRemoval && (
+                                                                <a
+                                                                    href={att.preview_url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="p-1.5 rounded-lg text-slate-500 hover:text-cyan-700 hover:bg-cyan-50 transition-colors"
+                                                                    title="Preview file"
+                                                                >
+                                                                    <Eye className="w-3.5 h-3.5" />
+                                                                </a>
+                                                            )}
+                                                            {!markedForRemoval && (
+                                                                <a
+                                                                    href={att.download_url}
+                                                                    className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-colors"
+                                                                    title="Download file"
+                                                                >
+                                                                    <Download className="w-3.5 h-3.5" />
+                                                                </a>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleRemoveExistingAttachment(att.id)}
+                                                                className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border-0 cursor-pointer ${
+                                                                    markedForRemoval
+                                                                        ? 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                                                                        : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                                                                }`}
+                                                            >
+                                                                {markedForRemoval ? 'Undo' : 'Remove'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Dropzone / multi-file picker */}
+                                <label
+                                    htmlFor="training-attachments-input"
+                                    className="portal-dropzone flex flex-col items-center justify-center gap-1.5 p-4 rounded-2xl bg-slate-50/80 hover:bg-cyan-50/40 text-center cursor-pointer transition-colors"
+                                >
+                                    <Upload className="w-5 h-5 text-cyan-600" />
+                                    <span className="text-xs font-bold text-slate-700">
+                                        Click to attach files (you can select multiple files)
+                                    </span>
+                                    <span className="text-[11px] text-slate-500">
+                                        Supported: PDF, JPG, PNG, WebP, GIF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP
+                                    </span>
+                                    <input
+                                        id="training-attachments-input"
+                                        type="file"
+                                        multiple
+                                        accept=".pdf,.jpg,.jpeg,.png,.webp,.gif,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.rtf,.odt,.ods,.odp,.zip"
+                                        onChange={handleTrainingAttachmentsChange}
+                                        className="hidden"
+                                    />
+                                </label>
+
+                                {/* Newly staged files queued for upload */}
+                                {Array.isArray(trainingForm.data.attachments) && trainingForm.data.attachments.length > 0 && (
+                                    <div className="space-y-1.5 p-3 rounded-2xl bg-cyan-50/60">
+                                        <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-800 font-mono">
+                                            Ready to Upload ({trainingForm.data.attachments.length} {trainingForm.data.attachments.length === 1 ? 'file' : 'files'})
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            {trainingForm.data.attachments.map((file, idx) => {
+                                                const ext = file.name.includes('.') ? file.name.split('.').pop() : 'file';
+                                                return (
+                                                    <div key={`${file.name}-${idx}`} className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-white">
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black uppercase font-mono shrink-0 ${getAttachmentBadgeStyle(ext)}`}>
+                                                                {ext}
+                                                            </span>
+                                                            <span className="text-xs font-semibold text-slate-800 truncate" title={file.name}>
+                                                                {file.name}
+                                                            </span>
+                                                            <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                                                                ({formatFileSize(file.size)})
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeStagedTrainingAttachment(idx)}
+                                                            className="p-1 rounded-lg text-slate-400 hover:text-rose-600 bg-transparent border-0 cursor-pointer shrink-0"
+                                                            title="Remove file"
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Display attachment validation errors if any */}
+                                {Object.entries(trainingForm.errors)
+                                    .filter(([key]) => key === 'attachments' || key.startsWith('attachments.'))
+                                    .map(([key, message]) => (
+                                        <p key={key} className="text-xs text-rose-600 font-semibold flex items-center gap-1.5 m-0">
+                                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                            <span>{message}</span>
+                                        </p>
+                                    ))}
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Reflection Prompt (English)</label>
                                     <textarea
@@ -2379,8 +2964,14 @@ export default function VerifyAcademy({
             {/* MODAL: UPDATE MEMBER REQUIREMENT PROGRESS */}
             {/* ============================================================== */}
             {requirementMemberModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => { if (!requirementProgressForm.processing) { setRequirementMemberModal(null); setSelectedRequirement(null); } }}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-amber-50/50">
                             <div>
                                 <span className="text-[10px] font-bold uppercase text-amber-700 font-mono">
@@ -2503,8 +3094,14 @@ export default function VerifyAcademy({
             {/* MODAL: MEMBER TRAININGS ACCREDITATION & GRANT */}
             {/* ============================================================== */}
             {trainingMemberModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => setTrainingMemberModal(null)}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-2xl w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-purple-50/50">
                             <div>
                                 <span className="text-[10px] font-bold uppercase text-purple-700 font-mono">
@@ -2618,6 +3215,188 @@ export default function VerifyAcademy({
                     </div>
                 </div>
             )}
+            {/* ============================================================== */}
+            {/* MODAL: CREATE / EDIT TIER COMMANDMENT */}
+            {/* ============================================================== */}
+            {showCreateCommandment && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => {
+                        if (!commandmentForm.processing) {
+                            setShowCreateCommandment(false);
+                            setEditingCommandment(null);
+                        }
+                    }}
+                >
+                    <div
+                        className="bg-white rounded-3xl max-w-xl w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between pb-3">
+                            <div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 font-mono">
+                                    Tier Commandments Management
+                                </span>
+                                <h3 className="text-base sm:text-lg font-black text-slate-900 uppercase font-mono mt-0.5 mb-0">
+                                    {editingCommandment ? 'Edit Commandment' : 'Add New Commandment'}
+                                </h3>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowCreateCommandment(false);
+                                    setEditingCommandment(null);
+                                }}
+                                aria-label="Close commandment modal"
+                                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 bg-transparent cursor-pointer"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {Object.keys(commandmentForm.errors).length > 0 && (
+                            <div className="p-3 rounded-xl bg-rose-50 text-rose-800 text-xs">
+                                {Object.values(commandmentForm.errors).join(' ')}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleCommandmentSubmit} className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="sm:col-span-2">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Target Rank / Level *
+                                    </label>
+                                    <select
+                                        value={commandmentForm.data.rank_tier}
+                                        onChange={(e) => {
+                                            const nextTier = e.target.value;
+                                            commandmentForm.setData({
+                                                ...commandmentForm.data,
+                                                rank_tier: nextTier,
+                                                order: editingCommandment ? commandmentForm.data.order : getNextCommandmentOrder(nextTier),
+                                            });
+                                        }}
+                                        className="w-full bg-slate-50 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 outline-none"
+                                    >
+                                        <option value="Rookie">Rookie (★)</option>
+                                        <option value="Elite">Elite (★★)</option>
+                                        <option value="Master">Master (★★★)</option>
+                                        <option value="Grand Master">Grand Master (★★★★)</option>
+                                        <option value="Legend">Legend (★★★★★)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Display Order #
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="999"
+                                        value={commandmentForm.data.order}
+                                        onChange={(e) => commandmentForm.setData('order', Number(e.target.value) || 1)}
+                                        className="w-full bg-slate-50 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 outline-none"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Commandment Title (English) *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={commandmentForm.data.title_en}
+                                    onChange={(e) => commandmentForm.setData('title_en', e.target.value)}
+                                    placeholder="e.g. Show Up, Every Time"
+                                    className="w-full bg-slate-50 rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Description / Guidance (English)
+                                </label>
+                                <textarea
+                                    rows="3"
+                                    value={commandmentForm.data.description_en}
+                                    onChange={(e) => commandmentForm.setData('description_en', e.target.value)}
+                                    placeholder="Explain what this commandment expects from members at this rank..."
+                                    className="w-full bg-slate-50 rounded-xl p-3 text-xs text-slate-900 outline-none resize-y"
+                                />
+                            </div>
+
+                            <div className="p-3.5 rounded-2xl bg-slate-50/80 space-y-3">
+                                <div className="text-[11px] font-bold text-slate-500">
+                                    Filipino Translation <span className="font-normal text-slate-400">(Optional — uses English if left blank)</span>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Commandment Title (Filipino)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={commandmentForm.data.title_tl}
+                                        onChange={(e) => commandmentForm.setData('title_tl', e.target.value)}
+                                        placeholder="e.g. Dumalo Palagi"
+                                        className="w-full bg-white rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Description / Guidance (Filipino)
+                                    </label>
+                                    <textarea
+                                        rows="2"
+                                        value={commandmentForm.data.description_tl}
+                                        onChange={(e) => commandmentForm.setData('description_tl', e.target.value)}
+                                        placeholder="Optional Filipino description..."
+                                        className="w-full bg-white rounded-xl p-3 text-xs text-slate-900 outline-none resize-y"
+                                    />
+                                </div>
+                            </div>
+
+                            <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(commandmentForm.data.is_active)}
+                                    onChange={(e) => commandmentForm.setData('is_active', e.target.checked)}
+                                    className="rounded text-[#0f766e]"
+                                />
+                                <span>Active (Visible immediately in the Legacy Member Portal)</span>
+                            </label>
+
+                            <div className="pt-2 flex justify-end gap-2.5">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowCreateCommandment(false);
+                                        setEditingCommandment(null);
+                                    }}
+                                    disabled={commandmentForm.processing}
+                                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={commandmentForm.processing}
+                                    className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-black uppercase tracking-wider shadow-sm cursor-pointer disabled:opacity-50"
+                                >
+                                    {commandmentForm.processing
+                                        ? 'Saving...'
+                                        : editingCommandment
+                                            ? 'Save Changes'
+                                            : 'Add Commandment'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* ============================================================== */}
             {/* MODAL: UPLOAD CUSTOM CERTIFICATE */}
             {/* ============================================================== */}

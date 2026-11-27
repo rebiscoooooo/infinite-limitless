@@ -6,9 +6,9 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -38,15 +38,18 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Always render rich Flare-Ignition error page for unhandled application errors
         $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
-            // Preserve standard redirects for validation and authentication flows
-            if ($e instanceof \Illuminate\Validation\ValidationException ||
+            // Preserve standard redirects, auth, validation, and 4xx HTTP responses (403, 404, 419, 429, etc.)
+            if (
+                $e instanceof \Illuminate\Validation\ValidationException ||
                 $e instanceof \Illuminate\Auth\AuthenticationException ||
-                $e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                $e instanceof \Illuminate\Auth\Access\AuthorizationException ||
+                ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface && $e->getStatusCode() < 500)
+            ) {
                 return null;
             }
 
             // Preserve standard JSON error responses for API calls unless explicit
-            if ($request->expectsJson() && ! $request->has('_ignition') && ! $request->has('flare') && ! $request->has('ignition')) {
+            if ($request->expectsJson() && !$request->has('_ignition') && !$request->has('flare') && !$request->has('ignition')) {
                 return null;
             }
 

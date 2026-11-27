@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import AcademyLayout from '../../Layouts/AcademyLayout';
 import CountryFlag from '../../Components/CountryFlag';
+import CommandmentsPanel from '../../Components/CommandmentsPanel';
 import { getCountryInfo, getTierDetails } from '../../Utils/academyBadges';
 import { getRankTheme } from '../../Utils/academyLang';
 import {
@@ -28,6 +29,7 @@ export default function Profile({
     currentRankRequirements = [],
     sequentialTrainings = [],
     certificates = [],
+    commandmentsByTier = null,
 }) {
     const rankTier = member.rank_tier || 'Rookie';
     const rankTheme = getRankTheme(rankTier);
@@ -104,88 +106,90 @@ export default function Profile({
                         </div>
                     )}
 
-                    {/* HERO PROFILE BANNER */}
-                    <div className="rounded-3xl bg-white p-6 sm:p-8 relative overflow-hidden">
-                        <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left min-w-0">
-                                <div className="relative group shrink-0">
-                                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-slate-100 overflow-hidden flex items-center justify-center shadow-sm">
-                                        {member.avatar_url ? (
-                                            <img
-                                                src={member.avatar_url}
-                                                alt={member.full_name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <User className="w-12 h-12 text-slate-400" />
-                                        )}
-                                    </div>
-                                    <Link
-                                        href="/academy-portal/settings"
-                                        className="absolute -bottom-1.5 -right-1.5 p-2 rounded-xl bg-[#0f766e] text-white hover:bg-[#115e59] transition-transform hover:scale-105 shadow-md"
-                                        title="Update Profile Photo & Settings"
-                                        aria-label="Update Profile Photo"
-                                    >
-                                        <Camera className="w-3.5 h-3.5" />
-                                    </Link>
+                    {/* HERO PROFILE BANNER — rank-based gradient with blended badge */}
+                    <div className={`rounded-3xl bg-gradient-to-br ${rankTheme.heroGradient} p-5 sm:p-8 relative overflow-hidden text-white shadow-[0_14px_36px_rgba(15,23,42,0.18)]`}>
+                        {/* Decorative glow shapes */}
+                        <div className="absolute -right-16 -top-20 w-64 h-64 rounded-full bg-white/10 pointer-events-none" />
+                        <div className="absolute right-24 -bottom-24 w-56 h-56 rounded-full bg-white/10 pointer-events-none" />
+                        <div className="absolute -left-12 -bottom-16 w-44 h-44 rounded-full bg-black/10 pointer-events-none" />
+
+                        {/* Blended Rank Shield Badge — seamlessly merges into the gradient background on mobile & PC */}
+                        <Link
+                            href="/academy-portal/rank-matrix"
+                            title={`${rankTier} — View 5-Tier Rank Matrix`}
+                            aria-label={`${rankTier} — View 5-Tier Rank Matrix`}
+                            className="absolute -right-4 -bottom-4 sm:-right-3 sm:-bottom-6 md:right-3 md:-bottom-8 z-0 pointer-events-none sm:pointer-events-auto select-none transition-all duration-300 no-underline group"
+                        >
+                            <img
+                                src={badgeImage}
+                                alt={rankTier}
+                                className="w-36 sm:w-44 md:w-56 lg:w-64 h-auto object-contain opacity-20 sm:opacity-25 md:opacity-30 group-hover:opacity-45 transition-opacity"
+                                style={{
+                                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0.35) 90%, rgba(0,0,0,0) 100%)',
+                                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 55%, rgba(0,0,0,0.35) 90%, rgba(0,0,0,0) 100%)',
+                                }}
+                            />
+                        </Link>
+
+                        <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left sm:pr-28 md:pr-44 min-w-0">
+                            <div className="relative group shrink-0">
+                                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white/20 overflow-hidden flex items-center justify-center shadow-lg ring-4 ring-white/40">
+                                    {member.avatar_url ? (
+                                        <img
+                                            src={member.avatar_url}
+                                            alt={member.full_name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <User className="w-12 h-12 text-white/80" />
+                                    )}
                                 </div>
-
-                                <div className="space-y-2 min-w-0">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-[#0f766e] font-mono text-[11px] font-bold uppercase tracking-wider">
-                                        <Shield className="w-3 h-3" />
-                                        <span>{t('member_id')}: {member.member_id}</span>
-                                    </div>
-
-                                    <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 uppercase tracking-tight mb-0 break-words">
-                                        {member.full_name}
-                                    </h2>
-
-                                    {/* Colorful Country Flag directly below Name */}
-                                    <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap pt-0.5">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100/90">
-                                            <CountryFlag
-                                                code={countryInfo.code}
-                                                flag={countryInfo.flag}
-                                                country={countryInfo.country}
-                                                className="w-5 h-3.5"
-                                            />
-                                            <span className="text-xs font-bold text-slate-800">{countryInfo.country}</span>
-                                            <span className="text-[11px] font-mono font-bold text-[#0f766e]">({member.phone_country_code || '+63'})</span>
-                                        </div>
-                                        <span className="text-xs text-slate-500 font-medium">{t('verified_member')}</span>
-                                    </div>
-
-                                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
-                                        <span className="flex items-center gap-1.5 break-all">
-                                            <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span className="font-mono">{member.email}</span>
-                                        </span>
-                                        <span className="flex items-center gap-1.5">
-                                            <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                                            <span className="font-mono">{member.phone_country_code} {member.phone_number}</span>
-                                        </span>
-                                    </div>
-                                </div>
+                                <Link
+                                    href="/academy-portal/settings"
+                                    className="absolute -bottom-1.5 -right-1.5 p-2 rounded-xl bg-white text-[#0f766e] hover:bg-teal-50 transition-transform hover:scale-105 shadow-md"
+                                    title="Update Profile Photo & Settings"
+                                    aria-label="Update Profile Photo"
+                                >
+                                    <Camera className="w-3.5 h-3.5" />
+                                </Link>
                             </div>
 
-                            {/* Rank Shield Thumbnail -> Links to 5-Tier Rank Matrix page */}
-                            <Link
-                                href="/academy-portal/rank-matrix"
-                                title="View 5-Tier Rank Matrix"
-                                className="shrink-0 flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50/90 hover:bg-teal-50/70 transition-all no-underline group"
-                            >
-                                <img
-                                    src={badgeImage}
-                                    alt={rankTier}
-                                    className="w-16 h-auto object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform"
-                                />
-                                <span className="font-mono font-black text-xs text-slate-900 uppercase mt-1.5">
-                                    {rankTier}
-                                </span>
-                                <span className="text-amber-500 text-[10px] tracking-widest mt-0.5">
-                                    {member.rank_details?.stars_display || '★'}
-                                </span>
-                            </Link>
+                            <div className="space-y-2 min-w-0">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white font-mono text-[11px] font-bold uppercase tracking-wider">
+                                    <Shield className="w-3 h-3" />
+                                    <span>{t('member_id')}: {member.member_id}</span>
+                                </div>
+
+                                <h2 className="text-2xl sm:text-3xl font-extrabold text-white uppercase tracking-tight mb-0 break-words drop-shadow-sm">
+                                    {member.full_name}
+                                </h2>
+
+                                {/* Colorful Country Flag directly below Name */}
+                                <div className="flex items-center justify-center sm:justify-start gap-2.5 flex-wrap pt-0.5">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/95 shadow-sm">
+                                        <CountryFlag
+                                            code={countryInfo.code}
+                                            flag={countryInfo.flag}
+                                            country={countryInfo.country}
+                                            className="w-5 h-3.5"
+                                        />
+                                        <span className="text-xs font-bold text-slate-800">{countryInfo.country}</span>
+                                        <span className="text-[11px] font-mono font-bold text-[#0f766e]">({member.phone_country_code || '+63'})</span>
+                                    </div>
+                                    <span className="text-xs text-white/85 font-semibold">{t('verified_member')}</span>
+                                </div>
+
+                                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-white/90 pt-1">
+                                    <span className="flex items-center gap-1.5 break-all">
+                                        <Mail className="w-3.5 h-3.5 text-white/70 shrink-0" />
+                                        <span className="font-mono">{member.email}</span>
+                                    </span>
+                                    <span className="flex items-center gap-1.5">
+                                        <Phone className="w-3.5 h-3.5 text-white/70 shrink-0" />
+                                        <span className="font-mono">{member.phone_country_code} {member.phone_number}</span>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -438,6 +442,23 @@ export default function Profile({
                         </div>
                     </div>
 
+                    {/* RANK COMMANDMENTS (based on member's current tier — admin-entered only) */}
+                    <CommandmentsPanel
+                        tier={rankTier}
+                        lang={lang}
+                        isCurrent
+                        items={commandmentsByTier?.[rankTier] ?? []}
+                    />
+                    <div className="flex justify-end -mt-3">
+                        <Link
+                            href="/academy-portal/rank-matrix"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0f766e] hover:text-[#115e59] no-underline"
+                        >
+                            <span>{lang === 'tl' ? 'Tingnan ang utos ng ibang antas' : 'View commandments of other tiers'}</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                    </div>
+
                     {/* OFFICIAL RANK DESIGNATION & IDENTITY MATRIX */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         <div className="lg:col-span-5">
@@ -446,7 +467,7 @@ export default function Profile({
                                     OFFICIAL ACADEMY DESIGNATION
                                 </div>
 
-                                <div className="my-2 flex flex-col items-center justify-center p-5 rounded-2xl bg-slate-50/80">
+                                <div className={`my-2 flex flex-col items-center justify-center p-5 rounded-2xl bg-gradient-to-br ${rankTheme.softGradient}`}>
                                     <img
                                         src={badgeImage}
                                         alt={`${rankTier} Tier Badge`}

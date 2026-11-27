@@ -4,6 +4,8 @@ import CountryFlag from '../../Components/CountryFlag';
 import { getCountryInfo, getTierDetails } from '../../Utils/academyBadges';
 import { Trophy, Medal, Flame, BookOpen, CheckSquare, Users, Sparkles } from 'lucide-react';
 
+const TIER_ORDER = ['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'];
+
 export default function Leaderboards({
     member,
     portalCounts = {},
@@ -13,7 +15,15 @@ export default function Leaderboards({
     const [category, setCategory] = useState('overall');
 
     const rankTier = leaderboards.current_member_rank || member?.rank_tier || 'Rookie';
-    const currentRows = Array.isArray(leaderboards[category]) ? leaderboards[category] : [];
+    const isTierView = category.startsWith('tier:');
+    const activeTierName = isTierView ? category.slice(5) : null;
+    const activeTierDetails = activeTierName ? getTierDetails(activeTierName) : null;
+    const tierCounts = leaderboards.tier_counts || {};
+
+    const rawRows = isTierView
+        ? leaderboards.tiers?.[activeTierName]
+        : leaderboards[category];
+    const currentRows = Array.isArray(rawRows) ? rawRows : [];
     const topThree = currentRows.slice(0, 3);
 
     const podiumThemes = [
@@ -47,10 +57,9 @@ export default function Leaderboards({
         >
             {({ t }) => {
                 const categories = [
-                    { key: 'overall', label: t('leaderboard_overall'), icon: Trophy },
+                    { key: 'overall', label: `${t('leaderboard_overall')} (All Tiers)`, icon: Trophy },
                     { key: 'training', label: t('leaderboard_training'), icon: BookOpen },
                     { key: 'requirements', label: t('leaderboard_requirements'), icon: CheckSquare },
-                    { key: 'rank_based', label: `${t('leaderboard_rank')} (${rankTier})`, icon: Users },
                 ];
 
                 return (
@@ -67,12 +76,17 @@ export default function Leaderboards({
                                         {t('leaderboard')}
                                     </h2>
                                     <p className="text-xs text-slate-500 mt-1 max-w-2xl leading-relaxed mb-0">
-                                        Rankings are computed strictly from administrator-approved sequential training reflections and verified rank requirements.
+                                        Rankings are computed from cumulative lifetime points earned across all your completed tiers. Points carry over automatically when you get promoted and continue growing with every new milestone.
                                     </p>
                                 </div>
-                                <span className="px-3.5 py-1.5 rounded-full bg-teal-50 text-[#0f766e] text-xs font-mono font-bold shrink-0">
-                                    Your Tier: {rankTier}
-                                </span>
+                                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                                    <span className="px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-mono font-bold">
+                                        Total Score: {member?.total_points ?? 0} pts
+                                    </span>
+                                    <span className="px-3.5 py-1.5 rounded-full bg-teal-50 text-[#0f766e] text-xs font-mono font-bold">
+                                        Your Tier: {rankTier}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Category Switcher Pills */}
@@ -96,6 +110,56 @@ export default function Leaderboards({
                                         </button>
                                     );
                                 })}
+                            </div>
+
+                            {/* Browse the full ranking of EVERY tier — visible to all members regardless of own rank */}
+                            <div className="pt-2 space-y-2.5">
+                                <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                                    <Users className="w-3.5 h-3.5" />
+                                    <span>Browse Ranking by Tier</span>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+                                    {TIER_ORDER.map((tierName) => {
+                                        const details = getTierDetails(tierName);
+                                        const key = `tier:${tierName}`;
+                                        const active = category === key;
+                                        const isMine = rankTier.toLowerCase() === tierName.toLowerCase();
+                                        const count = tierCounts[tierName] ?? 0;
+                                        return (
+                                            <button
+                                                key={tierName}
+                                                type="button"
+                                                onClick={() => setCategory(key)}
+                                                className={`relative p-3 rounded-2xl flex items-center gap-2.5 text-left transition-all cursor-pointer ${
+                                                    active
+                                                        ? 'bg-[#0f766e] text-white shadow-md'
+                                                        : 'bg-slate-50 hover:bg-teal-50 text-slate-700'
+                                                }`}
+                                            >
+                                                <img
+                                                    src={details.badge_image}
+                                                    alt={tierName}
+                                                    className="w-9 h-9 object-contain shrink-0 drop-shadow-sm"
+                                                />
+                                                <div className="min-w-0">
+                                                    <div className="text-xs font-black uppercase font-mono truncate">
+                                                        {details.name}
+                                                    </div>
+                                                    <div className={`text-[10px] font-semibold ${active ? 'text-white/80' : 'text-slate-400'}`}>
+                                                        {count} {count === 1 ? 'member' : 'members'}
+                                                    </div>
+                                                </div>
+                                                {isMine && (
+                                                    <span className={`absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full text-[8px] font-mono font-black uppercase ${
+                                                        active ? 'bg-white/25 text-white' : 'bg-teal-100 text-[#0f766e]'
+                                                    }`}>
+                                                        You
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
 
@@ -192,9 +256,15 @@ export default function Leaderboards({
                         <div className="rounded-3xl bg-white overflow-hidden">
                             <div className="p-5 sm:p-6 flex items-center justify-between gap-3 flex-wrap">
                                 <div className="flex items-center gap-2">
-                                    <Sparkles className="w-4 h-4 text-[#0f766e]" />
+                                    {isTierView && activeTierDetails ? (
+                                        <img src={activeTierDetails.badge_image} alt="" className="w-6 h-6 object-contain" />
+                                    ) : (
+                                        <Sparkles className="w-4 h-4 text-[#0f766e]" />
+                                    )}
                                     <h3 className="text-sm font-black text-slate-900 uppercase font-mono mb-0">
-                                        Top {currentRows.length} Performers
+                                        {isTierView
+                                            ? `${activeTierDetails?.name} Tier — Top ${currentRows.length}`
+                                            : `Top ${currentRows.length} Performers`}
                                     </h3>
                                 </div>
                                 <span className="text-[11px] font-mono text-slate-400">
@@ -207,7 +277,9 @@ export default function Leaderboards({
                                     <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
                                         <Trophy className="w-7 h-7" />
                                     </div>
-                                    <p className="text-sm font-bold text-slate-700 mb-0">No Leaderboard Entries Yet</p>
+                                    <p className="text-sm font-bold text-slate-700 mb-0">
+                                        {isTierView ? `No ${activeTierDetails?.name} Members Ranked Yet` : 'No Leaderboard Entries Yet'}
+                                    </p>
                                     <p className="text-xs text-slate-500 max-w-md mx-auto mb-0">
                                         Approved members with verified trainings and rank requirements will appear here automatically.
                                     </p>
@@ -323,9 +395,16 @@ export default function Leaderboards({
                                                             </div>
                                                         </td>
                                                         <td className="py-3.5 px-5 text-right">
-                                                            <span className="inline-flex items-center px-3 py-1 rounded-xl bg-teal-50 text-[#0f766e] text-xs font-black font-mono">
-                                                                {row.score} pts
-                                                            </span>
+                                                            <div className="inline-flex flex-col items-end">
+                                                                <span className="inline-flex items-center px-3 py-1 rounded-xl bg-teal-50 text-[#0f766e] text-xs font-black font-mono">
+                                                                    {row.score} pts
+                                                                </span>
+                                                                {row.previous_tiers_points > 0 && (
+                                                                    <span className="text-[10px] font-mono text-slate-400 mt-0.5">
+                                                                        {row.previous_tiers_points} carried + {row.current_tier_points} tier
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 );

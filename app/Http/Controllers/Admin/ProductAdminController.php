@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RealtimeController;
 use App\Models\ActivityLog;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
@@ -180,6 +181,8 @@ class ProductAdminController extends Controller
             'created_at' => now(),
         ]);
 
+        RealtimeController::flushSnapshotCache();
+
         return back()->with('success', "Product '{$product->name}' created successfully!");
     }
 
@@ -269,6 +272,8 @@ class ProductAdminController extends Controller
             'created_at' => now(),
         ]);
 
+        RealtimeController::flushSnapshotCache();
+
         return back()->with('success', "Product '{$product->name}' updated successfully!");
     }
 
@@ -290,6 +295,8 @@ class ProductAdminController extends Controller
             'created_at' => now(),
         ]);
 
+        RealtimeController::flushSnapshotCache();
+
         return back()->with('success', "Product '{$name}' permanently deleted.");
     }
 
@@ -299,6 +306,7 @@ class ProductAdminController extends Controller
     public function toggleStatus(Product $product): RedirectResponse
     {
         $product->update(['is_active' => !$product->is_active]);
+        RealtimeController::flushSnapshotCache();
         $statusStr = $product->is_active ? 'Active' : 'Inactive';
 
         return back()->with('success', "Product '{$product->name}' status changed to {$statusStr}.");
@@ -315,6 +323,7 @@ class ProductAdminController extends Controller
         ]);
 
         $count = Product::whereIn('id', $validated['ids'])->update(['archived_at' => now()]);
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Administrator',
@@ -340,6 +349,7 @@ class ProductAdminController extends Controller
         ]);
 
         $count = Product::whereIn('id', $validated['ids'])->update(['archived_at' => null]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully restored {$count} product(s).");
     }
@@ -355,6 +365,7 @@ class ProductAdminController extends Controller
         ]);
 
         $count = Product::whereIn('id', $validated['ids'])->delete();
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Administrator',

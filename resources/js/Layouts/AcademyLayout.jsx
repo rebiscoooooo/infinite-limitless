@@ -288,15 +288,12 @@ export default function AcademyLayout({
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <Link href="/" onClick={resetAnnouncementPopup} className="flex items-center gap-2.5 no-underline group shrink-0">
                             <img
-                                src="/assets/image/academy/logo-black-trimmed.png"
+                                src="/assets/image/academy/logo-black-trimmed.png?v=2"
                                 alt="Legacy Club PH"
-                                className="h-8 sm:h-10 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
+                                className="h-10 sm:h-12 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
                             />
                             <div className="hidden sm:block">
-                                <span className="text-sm font-black tracking-wider text-slate-900 block leading-tight font-mono">
-                                    LEGACY CLUB
-                                </span>
-                                <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#0f766e] block">
+                                <span className="text-sm font-black tracking-[0.25em] text-[#0f766e] block leading-tight font-mono">
                                     ACADEMY
                                 </span>
                             </div>
@@ -424,7 +421,7 @@ export default function AcademyLayout({
                 <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white p-4 xl:p-5 justify-between shrink-0 h-[calc(100dvh-5rem)] sticky top-20 z-20 overflow-y-auto shadow-[2px_0_16px_rgba(15,23,42,0.03)]">
                     <div className="space-y-6">
                         {/* Clean Borderless Member Identity Card */}
-                        <div className={`rounded-2xl p-4 ${rankTheme.accentBg || 'bg-slate-50'} space-y-3`}>
+                        <div className={`rounded-2xl p-4 bg-gradient-to-br ${rankTheme.softGradient} space-y-3`}>
                             <div className="space-y-1.5">
                                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-tight truncate mb-0">
                                     {member?.full_name}
@@ -531,9 +528,9 @@ export default function AcademyLayout({
                                 <div className="flex items-center justify-between pb-3">
                                     <div className="flex items-center gap-2 min-w-0">
                                         <img
-                                            src="/assets/image/academy/logo-black-trimmed.png"
+                                            src="/assets/image/academy/logo-black-trimmed.png?v=2"
                                             alt="Legacy Club PH"
-                                            className="h-8 w-auto object-contain shrink-0"
+                                            className="h-10 w-auto object-contain shrink-0"
                                         />
                                         <span className="font-mono font-bold text-xs text-slate-900 uppercase truncate">
                                             {t('portal_title')}
@@ -549,7 +546,7 @@ export default function AcademyLayout({
                                     </button>
                                 </div>
 
-                                <div className={`rounded-2xl p-3.5 ${rankTheme.accentBg || 'bg-slate-50'} space-y-1.5`}>
+                                <div className={`rounded-2xl p-3.5 bg-gradient-to-br ${rankTheme.softGradient} space-y-1.5`}>
                                     <div className="text-xs font-bold text-slate-900 truncate">{member?.full_name}</div>
                                     <div className="flex items-center gap-1.5 flex-wrap">
                                         <CountryFlag
@@ -650,28 +647,28 @@ export default function AcademyLayout({
             {/* AUTO-POPUP FOR ACTIVE ANNOUNCEMENTS ON PORTAL OPEN & RELOAD */}
             {activePopup && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/55 backdrop-blur-xs"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 lg:p-8 bg-slate-900/60 backdrop-blur-xs"
                     onClick={handleDismissPopup}
                 >
                     <div
-                        className="bg-white rounded-3xl max-w-lg w-full max-h-[90dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 relative"
+                        className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[96vw] sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-h-[94dvh] sm:max-h-[92dvh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 relative"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Top Accent Gradient Bar */}
                         <div className="h-1.5 w-full bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b] shrink-0" />
 
                         {/* Header */}
-                        <div className="p-4 sm:p-5 flex items-start justify-between gap-3 bg-gradient-to-r from-amber-50/80 via-white to-teal-50/50 shrink-0">
+                        <div className="p-4 sm:p-6 lg:p-7 flex items-start justify-between gap-3 bg-gradient-to-r from-amber-50/80 via-white to-teal-50/50 shrink-0">
                             <div className="flex items-start gap-3 min-w-0">
-                                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                                    <Bell className="w-5 h-5" />
+                                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                    <Bell className="w-5 h-5 sm:w-7 sm:h-7" />
                                 </div>
                                 <div className="min-w-0">
-                                    <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-700">
+                                    <div className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider text-amber-700">
                                         Official Academy Announcement
                                         {popupList.length > 1 ? ` • ${safePopupIndex + 1} of ${popupList.length}` : ''}
                                     </div>
-                                    <h3 className="text-sm sm:text-base font-black text-slate-900 leading-snug mt-0.5 mb-0 break-words">
+                                    <h3 className="text-base sm:text-xl lg:text-2xl font-black text-slate-900 leading-snug mt-0.5 mb-0 break-words">
                                         {activePopup.title}
                                     </h3>
                                 </div>
@@ -687,8 +684,8 @@ export default function AcademyLayout({
                         </div>
 
                         {/* Body */}
-                        <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
-                            <div className="flex items-center justify-between gap-2 flex-wrap text-[11px] font-mono">
+                        <div className="p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-4 sm:space-y-5 flex-1 min-h-0">
+                            <div className="flex items-center justify-between gap-2 flex-wrap text-[11px] sm:text-xs font-mono">
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <span className={`px-2.5 py-0.5 rounded-full font-bold uppercase ${(POPUP_TYPE_META[activePopup.type] || POPUP_TYPE_META.announcement).pill}`}>
                                         {(POPUP_TYPE_META[activePopup.type] || POPUP_TYPE_META.announcement).label}
@@ -709,11 +706,11 @@ export default function AcademyLayout({
                             </div>
 
                             {activePopup.image_url && (
-                                <div className="rounded-2xl overflow-hidden bg-slate-100">
+                                <div className="rounded-2xl overflow-hidden bg-slate-100 flex items-center justify-center">
                                     <img
                                         src={activePopup.image_url}
                                         alt={activePopup.title}
-                                        className="w-full h-auto object-cover max-h-64"
+                                        className="w-full h-auto object-contain max-h-[38dvh] sm:max-h-[46dvh]"
                                     />
                                 </div>
                             )}
@@ -745,7 +742,7 @@ export default function AcademyLayout({
                                 </div>
                             )}
 
-                            <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-line leading-relaxed break-words mb-0">
+                            <p className="text-sm sm:text-base lg:text-lg text-slate-700 whitespace-pre-line leading-relaxed break-words mb-0">
                                 {activePopup.content}
                             </p>
 
@@ -788,18 +785,18 @@ export default function AcademyLayout({
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 sm:px-6 flex items-center justify-between gap-3 bg-slate-50 shrink-0">
+                        <div className="p-3 sm:p-5 lg:px-8 flex flex-wrap items-center justify-between gap-3 bg-slate-50 shrink-0">
                             <Link
                                 href="/academy-portal/announcements"
                                 onClick={handleDismissPopup}
-                                className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold shadow-xs no-underline"
+                                className="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold shadow-xs no-underline"
                             >
                                 View All Announcements
                             </Link>
                             <button
                                 type="button"
                                 onClick={handleDismissPopup}
-                                className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold uppercase tracking-wider cursor-pointer shadow-sm"
+                                className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer shadow-sm"
                             >
                                 Got it
                             </button>

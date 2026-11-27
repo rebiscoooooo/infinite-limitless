@@ -531,9 +531,18 @@ class AcademyEnhancementTest extends TestCase
         ]);
         $member->initializeRankProgression('Rookie');
 
+        $training1 = AcademyTraining::where('rank_tier', 'Rookie')->where('order', 1)->first();
         $training5 = AcademyTraining::where('rank_tier', 'Rookie')->where('order', 5)->first();
 
         // Update existing training progress initialized by initializeRankProgression
+        AcademyTrainingProgress::updateOrCreate(
+            ['member_id' => $member->id, 'training_id' => $training1->id],
+            [
+                'status' => 'submitted',
+                'reflection_submission' => 'Module 1 submission should not be flagged as last module.',
+                'submitted_at' => now()->subMinute(),
+            ]
+        );
         $prog = AcademyTrainingProgress::updateOrCreate(
             ['member_id' => $member->id, 'training_id' => $training5->id],
             [
@@ -543,9 +552,19 @@ class AcademyEnhancementTest extends TestCase
             ]
         );
 
+        // Verify admin pendingReflections flags only the final level module as is_last_module = true
+        $this->actingAs($admin, 'admin');
+        $this->get(route('admin.academy.index'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->where('pendingReflections.0.training_id', $training5->id)
+                ->where('pendingReflections.0.is_last_module', true)
+                ->where('pendingReflections.1.training_id', $training1->id)
+                ->where('pendingReflections.1.is_last_module', false)
+            );
+
         $customCertImage = UploadedFile::fake()->create('edited_cert.png', 300, 'image/png');
 
-        $this->actingAs($admin, 'admin');
         $reviewRes = $this->post(route('admin.academy.trainings.review', $prog->id), [
             'action' => 'approve',
             'admin_feedback' => 'Approved! Here is your official personalized certificate.',
@@ -562,6 +581,245 @@ class AcademyEnhancementTest extends TestCase
 
         // Verify email queued
         \Illuminate\Support\Facades\Mail::assertQueued(\App\Mail\AcademyCertificateConferredMail::class);
+    }
+
+    public function test_points_carry_over_and_accumulate_after_rank_promotion(): void
+    {
+        $member = AcademyMember::create([
+            'first_name' => 'Carry',
+            'last_name' => 'Points',
+            'phone_country_code' => '+63',
+            'phone_number' => '9171112233',
+            'email' => 'carry.points@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Manila',
+            'status' => 'Approved',
+            'rank_tier' => 'Rookie',
+            'approved_at' => now(),
+        ]);
+        $member->initializeRankProgression('Rookie');
+
+        // 1. Complete ALL 5 Rookie trainings (5 * 15 = 75 pts) and ALL 3 Rookie requirements (3 * 20 + 100 = 160 pts) => 235 pts
+        foreach (AcademyTraining::where('rank_tier', 'Rookie')->get() as $t) {
+            AcademyTrainingProgress::updateOrCreate(
+                ['member_id' => $member->id, 'training_id' => $t->id],
+                ['status' => 'approved', 'reviewed_by' => 'Admin', 'reviewed_at' => now()]
+            );
+        }
+        foreach (AcademyRankRequirement::where('rank_tier', 'Rookie')->get() as $r) {
+            $member->requirementProgress()->updateOrCreate(
+                ['requirement_id' => $r->id],
+                ['current_value' => $r->target_value, 'is_verified' => true, 'verified_at' => now()]
+            );
+        }
+
+        $before = $member->fresh()->computeCumulativePoints();
+        $this->assertEquals(235, $before['total']);
+        $this->assertEquals(0, $before['previous_tiers']);
+        $this->assertEquals(235, $before['current_tier']);
+
+        // 2. Promote Rookie -> Elite: previously earned 235 pts MUST remain intact (NOT reset to 0!)
+        $admin = AdminUser::first();
+        $this->actingAs($admin, 'admin');
+        $this->post(route('admin.academy.member.promote', $member->id))->assertSessionHasNoErrors();
+
+        $promoted = $member->fresh();
+        $this->assertEquals('Elite', $promoted->rank_tier);
+
+        $afterPromotion = $promoted->computeCumulativePoints();
+        $this->assertEquals(235, $afterPromotion['total']);
+        $this->assertEquals(235, $afterPromotion['previous_tiers']);
+        $this->assertEquals(0, $afterPromotion['current_tier']);
+
+        // 3. Complete 1 Elite training (+15 pts) and 1 of 3 Elite requirements (+20 + 33 = +53 pts) => 235 + 68 = 303 pts
+        $eliteTraining1 = AcademyTraining::where('rank_tier', 'Elite')->where('order', 1)->first();
+        AcademyTrainingProgress::updateOrCreate(
+            ['member_id' => $promoted->id, 'training_id' => $eliteTraining1->id],
+            ['status' => 'approved', 'reviewed_by' => 'Admin', 'reviewed_at' => now()]
+        );
+
+        $eliteReq1 = AcademyRankRequirement::where('rank_tier', 'Elite')->orderBy('order')->first();
+        $promoted->requirementProgress()->updateOrCreate(
+            ['requirement_id' => $eliteReq1->id],
+            ['current_value' => $eliteReq1->target_value, 'is_verified' => true, 'verified_at' => now()]
+        );
+
+        \App\Http\Controllers\RealtimeController::flushAcademyCache();
+
+        $afterNewWork = $promoted->fresh()->computeCumulativePoints();
+        $this->assertEquals(303, $afterNewWork['total']);
+        $this->assertEquals(235, $afterNewWork['previous_tiers']);
+        $this->assertEquals(68, $afterNewWork['current_tier']);
+
+        // 4. Verify Leaderboards page serves the cumulative 303 pts score
+        $this->actingAs($promoted->fresh(), 'academy');
+        $this->get(route('academy.leaderboards'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Academy/Leaderboards')
+                ->where('member.total_points', 303)
+                ->where('leaderboards.overall.0.score', 303)
+                ->where('leaderboards.overall.0.previous_tiers_points', 235)
+                ->where('leaderboards.overall.0.current_tier_points', 68)
+                ->where('leaderboards.tiers.Elite.0.score', 303)
+            );
+    }
+
+    public function test_academy_emails_use_production_legacy_portal_login_url(): void
+    {
+        $member = AcademyMember::create([
+            'first_name' => 'Mail',
+            'last_name' => 'Recipient',
+            'phone_country_code' => '+63',
+            'phone_number' => '9179990000',
+            'email' => 'mail.recipient@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Manila',
+            'status' => 'Approved',
+            'rank_tier' => 'Rookie',
+            'approved_at' => now(),
+        ]);
+
+        $cert = AcademyCertificate::create([
+            'member_id' => $member->id,
+            'rank_tier' => 'Rookie',
+            'certificate_type' => 'training',
+            'certificate_number' => 'LCAC-ROOKIE-99999-2026',
+            'issued_at' => now(),
+            'template_design' => 'classic-gold',
+        ]);
+
+        $expectedUrl = 'https://infinite-limitless.com/academy-login';
+
+        $statusMail = new \App\Mail\AcademyStatusUpdatedMail($member);
+        $statusMail->assertSeeInHtml($expectedUrl);
+        $statusMail->assertSeeInText($expectedUrl);
+
+        $certMail = new \App\Mail\AcademyCertificateConferredMail($member, $cert);
+        $certMail->assertSeeInHtml($expectedUrl);
+        $certMail->assertSeeInText($expectedUrl);
+    }
+
+    public function test_admin_can_crud_commandments_per_tier_and_members_receive_them(): void
+    {
+        $admin = AdminUser::first();
+
+        // 0. By default there are NO pre-seeded commandments — only what Admin inputs
+        $this->assertEquals(0, \App\Models\AcademyCommandment::count());
+
+        $this->actingAs($admin, 'admin');
+
+        // 1. Admin creates a new commandment for Elite tier (leaving Filipino optional to verify auto-fallback)
+        $createRes = $this->post(route('admin.academy.commandments.store'), [
+            'rank_tier' => 'Elite',
+            'order' => 1,
+            'title_en' => 'Always Inspire Excellence',
+            'description_en' => 'Elevate the standards of every leader you mentor.',
+            'is_active' => true,
+        ]);
+        $createRes->assertSessionHasNoErrors();
+
+        $cmd = \App\Models\AcademyCommandment::where('title_en', 'Always Inspire Excellence')->first();
+        $this->assertNotNull($cmd);
+        $this->assertEquals('Elite', $cmd->rank_tier);
+        $this->assertEquals('Always Inspire Excellence', $cmd->title_tl);
+
+        // 2. Admin updates the commandment with Filipino translation
+        $updateRes = $this->put(route('admin.academy.commandments.update', $cmd->id), [
+            'rank_tier' => 'Elite',
+            'order' => 1,
+            'title_en' => 'Always Inspire Excellence (Updated)',
+            'title_tl' => 'Laging Magbigay ng Inspirasyon',
+            'description_en' => 'Updated guidance for Elite members.',
+            'description_tl' => 'Na-update na gabay para sa mga Elite.',
+            'is_active' => true,
+        ]);
+        $updateRes->assertSessionHasNoErrors();
+        $this->assertEquals('Laging Magbigay ng Inspirasyon', $cmd->fresh()->title_tl);
+
+        // 3. Approved Elite member sees ONLY the admin-added commandment in Portal Profile & Rank Matrix (and 0 for Rookie)
+        $member = AcademyMember::create([
+            'first_name' => 'Elena',
+            'last_name' => 'Elite',
+            'phone_country_code' => '+63',
+            'phone_number' => '9175556677',
+            'email' => 'elena.commandment@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Makati City',
+            'status' => 'Approved',
+            'rank_tier' => 'Elite',
+            'approved_at' => now(),
+        ]);
+        $member->initializeRankProgression('Elite');
+
+        $this->actingAs($member, 'academy');
+        $this->get(route('academy.portal'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Academy/Profile')
+                ->has('commandmentsByTier.Elite', 1)
+                ->has('commandmentsByTier.Rookie', 0)
+            );
+
+        $this->get(route('academy.rank-matrix'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Academy/RankMatrix')
+                ->has('commandmentsByTier.Elite', 1)
+                ->has('commandmentsByTier.Rookie', 0)
+            );
+
+        // 4. Admin toggles hidden -> member portal now shows 0 active Elite commandments
+        $this->actingAs($admin, 'admin');
+        $this->patch(route('admin.academy.commandments.toggle', $cmd->id))->assertSessionHasNoErrors();
+        $this->assertFalse($cmd->fresh()->is_active);
+
+        $this->actingAs($member, 'academy');
+        $this->get(route('academy.portal'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page->has('commandmentsByTier.Elite', 0));
+
+        // 5. Admin deletes the commandment
+        $this->actingAs($admin, 'admin');
+        $this->delete(route('admin.academy.commandments.destroy', $cmd->id))->assertSessionHasNoErrors();
+        $this->assertNull(\App\Models\AcademyCommandment::find($cmd->id));
+    }
+
+    public function test_leaderboards_expose_full_ranking_for_every_tier_to_any_member(): void
+    {
+        $makeMember = function (string $first, string $tier, string $email) {
+            $m = AcademyMember::create([
+                'first_name' => $first,
+                'last_name' => 'Ranker',
+                'phone_country_code' => '+63',
+                'phone_number' => '9' . random_int(100000000, 999999999),
+                'email' => $email,
+                'password' => 'Secret1234!',
+                'address' => 'Manila',
+                'status' => 'Approved',
+                'rank_tier' => $tier,
+                'approved_at' => now(),
+            ]);
+            $m->initializeRankProgression($tier);
+            return $m;
+        };
+
+        $rookie = $makeMember('Rick', 'Rookie', 'rick.rookie@example.com');
+        $makeMember('Eli', 'Elite', 'eli.elite@example.com');
+        $makeMember('Leo', 'Legend', 'leo.legend@example.com');
+
+        $this->actingAs($rookie, 'academy');
+        $this->get(route('academy.leaderboards'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Academy/Leaderboards')
+                ->has('leaderboards.tiers.Rookie', 1)
+                ->has('leaderboards.tiers.Elite', 1)
+                ->has('leaderboards.tiers.Master', 0)
+                ->has('leaderboards.tiers.Grand Master', 0)
+                ->has('leaderboards.tiers.Legend', 1)
+                ->where('leaderboards.tier_counts.Legend', 1)
+            );
     }
 
     public function test_all_eight_separate_academy_portal_pages_render_dedicated_components(): void
@@ -606,5 +864,153 @@ class AcademyEnhancementTest extends TestCase
                 ->has('popupAnnouncements')
             );
         }
+    }
+
+    public function test_admin_can_upload_manage_training_attachments_and_members_can_download_unlocked_ones(): void
+    {
+        Storage::fake('public');
+
+        $admin = AdminUser::first();
+        $this->actingAs($admin, 'admin');
+
+        // Clear seeded Rookie trainings so we have exact sequential modules #1 and #2
+        AcademyTraining::where('rank_tier', 'Rookie')->delete();
+
+        $pdfFile = UploadedFile::fake()->create('Rookie_Handbook.pdf', 120, 'application/pdf');
+        $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+        $imgFile = UploadedFile::fake()->createWithContent('Flowchart_Diagram.png', $tinyPng);
+
+        // 1. Admin creates Module #1 with 2 attachments (PDF + PNG)
+        $createRes = $this->post(route('admin.academy.trainings.store'), [
+            'rank_tier' => 'Rookie',
+            'order' => 1,
+            'title_en' => 'Module One With Files',
+            'title_tl' => 'Modyul Una May Kalakip',
+            'description_en' => 'Intro with resources',
+            'description_tl' => 'Panimula na may mga gabay',
+            'content_en' => 'Read the attached handbook and study the diagram carefully.',
+            'content_tl' => 'Basahin ang kalakip na gabay at pag-aralan ang larawan.',
+            'duration_minutes' => 30,
+            'is_published' => 1,
+            'attachments' => [$pdfFile, $imgFile],
+        ]);
+        $createRes->assertSessionHasNoErrors();
+
+        $module1 = AcademyTraining::where('title_en', 'Module One With Files')->firstOrFail();
+        $this->assertCount(2, $module1->attachments);
+
+        $pdfAtt = $module1->attachments[0];
+        $imgAtt = $module1->attachments[1];
+        Storage::disk('public')->assertExists($pdfAtt['path']);
+        Storage::disk('public')->assertExists($imgAtt['path']);
+
+        // Admin can download and preview attachment
+        $this->get(route('admin.academy.trainings.attachments.download', [$module1->id, $pdfAtt['id']]))
+            ->assertStatus(200);
+        $this->get(route('admin.academy.trainings.attachments.download', ['training' => $module1->id, 'attachmentId' => $imgAtt['id'], 'inline' => 1]))
+            ->assertStatus(200);
+
+        // 2. Admin updates Module #1 via POST + _method=PUT (Inertia multipart FormData pattern):
+        //    removes Flowchart_Diagram.png and adds a Word document workbook.docx
+        $docFile = UploadedFile::fake()->create(
+            'Action_Workbook.docx',
+            80,
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        );
+
+        $updateRes = $this->post(route('admin.academy.trainings.update', $module1->id), [
+            '_method' => 'PUT',
+            'rank_tier' => 'Rookie',
+            'order' => 1,
+            'title_en' => 'Module One Updated',
+            'title_tl' => 'Modyul Una Na-update',
+            'description_en' => 'Updated intro',
+            'description_tl' => 'Na-update na panimula',
+            'content_en' => 'Updated content with handbook and workbook.',
+            'content_tl' => 'Na-update na aralin.',
+            'duration_minutes' => 35,
+            'is_published' => 1,
+            'remove_attachments' => [$imgAtt['id']],
+            'attachments' => [$docFile],
+        ]);
+        $updateRes->assertSessionHasNoErrors();
+
+        $module1->refresh();
+        $this->assertCount(2, $module1->attachments);
+        Storage::disk('public')->assertMissing($imgAtt['path']);
+        Storage::disk('public')->assertExists($pdfAtt['path']);
+        $docAtt = collect($module1->attachments)->firstWhere('name', 'Action_Workbook.docx');
+        $this->assertNotNull($docAtt);
+        Storage::disk('public')->assertExists($docAtt['path']);
+
+        // 3. Admin creates Module #2 with 1 attachment (initially locked for a new member)
+        $lockedPdf = UploadedFile::fake()->create('Advanced_Notes.pdf', 90, 'application/pdf');
+        $this->post(route('admin.academy.trainings.store'), [
+            'rank_tier' => 'Rookie',
+            'order' => 2,
+            'title_en' => 'Module Two Locked',
+            'title_tl' => 'Modyul Pangalawa',
+            'description_en' => 'Second sequential module',
+            'description_tl' => 'Pangalawang aralin',
+            'content_en' => 'Unlocked after module 1.',
+            'content_tl' => 'Mabubuksan pagkatapos ng modyul 1.',
+            'duration_minutes' => 40,
+            'is_published' => 1,
+            'attachments' => [$lockedPdf],
+        ])->assertSessionHasNoErrors();
+
+        $module2 = AcademyTraining::where('title_en', 'Module Two Locked')->firstOrFail();
+        $lockedAtt = $module2->attachments[0];
+
+        // 4. Approved Rookie member views Trainings page & tests attachment access
+        $member = AcademyMember::create([
+            'first_name' => 'Ana',
+            'last_name' => 'Learner',
+            'phone_country_code' => '+63',
+            'phone_number' => '9172223344',
+            'email' => 'ana.attachments@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Quezon City',
+            'status' => 'Approved',
+            'rank_tier' => 'Rookie',
+            'approved_at' => now(),
+        ]);
+        $member->initializeRankProgression('Rookie');
+
+        $this->actingAs($member, 'academy');
+
+        $this->get(route('academy.trainings'))
+            ->assertStatus(200)
+            ->assertInertia(fn ($page) => $page
+                ->component('Academy/Trainings')
+                ->where('sequentialTrainings.0.id', $module1->id)
+                ->where('sequentialTrainings.0.is_unlocked', true)
+                ->has('sequentialTrainings.0.attachments', 2)
+                ->where('sequentialTrainings.1.id', $module2->id)
+                ->where('sequentialTrainings.1.is_unlocked', false)
+                ->where('sequentialTrainings.1.attachments_count', 1)
+                ->has('sequentialTrainings.1.attachments', 0)
+            );
+
+        // Unlocked Module #1: member CAN download DOCX and preview PDF inline
+        $this->get(route('academy.trainings.attachments.download', [$module1->id, $docAtt['id']]))
+            ->assertStatus(200)
+            ->assertHeader('content-disposition', 'attachment; filename=Action_Workbook.docx');
+
+        $this->get(route('academy.trainings.attachments.download', ['training' => $module1->id, 'attachmentId' => $pdfAtt['id'], 'inline' => 1]))
+            ->assertStatus(200);
+
+        // Locked Module #2: member receives HTTP 403
+        $this->get(route('academy.trainings.attachments.download', [$module2->id, $lockedAtt['id']]))
+            ->assertStatus(403);
+
+        // 5. Once Admin approves Module #1, Module #2 unlocks and member CAN download its attachment
+        AcademyTrainingProgress::updateOrCreate(
+            ['member_id' => $member->id, 'training_id' => $module1->id],
+            ['status' => 'approved', 'reviewed_by' => 'Admin', 'reviewed_at' => now()]
+        );
+
+        $this->get(route('academy.trainings.attachments.download', [$module2->id, $lockedAtt['id']]))
+            ->assertStatus(200);
     }
 }

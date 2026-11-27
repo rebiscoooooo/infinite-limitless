@@ -263,12 +263,95 @@ class AcademyMember extends Authenticatable
     {
         $training = $this->computeTrainingStats();
         $requirements = $this->computeRequirementsStats();
+        $points = $this->computeCumulativePoints();
 
         return [
             'training' => $training,
             'requirements' => $requirements,
             'program' => $this->computeProgramProgress($training, $requirements),
             'promotion' => $this->computePromotionEligibility($training, $requirements),
+            'points' => $points,
+        ];
+    }
+
+    /**
+     * Compute cumulative lifetime points across ALL rank tiers so promoting a member
+     * never resets or removes previously earned points — newly earned points simply add on top.
+     */
+    public function computeCumulativePoints(): array
+    {
+        $tiers = ['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'];
+        $currentRank = $this->rank_tier ?? 'Rookie';
+
+        // 1. Approved trainings grouped by rank tier (15 pts each)
+        $approvedRows = $this->trainingProgress()
+            ->where('status', 'approved')
+            ->join('academy_trainings', 'academy_trainings.id', '=', 'academy_training_progress.training_id')
+            ->whereNull('academy_trainings.deleted_at')
+            ->selectRaw('academy_trainings.rank_tier, COUNT(*) as completed_count')
+            ->groupBy('academy_trainings.rank_tier')
+            ->get();
+
+        $approvedByTier = [];
+        foreach ($approvedRows as $row) {
+            $approvedByTier[strtolower(trim((string) $row->rank_tier))] = (int) $row->completed_count;
+        }
+
+        // 2. Active rank requirements grouped by tier
+        $activeReqsByTier = AcademyRankRequirement::where('is_active', true)
+            ->get(['id', 'rank_tier', 'target_value'])
+            ->groupBy(fn ($r) => strtolower(trim((string) $r->rank_tier)));
+
+        // 3. Verified requirement progress records for this member
+        $verifiedProgressMap = $this->requirementProgress()
+            ->where('is_verified', true)
+            ->get(['requirement_id', 'current_value'])
+            ->keyBy('requirement_id');
+
+        $totalPoints = 0;
+        $currentTierPoints = 0;
+        $previousTiersPoints = 0;
+        $lifetimeTrainingsCompleted = 0;
+        $lifetimeRequirementsCompleted = 0;
+        $byTier = [];
+
+        foreach ($tiers as $tier) {
+            $tierKey = strtolower($tier);
+            $trainCompleted = $approvedByTier[$tierKey] ?? 0;
+            $lifetimeTrainingsCompleted += $trainCompleted;
+
+            $tierReqs = $activeReqsByTier->get($tierKey, collect());
+            $tierReqTotal = $tierReqs->count();
+            $tierReqCompleted = 0;
+
+            foreach ($tierReqs as $req) {
+                $prog = $verifiedProgressMap->get($req->id);
+                if ($prog && $prog->current_value >= $req->target_value) {
+                    $tierReqCompleted++;
+                }
+            }
+
+            $lifetimeRequirementsCompleted += $tierReqCompleted;
+            $tierReqPct = $tierReqTotal > 0 ? (int) round(($tierReqCompleted / $tierReqTotal) * 100) : 0;
+
+            $tierPoints = ($trainCompleted * 15) + ($tierReqCompleted * 20) + $tierReqPct;
+            $byTier[$tier] = $tierPoints;
+            $totalPoints += $tierPoints;
+
+            if (strcasecmp($tier, $currentRank) === 0) {
+                $currentTierPoints = $tierPoints;
+            } else {
+                $previousTiersPoints += $tierPoints;
+            }
+        }
+
+        return [
+            'total' => $totalPoints,
+            'current_tier' => $currentTierPoints,
+            'previous_tiers' => $previousTiersPoints,
+            'lifetime_trainings_completed' => $lifetimeTrainingsCompleted,
+            'lifetime_requirements_completed' => $lifetimeRequirementsCompleted,
+            'by_tier' => $byTier,
         ];
     }
 
@@ -570,6 +653,8 @@ class AcademyMember extends Authenticatable
             'program_progress' => $snapshot['program'],
             'training_stats' => $snapshot['training'],
             'requirements_stats' => $snapshot['requirements'],
+            'total_points' => $snapshot['points']['total'] ?? 0,
+            'points_breakdown' => $snapshot['points'] ?? null,
             'next_rank' => $this->next_rank,
             'promotion_eligibility' => $snapshot['promotion'],
             'rejection_reason' => $this->rejection_reason,

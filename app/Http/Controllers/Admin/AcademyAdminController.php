@@ -7,6 +7,7 @@ use App\Http\Controllers\RealtimeController;
 use App\Mail\AcademyStatusUpdatedMail;
 use App\Models\AcademyAnnouncement;
 use App\Models\AcademyCertificate;
+use App\Models\AcademyCommandment;
 use App\Models\AcademyMember;
 use App\Models\AcademyMemberRequirementProgress;
 use App\Models\AcademyRankRequirement;
@@ -109,29 +110,66 @@ class AcademyAdminController extends Controller
             ->latest('submitted_at')
             ->take(30)
             ->get()
-            ->map(fn($p) => [
-                'id' => $p->id,
-                'member_id' => $p->member_id,
-                'member_name' => $p->member?->full_name,
-                'member_code' => $p->member?->member_id,
-                'member_rank' => $p->member?->rank_tier,
-                'training_id' => $p->training_id,
-                'training_title' => $p->training?->title_en,
-                'training_order' => $p->training?->order,
-                'reflection_prompt' => $p->training?->reflection_prompt_en,
-                'reflection_submission' => $p->reflection_submission,
-                'submitted_at' => $p->submitted_at?->format('M d, Y h:i A'),
-            ]);
+            ->map(function ($p) {
+                $member = $p->member;
+                $training = $p->training;
+                $rank = $training?->rank_tier ?? $member?->rank_tier ?? 'Rookie';
+
+                $levelTrainingIds = AcademyTraining::where(function ($q) use ($rank, $member) {
+                        $q->where(function ($sub) use ($rank) {
+                            $sub->where('rank_tier', $rank)->whereNull('target_member_id');
+                        });
+                        if ($member) {
+                            $q->orWhere('target_member_id', $member->id);
+                        }
+                    })
+                    ->where('is_published', true)
+                    ->orderBy('order')
+                    ->orderBy('id')
+                    ->pluck('id');
+
+                $lastTrainingId = $levelTrainingIds->last();
+                $isLastModule = $training && $lastTrainingId !== null && (int) $training->id === (int) $lastTrainingId;
+
+                return [
+                    'id' => $p->id,
+                    'member_id' => $p->member_id,
+                    'member_name' => $member?->full_name,
+                    'member_code' => $member?->member_id,
+                    'member_rank' => $member?->rank_tier,
+                    'training_id' => $p->training_id,
+                    'training_title' => $training?->title_en,
+                    'training_order' => $training?->order,
+                    'total_level_modules' => $levelTrainingIds->count(),
+                    'is_last_module' => $isLastModule,
+                    'reflection_prompt' => $training?->reflection_prompt_en,
+                    'reflection_submission' => $p->reflection_submission,
+                    'submitted_at' => $p->submitted_at?->format('M d, Y h:i A'),
+                ];
+            });
 
         // Requirements definitions grouped by rank
         $rankRequirements = AcademyRankRequirement::orderBy('rank_tier')
             ->orderBy('order')
             ->get();
 
-        // Trainings curriculum grouped by rank
+        // Trainings curriculum grouped by rank (with formatted downloadable attachment links)
         $rankTrainings = AcademyTraining::orderBy('rank_tier')
             ->orderBy('order')
-            ->get();
+            ->get()
+            ->map(function (AcademyTraining $t) {
+                $arr = $t->toArray();
+                $arr['attachments'] = $t->getFormattedAttachments('admin.academy.trainings.attachments.download');
+                return $arr;
+            });
+
+        // Tier commandments managed by admin
+        $rankCommandments = \Illuminate\Support\Facades\Schema::hasTable('academy_commandments')
+            ? AcademyCommandment::orderBy('rank_tier')
+                ->orderBy('order')
+                ->orderBy('id')
+                ->get()
+            : collect();
 
         // Announcements and Recognitions
         $announcements = AcademyAnnouncement::with('featuredMember')
@@ -180,6 +218,7 @@ class AcademyAdminController extends Controller
             'pendingReflections' => $pendingReflections,
             'rankRequirements' => $rankRequirements,
             'rankTrainings' => $rankTrainings,
+            'rankCommandments' => $rankCommandments,
             'announcements' => $announcements,
             'certificates' => $certificates,
             'filters' => [
@@ -565,7 +604,13 @@ class AcademyAdminController extends Controller
             'admin_notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $previousTier = $member->rank_tier;
         $member->update($validated);
+
+        // If rank tier changed, initialize progression for the new tier while preserving all previous tier progress & points
+        if (!empty($validated['rank_tier']) && $validated['rank_tier'] !== $previousTier) {
+            $member->initializeRankProgression($validated['rank_tier']);
+        }
 
         RealtimeController::flushAcademyCache();
 
@@ -663,7 +708,7 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Store new training module (bilingual).
+     * Store new training module (bilingual) with optional multi-file attachments.
      */
     public function storeTraining(Request $request): RedirectResponse
     {
@@ -682,7 +727,28 @@ class AcademyAdminController extends Controller
             'reflection_prompt_en' => ['nullable', 'string'],
             'reflection_prompt_tl' => ['nullable', 'string'],
             'is_published' => ['nullable', 'boolean'],
+            'attachments' => ['nullable', 'array', 'max:10'],
+            'attachments.*' => [
+                'file',
+                'mimes:pdf,jpg,jpeg,png,webp,gif,doc,docx,xls,xlsx,ppt,pptx,txt,csv,rtf,odt,ods,odp,zip',
+                'max:15360',
+            ],
         ]);
+
+        unset($validated['attachments']);
+        $validated['is_published'] = $request->boolean('is_published', true);
+
+        $uploadedFiles = $request->file('attachments', []);
+        if (!empty($uploadedFiles)) {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('academy_trainings', 'attachments')) {
+                return back()->withErrors([
+                    'attachments' => 'Database migration required for training attachments. Please run php artisan migrate.',
+                ]);
+            }
+            $validated['attachments'] = AcademyTraining::storeUploadedAttachments(
+                is_array($uploadedFiles) ? $uploadedFiles : [$uploadedFiles]
+            );
+        }
 
         $training = AcademyTraining::create($validated);
 
@@ -703,7 +769,7 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Update training module (bilingual).
+     * Update training module (bilingual) including adding/removing attachments.
      */
     public function updateTraining(Request $request, AcademyTraining $training): RedirectResponse
     {
@@ -722,13 +788,86 @@ class AcademyAdminController extends Controller
             'reflection_prompt_en' => ['nullable', 'string'],
             'reflection_prompt_tl' => ['nullable', 'string'],
             'is_published' => ['nullable', 'boolean'],
+            'attachments' => ['nullable', 'array', 'max:10'],
+            'attachments.*' => [
+                'file',
+                'mimes:pdf,jpg,jpeg,png,webp,gif,doc,docx,xls,xlsx,ppt,pptx,txt,csv,rtf,odt,ods,odp,zip',
+                'max:15360',
+            ],
+            'remove_attachments' => ['nullable', 'array'],
+            'remove_attachments.*' => ['string'],
         ]);
+
+        unset($validated['attachments'], $validated['remove_attachments']);
+        $validated['is_published'] = $request->boolean('is_published', (bool) $training->is_published);
+
+        $hasAttachmentsColumn = \Illuminate\Support\Facades\Schema::hasColumn('academy_trainings', 'attachments');
+        $uploadedFiles = $request->file('attachments', []);
+        $removeIds = array_map('strval', $request->input('remove_attachments', []));
+
+        if ((!empty($uploadedFiles) || !empty($removeIds)) && !$hasAttachmentsColumn) {
+            return back()->withErrors([
+                'attachments' => 'Database migration required for training attachments. Please run php artisan migrate.',
+            ]);
+        }
+
+        if ($hasAttachmentsColumn) {
+            $current = is_array($training->attachments) ? $training->attachments : [];
+            $kept = [];
+
+            foreach ($current as $item) {
+                $itemId = isset($item['id']) ? (string) $item['id'] : '';
+                if ($itemId !== '' && in_array($itemId, $removeIds, true)) {
+                    if (!empty($item['path']) && Storage::disk('public')->exists($item['path'])) {
+                        Storage::disk('public')->delete($item['path']);
+                    }
+                    continue;
+                }
+                $kept[] = $item;
+            }
+
+            if (!empty($uploadedFiles)) {
+                $newItems = AcademyTraining::storeUploadedAttachments(
+                    is_array($uploadedFiles) ? $uploadedFiles : [$uploadedFiles]
+                );
+                $kept = array_merge($kept, $newItems);
+            }
+
+            $validated['attachments'] = array_values($kept);
+        }
 
         $training->update($validated);
 
         RealtimeController::flushAcademyCache();
 
         return back()->with('success', 'Training module updated successfully.');
+    }
+
+    /**
+     * Download or preview a training attachment from Admin console.
+     */
+    public function downloadTrainingAttachment(Request $request, AcademyTraining $training, string $attachmentId)
+    {
+        $attachment = $training->findAttachment($attachmentId);
+        if (!$attachment || empty($attachment['path']) || !Storage::disk('public')->exists($attachment['path'])) {
+            abort(404, 'Attachment not found.');
+        }
+
+        $safeName = str_replace(['"', "\r", "\n"], '', (string) ($attachment['name'] ?? basename($attachment['path'])));
+        $ext = strtolower((string) ($attachment['extension'] ?? pathinfo($safeName, PATHINFO_EXTENSION)));
+        $canPreview = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'], true);
+
+        if ($request->boolean('inline') && $canPreview) {
+            $fullPath = Storage::disk('public')->path($attachment['path']);
+            $mime = !empty($attachment['mime']) ? $attachment['mime'] : (mime_content_type($fullPath) ?: 'application/octet-stream');
+
+            return response()->file($fullPath, [
+                'Content-Type' => $mime,
+                'Content-Disposition' => 'inline; filename="' . $safeName . '"',
+            ]);
+        }
+
+        return Storage::disk('public')->download($attachment['path'], $safeName);
     }
 
     /**
@@ -800,5 +939,97 @@ class AcademyAdminController extends Controller
         RealtimeController::flushAcademyCache();
 
         return back()->with('success', 'Rank requirement deleted.');
+    }
+
+    /**
+     * Store a new commandment for a specific rank tier.
+     */
+    public function storeCommandment(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
+            'order' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'title_en' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
+            'description_en' => ['nullable', 'string', 'max:2000'],
+            'description_tl' => ['nullable', 'string', 'max:2000'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $nextOrder = (int) AcademyCommandment::where('rank_tier', $validated['rank_tier'])->max('order') + 1;
+        $admin = auth('admin')->user();
+
+        AcademyCommandment::create([
+            'rank_tier' => $validated['rank_tier'],
+            'order' => $validated['order'] ?? $nextOrder,
+            'title_en' => trim($validated['title_en']),
+            'title_tl' => !empty($validated['title_tl']) ? trim($validated['title_tl']) : trim($validated['title_en']),
+            'description_en' => !empty($validated['description_en']) ? trim($validated['description_en']) : null,
+            'description_tl' => !empty($validated['description_tl'])
+                ? trim($validated['description_tl'])
+                : (!empty($validated['description_en']) ? trim($validated['description_en']) : null),
+            'is_active' => array_key_exists('is_active', $validated) ? (bool) $validated['is_active'] : true,
+            'created_by' => $admin?->name ?? $admin?->username ?? 'Admin',
+        ]);
+
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', 'Commandment added for ' . $validated['rank_tier'] . ' tier.');
+    }
+
+    /**
+     * Update an existing tier commandment.
+     */
+    public function updateCommandment(Request $request, AcademyCommandment $commandment): RedirectResponse
+    {
+        $validated = $request->validate([
+            'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
+            'order' => ['nullable', 'integer', 'min:1', 'max:999'],
+            'title_en' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
+            'description_en' => ['nullable', 'string', 'max:2000'],
+            'description_tl' => ['nullable', 'string', 'max:2000'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $commandment->update([
+            'rank_tier' => $validated['rank_tier'],
+            'order' => $validated['order'] ?? $commandment->order,
+            'title_en' => trim($validated['title_en']),
+            'title_tl' => !empty($validated['title_tl']) ? trim($validated['title_tl']) : trim($validated['title_en']),
+            'description_en' => !empty($validated['description_en']) ? trim($validated['description_en']) : null,
+            'description_tl' => !empty($validated['description_tl'])
+                ? trim($validated['description_tl'])
+                : (!empty($validated['description_en']) ? trim($validated['description_en']) : null),
+            'is_active' => array_key_exists('is_active', $validated) ? (bool) $validated['is_active'] : $commandment->is_active,
+        ]);
+
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', 'Commandment updated successfully.');
+    }
+
+    /**
+     * Toggle active/hidden state of a tier commandment.
+     */
+    public function toggleCommandment(AcademyCommandment $commandment): RedirectResponse
+    {
+        $commandment->is_active = !$commandment->is_active;
+        $commandment->save();
+
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', 'Commandment ' . ($commandment->is_active ? 'activated' : 'hidden') . '.');
+    }
+
+    /**
+     * Delete a tier commandment.
+     */
+    public function deleteCommandment(AcademyCommandment $commandment): RedirectResponse
+    {
+        $commandment->delete();
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', 'Commandment deleted successfully.');
     }
 }

@@ -320,7 +320,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                 {/* 4 Header KPI Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                     {/* KPI 1: Total Admins */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#0f766e] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Total Administrators
@@ -346,7 +346,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     </div>
 
                     {/* KPI 2: Active Accounts */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#10b981,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Active Accounts
@@ -372,7 +372,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     </div>
 
                     {/* KPI 3: Super Admins */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-purple-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#a855f7,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Super Administrators
@@ -398,7 +398,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                     </div>
 
                     {/* KPI 4: Archived Accounts */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#f59e0b] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Archived Accounts
@@ -579,7 +579,7 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
                                                 key={a.id}
                                                 className={`transition-colors ${
                                                     isSelected
-                                                        ? 'bg-teal-50/70 border-l-4 border-l-[#0f766e]'
+                                                        ? 'bg-teal-50/70 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]'
                                                         : isSelf
                                                         ? 'bg-slate-50/90'
                                                         : 'hover:bg-slate-50/70'

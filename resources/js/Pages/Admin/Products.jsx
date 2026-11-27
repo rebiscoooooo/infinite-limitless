@@ -250,7 +250,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
                 {/* 4 HIGH-END KPI STAT CARDS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                     {/* Card 1: Total */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#0f766e] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Total Products
@@ -274,7 +274,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
                     </div>
 
                     {/* Card 2: Live */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#10b981,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Live On Website
@@ -298,7 +298,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
                     </div>
 
                     {/* Card 3: Archived */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#f59e0b] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Archived Items
@@ -329,7 +329,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
                     </div>
 
                     {/* Card 4: Categories */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-purple-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#a855f7,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Categories
@@ -662,7 +662,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
                                                 <tr
                                                     key={p.id}
                                                     className={`transition-colors ${
-                                                        isSelected ? 'bg-teal-50/70 border-l-4 border-l-[#0f766e]' : 'hover:bg-slate-50/70'
+                                                        isSelected ? 'bg-teal-50/70 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]' : 'hover:bg-slate-50/70'
                                                     }`}
                                                 >
                                                     <td className="py-3 px-4 text-center">

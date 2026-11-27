@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RealtimeController;
 use App\Models\ActivityLog;
 use App\Models\AdminUser;
 use Illuminate\Http\RedirectResponse;
@@ -101,6 +102,8 @@ class AdminUserController extends Controller
             'created_at' => now(),
         ]);
 
+        RealtimeController::flushSnapshotCache();
+
         return back()->with('success', "Administrator account '@{$admin->username}' ({$admin->name}) created successfully!");
     }
 
@@ -141,6 +144,8 @@ class AdminUserController extends Controller
             'status' => 'Success',
             'created_at' => now(),
         ]);
+
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Administrator '@{$adminUser->username}' updated successfully!");
     }
@@ -202,6 +207,8 @@ class AdminUserController extends Controller
             'created_at' => now(),
         ]);
 
+        RealtimeController::flushSnapshotCache();
+
         return back()->with('success', "Administrator account '@{$username}' permanently deleted.");
     }
 
@@ -217,6 +224,7 @@ class AdminUserController extends Controller
 
         $newStatus = $admin->status === 'Active' ? 'Inactive' : 'Active';
         $admin->update(['status' => $newStatus]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Administrator '@{$admin->username}' status changed to {$newStatus}.");
     }
@@ -239,6 +247,7 @@ class AdminUserController extends Controller
         }
 
         $count = AdminUser::whereIn('id', $safeIds)->update(['archived_at' => now()]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully archived {$count} administrator account(s).");
     }
@@ -254,6 +263,7 @@ class AdminUserController extends Controller
         ]);
 
         $count = AdminUser::whereIn('id', $validated['ids'])->update(['archived_at' => null]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully restored {$count} administrator account(s).");
     }
@@ -276,6 +286,7 @@ class AdminUserController extends Controller
         }
 
         $count = AdminUser::whereIn('id', $safeIds)->delete();
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Permanently deleted {$count} administrator account(s).");
     }

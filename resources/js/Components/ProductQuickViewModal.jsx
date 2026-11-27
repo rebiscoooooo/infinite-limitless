@@ -85,17 +85,21 @@ export default function ProductQuickViewModal({ product, isOpen, onClose }) {
                                     </div>
                                 </div>
 
-                                <div className="pt-4 flex items-center gap-3">
+                                <div className="pt-4 flex flex-wrap items-center gap-3">
                                     <Link
                                         href="/world-plan"
                                         onClick={onClose}
-                                        className="flex-1 py-3 px-5 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200"
+                                        className="flex-1 min-w-[160px] py-3 px-5 rounded-xl bg-ch-teal hover:bg-ch-teal-darker text-ch-dark-slate hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-200"
                                     >
-                                        <ShoppingBag className="w-4 h-4" />
+                                        <ShoppingBag className="w-4 h-4 shrink-0" />
                                         <span>Order via World Plan</span>
                                     </Link>
                                     <Link
-                                        href="/barley"
+                                        href={
+                                            /skincare|olamour|o'lamour|serum|soap|cream|lotion/i.test(`${product.category || ''} ${product.name || ''}`)
+                                                ? '/olamour'
+                                                : '/barley'
+                                        }
                                         onClick={onClose}
                                         className="py-3 px-4 rounded-xl border border-white/20 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-white/5 transition-colors"
                                     >

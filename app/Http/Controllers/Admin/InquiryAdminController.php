@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\RealtimeController;
 use App\Models\ActivityLog;
 use App\Models\Inquiry;
 use Illuminate\Http\RedirectResponse;
@@ -72,6 +73,7 @@ class InquiryAdminController extends Controller
         $inquiry->update([
             'is_read' => !$inquiry->is_read,
         ]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', 'Inquiry status updated.');
     }
@@ -103,6 +105,7 @@ class InquiryAdminController extends Controller
             ]);
 
             $inquiry->update(['is_read' => true]);
+            RealtimeController::flushSnapshotCache();
 
             return back()->with('success', "Reply sent successfully to {$inquiry->name} ({$inquiry->email}).");
         } catch (\Throwable $e) {
@@ -130,6 +133,7 @@ class InquiryAdminController extends Controller
     {
         $name = $inquiry->name;
         $inquiry->delete();
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
@@ -155,6 +159,7 @@ class InquiryAdminController extends Controller
         ]);
 
         $count = Inquiry::whereIn('id', $validated['ids'])->update(['archived_at' => now()]);
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',
@@ -180,6 +185,7 @@ class InquiryAdminController extends Controller
         ]);
 
         $count = Inquiry::whereIn('id', $validated['ids'])->update(['archived_at' => null]);
+        RealtimeController::flushSnapshotCache();
 
         return back()->with('success', "Successfully restored {$count} contact inquiry/inquiries.");
     }
@@ -195,6 +201,7 @@ class InquiryAdminController extends Controller
         ]);
 
         $count = Inquiry::whereIn('id', $validated['ids'])->delete();
+        RealtimeController::flushSnapshotCache();
 
         ActivityLog::create([
             'admin_user' => Auth::guard('admin')->user()?->username ?? 'Admin',

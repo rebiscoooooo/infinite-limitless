@@ -139,7 +139,7 @@ export default function Dashboard({
                 {/* 4 HIGH-IMPACT KPI STATS */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                     {/* KPI 1: Inquiries */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Customer Inquiries
@@ -168,7 +168,7 @@ export default function Dashboard({
                     </div>
 
                     {/* KPI 2: World Plan */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 border-l-4 border-l-[#f59e0b]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider font-mono truncate">
                                 World Plan Registrations
@@ -197,7 +197,7 @@ export default function Dashboard({
                     </div>
 
                     {/* KPI 3: Products Catalog */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 border-l-4 border-l-purple-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#a855f7,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono truncate">
                                 Active Catalog Products
@@ -226,7 +226,7 @@ export default function Dashboard({
                     </div>
 
                     {/* KPI 4: Platform Traffic & Activity */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-emerald-400/80 transition-all duration-300 border-l-4 border-l-[#10b981]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-emerald-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#10b981,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider font-mono truncate">
                                 Global Traffic &amp; Reach

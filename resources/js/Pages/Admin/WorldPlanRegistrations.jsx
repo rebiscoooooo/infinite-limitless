@@ -250,7 +250,7 @@ export default function WorldPlanRegistrations({
                 {/* 4 HIGH-IMPACT KPI STATS (Clean White Cards with System Palette Accents) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
                     {/* KPI 1: Pending Applications */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 border-l-4 border-l-[#f59e0b]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-amber-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider font-mono truncate">
                                 Pending Verification
@@ -286,7 +286,7 @@ export default function WorldPlanRegistrations({
                     </div>
 
                     {/* KPI 2: Approved Members */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-emerald-400/80 transition-all duration-300 border-l-4 border-l-[#10b981]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-emerald-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#10b981,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider font-mono truncate">
                                 Approved Members
@@ -322,7 +322,7 @@ export default function WorldPlanRegistrations({
                     </div>
 
                     {/* KPI 3: Total Registrations */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 border-l-4 border-l-[#0f766e]">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-teal-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-mono truncate">
                                 Total Registrations
@@ -348,7 +348,7 @@ export default function WorldPlanRegistrations({
                     </div>
 
                     {/* KPI 4: Archived Applications */}
-                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 border-l-4 border-l-purple-500">
+                    <div className="rounded-2xl p-5 xl:p-6 bg-white border border-slate-200/90 shadow-xs relative overflow-hidden group hover:border-purple-400/80 transition-all duration-300 shadow-[inset_4px_0_0_#a855f7,0_2px_12px_rgba(15,23,42,0.045)]">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono truncate">
                                 Archived Records

@@ -18,6 +18,7 @@ class InquiryController extends Controller
     public function store(StoreInquiryRequest $request): JsonResponse|RedirectResponse
     {
         $inquiry = Inquiry::create($request->validated());
+        RealtimeController::flushSnapshotCache();
 
         // Send notifications to admin and inquirer
         try {

@@ -20,7 +20,6 @@ import {
     Mail,
     Bell,
     CheckCircle2,
-    Shield,
     Volume2,
     VolumeX,
     RefreshCw,
@@ -190,7 +189,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
             href: '/admin/verify-academy',
             icon: (props) => (
                 <img
-                    src="/assets/image/academy/logo-black-trimmed.png"
+                    src="/assets/image/academy/logo-black-trimmed.png?v=2"
                     alt="Academy"
                     className={`${props?.className || 'w-4 h-4'} object-contain`}
                 />
@@ -244,18 +243,15 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
 
                     {/* Logo & Portal Name */}
                     <div className="flex items-center gap-3">
-                        <Link href="/" className="flex items-center gap-2.5 no-underline">
-                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-black shadow-md shadow-teal-700/20 shrink-0">
-                                <Shield className="w-5 h-5 fill-white stroke-white" />
-                            </div>
-                            <div className="hidden sm:block">
-                                <span className="text-sm font-black tracking-wider text-slate-900 block leading-tight font-mono">
-                                    INFINITE
-                                </span>
-                                <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#0f766e] block">
-                                    EXECUTIVE PORTAL
-                                </span>
-                            </div>
+                        <Link href="/" className="flex flex-col items-start justify-center no-underline shrink-0 group">
+                            <img
+                                src="/assets/image/logo.webp"
+                                alt="INFINITE — Live Limitless"
+                                className="h-7 sm:h-8 w-auto object-contain transition-opacity group-hover:opacity-85"
+                            />
+                            <span className="hidden sm:block text-[9px] uppercase font-bold tracking-[0.22em] text-[#0f766e] leading-none mt-1">
+                                EXECUTIVE PORTAL
+                            </span>
                         </Link>
 
                         <div className="hidden md:block h-7 w-[1px] bg-slate-200 mx-2" />
@@ -458,15 +454,16 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                         <aside className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white border-r border-slate-200 p-5 flex flex-col justify-between z-10 shadow-2xl overflow-y-auto">
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="w-9 h-9 rounded-xl bg-[#0f766e] flex items-center justify-center text-white font-black shadow-md">
-                                            <Shield className="w-4 h-4 fill-white stroke-white" />
-                                        </div>
-                                        <div>
-                                            <span className="font-extrabold text-base text-slate-900 tracking-tight font-mono">INFINITE</span>
-                                            <span className="text-[9px] uppercase font-bold text-[#0f766e] block tracking-widest">ADMIN PORTAL</span>
-                                        </div>
-                                    </div>
+                                    <Link href="/" className="flex flex-col items-start justify-center no-underline">
+                                        <img
+                                            src="/assets/image/logo.webp"
+                                            alt="INFINITE — Live Limitless"
+                                            className="h-7 w-auto object-contain"
+                                        />
+                                        <span className="text-[9px] uppercase font-bold text-[#0f766e] block tracking-[0.2em] mt-1 leading-none">
+                                            ADMIN PORTAL
+                                        </span>
+                                    </Link>
                                     <button
                                         type="button"
                                         onClick={() => setSidebarOpen(false)}

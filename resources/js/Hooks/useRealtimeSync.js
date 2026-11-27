@@ -278,6 +278,13 @@ export default function useRealtimeSync({
                         title: 'Curriculum Updated',
                         message: 'New or updated training modules are now available in your portal.',
                     });
+                } else if (newAcad.commandments_hash && oldAcad.commandments_hash && newAcad.commandments_hash !== oldAcad.commandments_hash && !playSoundType) {
+                    playSoundType = 'default';
+                    addNotification({
+                        type: 'academy',
+                        title: 'Tier Commandments Updated',
+                        message: 'Administration updated the official commandments for your rank tier.',
+                    });
                 }
             }
         } else {

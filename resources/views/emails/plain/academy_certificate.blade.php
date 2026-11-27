@@ -14,7 +14,7 @@ OFFICIAL CREDENTIALS:
 
 Your official certificate file is attached directly to this email. You may also access your member portal at any time to view, download, or review your rank progression:
 
-Access Member Portal: {{ $portalUrl }}
+Access Member Portal: {{ $loginUrl }}
 
 Conferred by:
 PRIMO ECALNE JR.

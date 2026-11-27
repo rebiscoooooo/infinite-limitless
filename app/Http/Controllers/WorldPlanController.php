@@ -111,6 +111,7 @@ class WorldPlanController extends Controller
             'payment_proof' => $proofPath,
             'status' => 'Pending',
         ]);
+        RealtimeController::flushSnapshotCache();
 
         // Send notifications to applicant and administrator
         try {

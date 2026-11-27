@@ -555,7 +555,7 @@ export default function CompanyProfile({ executiveTiers = [], proofs = {} }) {
                         <div className="cards-grid">
                             <div className="info-card">
                                 <div className="card-img">
-                                    <img src="/assets/image/product-received/5.jpg" alt="Order Preparation" loading="lazy" decoding="async" />
+                                    <img src="/assets/image/product-received/product-received-5.jpg" alt="Order Preparation" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="card-body">
                                     <h3>Order Preparation &amp; Air Freight</h3>
@@ -566,7 +566,7 @@ export default function CompanyProfile({ executiveTiers = [], proofs = {} }) {
 
                             <div className="info-card">
                                 <div className="card-img">
-                                    <img src="/assets/image/product-received/6.jpg" alt="Courier Turnover" loading="lazy" decoding="async" />
+                                    <img src="/assets/image/product-received/product-received-6.jpg" alt="Courier Turnover" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="card-body">
                                     <h3>Direct Port Container Cargo</h3>
@@ -577,7 +577,7 @@ export default function CompanyProfile({ executiveTiers = [], proofs = {} }) {
 
                             <div className="info-card">
                                 <div className="card-img">
-                                    <img src="/assets/image/product-received/1.jpg" alt="Bulk Customs Clearance" loading="lazy" decoding="async" />
+                                    <img src="/assets/image/product-received/product-received-1.jpg" alt="Bulk Customs Clearance" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="card-body">
                                     <h3>Bulk Customs Clearance</h3>
@@ -588,7 +588,7 @@ export default function CompanyProfile({ executiveTiers = [], proofs = {} }) {
 
                             <div className="info-card">
                                 <div className="card-img">
-                                    <img src="/assets/image/product-received/2.jpg" alt="Global Shipping" loading="lazy" decoding="async" />
+                                    <img src="/assets/image/product-received/product-received-2.jpg" alt="Global Shipping" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="card-body">
                                     <h3>West Africa Central Hub</h3>

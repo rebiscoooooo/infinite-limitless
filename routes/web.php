@@ -88,6 +88,7 @@ Route::middleware('academy.auth')->group(function () {
     Route::post('/academy-profile', [AcademyAuthController::class, 'updateProfile'])->name('academy.profile.update');
     Route::post('/academy-portal/language', [AcademyAuthController::class, 'switchLanguage'])->name('academy.portal.language');
     Route::post('/academy-portal/trainings/{training}/reflect', [AcademyAuthController::class, 'submitReflection'])->name('academy.trainings.reflect');
+    Route::get('/academy-portal/trainings/{training}/attachments/{attachmentId}', [AcademyAuthController::class, 'downloadTrainingAttachment'])->name('academy.trainings.attachments.download');
     Route::get('/academy-portal/certificates/{certificate}/download', [AcademyAuthController::class, 'downloadCertificate'])->name('academy.certificates.download');
 });
 
@@ -162,11 +163,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/verify-academy/members/{member}/trainings/grant-all', [AcademyAdminController::class, 'grantAllMemberTrainings'])->name('academy.trainings.grant-member-all');
         Route::post('/verify-academy/trainings/{training}/grant-all', [AcademyAdminController::class, 'grantTrainingToAllMembers'])->name('academy.trainings.grant-rank-all');
         Route::post('/verify-academy/trainings', [AcademyAdminController::class, 'storeTraining'])->name('academy.trainings.store');
-        Route::match(['put', 'patch'], '/verify-academy/trainings/{training}', [AcademyAdminController::class, 'updateTraining'])->name('academy.trainings.update');
+        Route::match(['post', 'put', 'patch'], '/verify-academy/trainings/{training}', [AcademyAdminController::class, 'updateTraining'])->name('academy.trainings.update');
+        Route::get('/verify-academy/trainings/{training}/attachments/{attachmentId}', [AcademyAdminController::class, 'downloadTrainingAttachment'])->name('academy.trainings.attachments.download');
         Route::delete('/verify-academy/trainings/{training}', [AcademyAdminController::class, 'deleteTraining'])->name('academy.trainings.destroy');
         Route::post('/verify-academy/requirements', [AcademyAdminController::class, 'storeRequirement'])->name('academy.requirements.store');
         Route::match(['put', 'patch'], '/verify-academy/requirements/{requirement}', [AcademyAdminController::class, 'updateRequirement'])->name('academy.requirements.definition.update');
         Route::delete('/verify-academy/requirements/{requirement}', [AcademyAdminController::class, 'deleteRequirement'])->name('academy.requirements.destroy');
+        Route::post('/verify-academy/commandments', [AcademyAdminController::class, 'storeCommandment'])->name('academy.commandments.store');
+        Route::match(['put', 'patch'], '/verify-academy/commandments/{commandment}', [AcademyAdminController::class, 'updateCommandment'])->name('academy.commandments.update');
+        Route::patch('/verify-academy/commandments/{commandment}/toggle', [AcademyAdminController::class, 'toggleCommandment'])->name('academy.commandments.toggle');
+        Route::delete('/verify-academy/commandments/{commandment}', [AcademyAdminController::class, 'deleteCommandment'])->name('academy.commandments.destroy');
         Route::get('/verify-academy/certificates/{certificate}/download', [AcademyAdminController::class, 'downloadCertificate'])->name('academy.admin.certificates.download');
         Route::post('/verify-academy/members/{member}/certificates/upload', [AcademyAdminController::class, 'uploadMemberCertificate'])->name('academy.certificates.upload');
         Route::post('/verify-academy/announcements', [AcademyAdminController::class, 'storeAnnouncement'])->name('academy.announcements.store');

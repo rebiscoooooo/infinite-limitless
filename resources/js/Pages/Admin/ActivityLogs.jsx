@@ -144,7 +144,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                 {/* 4 Top KPI Stat Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                     {/* KPI 1: Total Logs */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#0f766e] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Total Audit Records
@@ -170,7 +170,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     </div>
 
                     {/* KPI 2: Active Logs */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#10b981,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Active Audit Logs
@@ -196,7 +196,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     </div>
 
                     {/* KPI 3: Today's Events */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-sky-500 transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#0ea5e9,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Today's Actions
@@ -222,7 +222,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     </div>
 
                     {/* KPI 4: Archived Entries */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs border-l-4 border-l-[#f59e0b] transition-all hover:shadow-md">
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-[inset_4px_0_0_#f59e0b,0_2px_12px_rgba(15,23,42,0.045)] transition-all hover:shadow-md">
                         <div className="flex items-center justify-between gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                                 Archived Entries
@@ -435,7 +435,7 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                                             <tr
                                                 key={log.id}
                                                 className={`transition-colors ${
-                                                    isSelected ? 'bg-teal-50/70 border-l-4 border-l-[#0f766e]' : 'hover:bg-slate-50/70'
+                                                    isSelected ? 'bg-teal-50/70 shadow-[inset_4px_0_0_#0f766e,0_2px_12px_rgba(15,23,42,0.045)]' : 'hover:bg-slate-50/70'
                                                 }`}
                                             >
                                                 <td className="p-3.5 text-center">

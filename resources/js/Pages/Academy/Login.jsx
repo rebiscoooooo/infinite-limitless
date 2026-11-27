@@ -84,7 +84,7 @@ export default function Login() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 no-underline group">
                         <img
-                            src="/assets/image/academy/logo-black-trimmed.png"
+                            src="/assets/image/academy/logo-black-trimmed.png?v=2"
                             alt="Legacy Club PH"
                             className="h-9 sm:h-11 w-auto object-contain shrink-0 group-hover:scale-105 transition-transform"
                         />

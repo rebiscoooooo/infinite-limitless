@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import AcademyLayout from '../../Layouts/AcademyLayout';
+import CommandmentsPanel from '../../Components/CommandmentsPanel';
 import { ACADEMY_TIERS, getTierDetails } from '../../Utils/academyBadges';
 import { Shield, CheckCircle2, Sparkles, Lock, BookOpen, CheckSquare, ArrowRight, Crown } from 'lucide-react';
 
@@ -8,8 +9,10 @@ export default function RankMatrix({
     member,
     portalCounts = {},
     latestAnnouncement = null,
+    commandmentsByTier = null,
 }) {
     const rankTier = member?.rank_tier || 'Rookie';
+    const [commandmentTier, setCommandmentTier] = useState(rankTier);
     const currentDetails = getTierDetails(rankTier);
     const orderedTiers = Object.values(ACADEMY_TIERS);
     const currentIdx = Math.max(
@@ -29,7 +32,7 @@ export default function RankMatrix({
             pageTitle="5-Tier Rank Matrix"
             headTitle={`5-Tier Rank Matrix - ${member.full_name} | Legacy Club Academy`}
         >
-            {({ t }) => (
+            {({ lang, t }) => (
                 <div className="space-y-6">
                     {/* Hero Current Rank & Progression Summary */}
                     <div className="rounded-3xl bg-white p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -218,6 +221,52 @@ export default function RankMatrix({
                                 </div>
                             );
                         })}
+                    </div>
+
+                    {/* Commandments per Tier */}
+                    <div className="space-y-4">
+                        <div className="rounded-3xl bg-white p-5 sm:p-6 space-y-4">
+                            <div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#0f766e] font-mono">
+                                    {lang === 'tl' ? 'Kodigo ng Bawat Antas' : 'Code of Conduct per Tier'}
+                                </span>
+                                <h3 className="text-lg font-black text-slate-900 uppercase font-mono mt-0.5 mb-0">
+                                    {lang === 'tl' ? 'Mga Utos ng Bawat Antas' : 'Tier Commandments'}
+                                </h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {orderedTiers.map((tier) => {
+                                    const active = commandmentTier.toLowerCase() === tier.tier.toLowerCase();
+                                    const isMine = tier.tier.toLowerCase() === rankTier.toLowerCase();
+                                    return (
+                                        <button
+                                            key={tier.tier}
+                                            type="button"
+                                            onClick={() => setCommandmentTier(tier.tier)}
+                                            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                                active
+                                                    ? 'bg-[#0f766e] text-white shadow-sm'
+                                                    : 'bg-slate-100/90 text-slate-600 hover:bg-teal-50 hover:text-[#0f766e]'
+                                            }`}
+                                        >
+                                            <img src={tier.badge_image} alt="" className="w-5 h-5 object-contain" />
+                                            <span>{tier.name}</span>
+                                            {isMine && (
+                                                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-mono uppercase ${active ? 'bg-white/25 text-white' : 'bg-teal-100 text-[#0f766e]'}`}>
+                                                    {lang === 'tl' ? 'Ikaw' : 'You'}
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <CommandmentsPanel
+                            tier={commandmentTier}
+                            lang={lang}
+                            isCurrent={commandmentTier.toLowerCase() === rankTier.toLowerCase()}
+                            items={commandmentsByTier?.[commandmentTier] ?? []}
+                        />
                     </div>
                 </div>
             )}

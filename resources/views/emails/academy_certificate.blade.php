@@ -195,7 +195,10 @@
                 </p>
 
                 <div class="btn-wrap">
-                    <a href="{{ $portalUrl }}" class="btn" target="_blank">Access Member Portal &rarr;</a>
+                    <a href="{{ $loginUrl }}" class="btn" target="_blank">Access Member Portal &rarr;</a>
+                    <div style="margin-top: 12px; font-size: 12px; color: #64748b;">
+                        Or log in at: <a href="{{ $loginUrl }}" target="_blank" style="color: #0f766e; font-weight: 700; text-decoration: none;">{{ $loginUrl }}</a>
+                    </div>
                 </div>
 
                 <!-- Signatory Block -->
@@ -214,7 +217,7 @@
                     You are receiving this official transactional email because you completed accredited leadership training with Legacy Club Academy.
                 </div>
                 <div style="margin-top: 8px;">
-                    <a href="{{ $portalUrl }}">Manage Portal</a> &bull;
+                    <a href="{{ $loginUrl }}">Manage Portal</a> &bull;
                     <a href="mailto:admin@infinite-limitless.com?subject=Unsubscribe">Unsubscribe Preferences</a>
                 </div>
             </div>

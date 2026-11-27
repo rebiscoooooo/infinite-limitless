@@ -21,6 +21,8 @@ class AcademyCertificateConferredMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public const LEGACY_PORTAL_LOGIN_URL = 'https://infinite-limitless.com/academy-login';
+
     /**
      * Create a new message instance.
      */
@@ -54,7 +56,7 @@ class AcademyCertificateConferredMail extends Mailable implements ShouldQueue
      */
     public function headers(): Headers
     {
-        $unsubscribeUrl = url('/academy-portal');
+        $unsubscribeUrl = self::LEGACY_PORTAL_LOGIN_URL;
         $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
         $certId = $this->certificate->id;
 
@@ -77,8 +79,8 @@ class AcademyCertificateConferredMail extends Mailable implements ShouldQueue
      */
     public function content(): Content
     {
-        $loginUrl = url('/academy-login');
-        $portalUrl = url('/academy-portal');
+        $loginUrl = self::LEGACY_PORTAL_LOGIN_URL;
+        $portalUrl = self::LEGACY_PORTAL_LOGIN_URL;
         $rank = $this->certificate->rank_tier ?? 'Rookie';
 
         return new Content(

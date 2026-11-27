@@ -16,6 +16,8 @@ class AcademyStatusUpdatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public const LEGACY_PORTAL_LOGIN_URL = 'https://infinite-limitless.com/academy-login';
+
     /**
      * Create a new message instance.
      */
@@ -53,7 +55,7 @@ class AcademyStatusUpdatedMail extends Mailable implements ShouldQueue
     public function headers(): Headers
     {
         $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
-        $portalUrl = url('/academy-portal');
+        $portalUrl = self::LEGACY_PORTAL_LOGIN_URL;
 
         return new Headers(
             text: [
@@ -80,7 +82,8 @@ class AcademyStatusUpdatedMail extends Mailable implements ShouldQueue
             with: [
                 'member' => $this->member,
                 'rankDetails' => $this->member->rank_details,
-                'loginUrl' => url('/academy-login'),
+                'loginUrl' => self::LEGACY_PORTAL_LOGIN_URL,
+                'portalUrl' => self::LEGACY_PORTAL_LOGIN_URL,
             ],
         );
     }
