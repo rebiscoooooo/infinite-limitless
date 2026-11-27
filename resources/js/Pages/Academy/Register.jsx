@@ -41,6 +41,7 @@ export default function Register({ countryCodes = [] }) {
         password_confirmation: '',
         address: '',
         profile_picture: null,
+        preferred_language: 'en',
         terms: false,
     });
 
@@ -69,8 +70,9 @@ export default function Register({ countryCodes = [] }) {
     }, []);
 
     const handleFileChange = (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files?.[0];
         if (file) {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
             setData('profile_picture', file);
             const objectUrl = URL.createObjectURL(file);
             setPreviewUrl(objectUrl);
@@ -78,12 +80,28 @@ export default function Register({ countryCodes = [] }) {
     };
 
     const handleRemovePhoto = () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
         setData('profile_picture', null);
         setPreviewUrl(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
+
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
+
+    useEffect(() => {
+        if (!showTermsModal) return;
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') setShowTermsModal(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [showTermsModal]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -146,9 +164,10 @@ export default function Register({ countryCodes = [] }) {
 
                         <Link
                             href="/academy-login"
-                            className="text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0f766e] bg-slate-100 hover:bg-slate-200/80 py-2 px-3.5 sm:px-4 rounded-xl transition-all border-0 no-underline shadow-none"
+                            className="text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0f766e] bg-slate-100 hover:bg-slate-200/80 py-2 px-3 sm:px-4 rounded-xl transition-all border-0 no-underline shadow-none whitespace-nowrap"
                         >
-                            Already registered? <span className="text-[#0f766e] font-extrabold ml-1 no-underline">Sign In</span>
+                            <span className="hidden sm:inline">Already registered? </span>
+                            <span className="text-[#0f766e] font-extrabold no-underline">Sign In</span>
                         </Link>
                     </div>
                 </div>
@@ -170,7 +189,7 @@ export default function Register({ countryCodes = [] }) {
                     </p>
 
                     {/* 3-Step Process Flow Indicator */}
-                    <div className="mt-6 max-w-2xl mx-auto grid grid-cols-3 gap-2 sm:gap-4 text-left">
+                    <div className="mt-6 max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 text-left">
                         <div className="p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-2.5">
                             <div className="w-7 h-7 rounded-xl bg-teal-50 text-[#0f766e] font-black text-xs flex items-center justify-center shrink-0 border border-teal-200">
                                 1
@@ -354,18 +373,23 @@ export default function Register({ countryCodes = [] }) {
                                         <select
                                             value={data.phone_country_code}
                                             onChange={(e) => setData('phone_country_code', e.target.value)}
-                                            className="w-32 bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-2.5 py-2.5 text-sm text-slate-900 transition-colors shrink-0 outline-none font-medium"
+                                            className="w-28 sm:w-32 bg-slate-50 border border-slate-300 focus:bg-white focus:border-[#0f766e] focus:ring-2 focus:ring-teal-500/20 rounded-xl px-2.5 py-2.5 text-sm text-slate-900 transition-colors shrink-0 outline-none font-medium"
                                         >
-                                            {countryCodes.map((c) => (
-                                                <option key={c.code} value={c.code}>
-                                                    {c.flag} {c.code}
-                                                </option>
-                                            ))}
-                                            <option value="+63">🇵🇭 +63 (PH)</option>
-                                            <option value="+1">🇺🇸 +1 (US)</option>
-                                            <option value="+44">🇬🇧 +44 (UK)</option>
-                                            <option value="+226">🇧🇫 +226 (BF)</option>
-                                            <option value="+675">🇵🇬 +675 (PG)</option>
+                                            {countryCodes.length > 0 ? (
+                                                countryCodes.map((c) => (
+                                                    <option key={c.code} value={c.code}>
+                                                        {c.flag} {c.code}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    <option value="+63">🇵🇭 +63 (PH)</option>
+                                                    <option value="+1">🇺🇸 +1 (US)</option>
+                                                    <option value="+44">🇬🇧 +44 (UK)</option>
+                                                    <option value="+226">🇧🇫 +226 (BF)</option>
+                                                    <option value="+675">🇵🇬 +675 (PG)</option>
+                                                </>
+                                            )}
                                         </select>
                                         <input
                                             type="tel"
@@ -475,7 +499,85 @@ export default function Register({ countryCodes = [] }) {
                             </div>
                         </div>
 
-                        {/* Section 6: Terms and Conditions Agreement */}
+                        {/* Section 6: Bilingual Preference & 60-Day Rookie Program */}
+                        <div className="space-y-4 pt-2">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2 border-b border-slate-100 pb-2.5">
+                                <Sparkles className="w-4 h-4 text-[#0f766e]" /> Preferred Learning Language &amp; Initial Placement
+                            </h3>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label
+                                    className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all ${
+                                        data.preferred_language === 'en'
+                                            ? 'bg-teal-50/70 text-[#0f766e] border-[#0f766e] shadow-xs'
+                                            : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="radio"
+                                            name="preferred_language"
+                                            value="en"
+                                            checked={data.preferred_language === 'en'}
+                                            onChange={() => setData('preferred_language', 'en')}
+                                            className="w-4 h-4 text-[#0f766e] border-slate-300 focus:ring-[#0f766e]"
+                                        />
+                                        <div>
+                                            <div className="text-sm font-black flex items-center gap-2">
+                                                <span>🇺🇸 English</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-0.5">
+                                                Standard curriculum and training modules in English
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label
+                                    className={`p-4 rounded-2xl border cursor-pointer flex items-center justify-between transition-all ${
+                                        data.preferred_language === 'tl'
+                                            ? 'bg-teal-50/70 text-[#0f766e] border-[#0f766e] shadow-xs'
+                                            : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
+                                    }`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="radio"
+                                            name="preferred_language"
+                                            value="tl"
+                                            checked={data.preferred_language === 'tl'}
+                                            onChange={() => setData('preferred_language', 'tl')}
+                                            className="w-4 h-4 text-[#0f766e] border-slate-300 focus:ring-[#0f766e]"
+                                        />
+                                        <div>
+                                            <div className="text-sm font-black flex items-center gap-2">
+                                                <span>🇵🇭 Filipino</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 mt-0.5">
+                                                Modyul at pagsasanay sa wikang Filipino / Tagalog
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/* Rookie Placement & 60-Day Cycle Notice */}
+                            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center gap-4">
+                                <img
+                                    src="/assets/image/academy/badge-rookie.png"
+                                    alt="Rookie Rank"
+                                    className="w-12 h-auto object-contain filter drop-shadow-xs shrink-0"
+                                />
+                                <div className="text-xs text-slate-600 leading-relaxed">
+                                    <span className="font-bold text-slate-900 block text-xs uppercase tracking-wider font-mono">
+                                        Automatic Initial Placement: ROOKIE (1 Star)
+                                    </span>
+                                    Upon official admission, you automatically begin Day 1 of your personal <strong>60-Day Rank Development Program</strong>. Complete sequential trainings and fulfilled requirements to earn promotion.
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section 7: Terms and Conditions Agreement */}
                         <div className="pt-2">
                             <label className="flex items-start gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-[#0f766e]/50 cursor-pointer transition-colors">
                                 <input
@@ -528,21 +630,29 @@ export default function Register({ countryCodes = [] }) {
 
             {/* Clean White Terms and Conditions Modal */}
             {showTermsModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 overflow-hidden">
-                        <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/70">
-                            <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-[#0f766e]" />
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => setShowTermsModal(false)}
+                >
+                    <div
+                        className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full max-h-[90dvh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/70 shrink-0">
+                            <h3 className="text-sm sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-[#0f766e] shrink-0" />
                                 Terms &amp; Conditions &bull; Legacy Club Academy
                             </h3>
                             <button
+                                type="button"
                                 onClick={() => setShowTermsModal(false)}
+                                aria-label="Close terms"
                                 className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 cursor-pointer border-0 bg-transparent outline-none"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                        <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
                             <p>
                                 <strong className="text-slate-900">1. Membership Eligibility:</strong> Admission into the Legacy Club Academy is subject to executive review and authentication. Submission of an application does not guarantee automatic acceptance.
                             </p>
@@ -559,8 +669,16 @@ export default function Register({ countryCodes = [] }) {
                                 <strong className="text-slate-900">5. Privacy &amp; Data Protection:</strong> Personal details provided are collected for identity verification and academy credentialing under strict security protocols.
                             </p>
                         </div>
-                        <div className="p-4 border-t border-slate-200 flex justify-end bg-slate-50/70">
+                        <div className="p-4 border-t border-slate-200 flex justify-end gap-2 bg-slate-50/70 shrink-0">
                             <button
+                                type="button"
+                                onClick={() => setShowTermsModal(false)}
+                                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs cursor-pointer border-0 outline-none"
+                            >
+                                Close
+                            </button>
+                            <button
+                                type="button"
                                 onClick={() => {
                                     setData('terms', true);
                                     setShowTermsModal(false);

@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { router } from '@inertiajs/react';
-import { playNotificationChime } from '../Services/realtime';
+import {
+    playNotificationChime,
+    broadcastRealtimePing,
+    subscribeRealtimeBroadcast,
+} from '../Services/realtime';
 
 export default function useRealtimeSync({
     isAdmin = false,
-    intervalMs = 4000,
+    isAcademy = false,
+    intervalMs = 2500,
     enableSoundByDefault = true,
 } = {}) {
     const [connected, setConnected] = useState(true);
@@ -17,14 +22,14 @@ export default function useRealtimeSync({
     });
     const [notifications, setNotifications] = useState([]);
 
-    // Store previous snapshot to detect exact deltas
     const prevSnapshotRef = useRef(null);
     const isInitialRef = useRef(true);
     const sseRef = useRef(null);
     const timerRef = useRef(null);
+    const isReloadingRef = useRef(false);
+    const pendingReloadRef = useRef(false);
     const soundEnabledRef = useRef(soundEnabled);
 
-    // Keep ref updated for callbacks
     useEffect(() => {
         soundEnabledRef.current = soundEnabled;
         if (typeof window !== 'undefined') {
@@ -50,13 +55,32 @@ export default function useRealtimeSync({
 
         setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
 
-        // Auto-dismiss after 6 seconds
         setTimeout(() => {
             setNotifications((prev) => prev.filter((n) => n.id !== id));
-        }, 6000);
+        }, 6500);
     }, []);
 
-    // Handle snapshot difference evaluation
+    // Coalesced Inertia reload so rapid updates never overlap or reset user input/scroll
+    const triggerSeamlessReload = useCallback(() => {
+        if (isReloadingRef.current) {
+            pendingReloadRef.current = true;
+            return;
+        }
+        isReloadingRef.current = true;
+        router.reload({
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                isReloadingRef.current = false;
+                if (pendingReloadRef.current) {
+                    pendingReloadRef.current = false;
+                    triggerSeamlessReload();
+                }
+            },
+        });
+    }, []);
+
+    // Evaluate snapshot deltas across Admin, Legacy Academy Portal, and Public pages
     const handleSnapshot = useCallback((newSnap) => {
         if (!newSnap) return;
 
@@ -66,7 +90,7 @@ export default function useRealtimeSync({
         const oldSnap = prevSnapshotRef.current;
         prevSnapshotRef.current = newSnap;
 
-        // If this is the initial page load check, just record the baseline
+        // First snapshot establishes baseline without reloading
         if (isInitialRef.current || !oldSnap) {
             isInitialRef.current = false;
             return;
@@ -76,7 +100,7 @@ export default function useRealtimeSync({
         let playSoundType = null;
 
         if (isAdmin) {
-            // 1. Inquiries check
+            // 1. Inquiries
             const hasNewInquiry =
                 (newSnap.inquiries?.latest_id &&
                     (!oldSnap.inquiries?.latest_id || newSnap.inquiries.latest_id > oldSnap.inquiries.latest_id)) ||
@@ -98,7 +122,7 @@ export default function useRealtimeSync({
                 needsReload = true;
             }
 
-            // 2. World Plan Registrations check
+            // 2. World Plan Registrations
             const hasNewWorldPlan =
                 (newSnap.world_plan?.latest_id &&
                     (!oldSnap.world_plan?.latest_id || newSnap.world_plan.latest_id > oldSnap.world_plan.latest_id)) ||
@@ -120,7 +144,41 @@ export default function useRealtimeSync({
                 needsReload = true;
             }
 
-            // 3. Products check
+            // 3. Legacy Club Academy (Registrations, Reflections, Requirements, Trainings, Announcements, Certificates)
+            const newAcad = newSnap.academy;
+            const oldAcad = oldSnap.academy;
+            if (newAcad && oldAcad && newAcad.hash !== oldAcad.hash) {
+                needsReload = true;
+
+                const hasNewMember =
+                    (newAcad.members?.latest_id &&
+                        (!oldAcad.members?.latest_id || newAcad.members.latest_id > oldAcad.members.latest_id)) ||
+                    (newAcad.members?.count ?? 0) > (oldAcad.members?.count ?? 0);
+
+                const hasNewReflection =
+                    (newAcad.reflections?.pending_count ?? 0) > (oldAcad.reflections?.pending_count ?? 0) ||
+                    (newAcad.reflections?.latest_id &&
+                        newAcad.reflections.latest_id !== oldAcad.reflections?.latest_id &&
+                        (newAcad.reflections?.pending_count ?? 0) > 0);
+
+                if (hasNewMember) {
+                    playSoundType = 'academy';
+                    addNotification({
+                        type: 'academy',
+                        title: 'New Academy Registration',
+                        message: `${newAcad.members?.latest_name || 'New Applicant'} registered for Legacy Club Academy.`,
+                    });
+                } else if (hasNewReflection) {
+                    playSoundType = 'academy';
+                    addNotification({
+                        type: 'academy',
+                        title: 'New Training Reflection Submitted',
+                        message: `${newAcad.reflections?.latest_member_name || 'A member'} submitted Module #${newAcad.reflections?.latest_training_order || ''} reflection for review.`,
+                    });
+                }
+            }
+
+            // 4. Products
             if (newSnap.products?.hash && oldSnap.products?.hash && newSnap.products.hash !== oldSnap.products.hash) {
                 needsReload = true;
                 if (!playSoundType) playSoundType = 'default';
@@ -131,12 +189,96 @@ export default function useRealtimeSync({
                 });
             }
 
-            // 4. Admin accounts or Activity logs check
+            // 5. Admin accounts or Activity logs
             if (
                 (newSnap.admins?.hash && newSnap.admins.hash !== oldSnap.admins?.hash) ||
                 (newSnap.logs?.latest_id && newSnap.logs.latest_id !== oldSnap.logs?.latest_id)
             ) {
                 needsReload = true;
+            }
+        } else if (isAcademy) {
+            const newMe = newSnap.academy_member;
+            const oldMe = oldSnap.academy_member;
+            const newAcad = newSnap.academy;
+            const oldAcad = oldSnap.academy;
+
+            // Member-specific live changes (rank promotion, approval, trainings, requirements, certificates)
+            if (newMe && oldMe && newMe.hash !== oldMe.hash) {
+                needsReload = true;
+
+                if (newMe.rank_tier && oldMe.rank_tier && newMe.rank_tier !== oldMe.rank_tier) {
+                    playSoundType = 'celebration';
+                    addNotification({
+                        type: 'celebration',
+                        title: `Promoted to ${newMe.rank_tier}!`,
+                        message: `Congratulations! Your official rank tier has been elevated to ${newMe.rank_tier}.`,
+                    });
+                } else if (newMe.status !== oldMe.status && newMe.status === 'Approved') {
+                    playSoundType = 'celebration';
+                    addNotification({
+                        type: 'celebration',
+                        title: 'Membership Approved!',
+                        message: 'Your Legacy Club Academy application has been approved.',
+                    });
+                } else if (
+                    newMe.certificates_hash !== oldMe.certificates_hash &&
+                    (newMe.certificates_count ?? 0) >= (oldMe.certificates_count ?? 0) &&
+                    (newMe.certificates_count ?? 0) > 0
+                ) {
+                    playSoundType = 'celebration';
+                    addNotification({
+                        type: 'certificate',
+                        title: 'Certificate Updated / Conferred!',
+                        message: 'Your official training completion certificate is ready to download.',
+                    });
+                } else if ((newMe.training_approved ?? 0) > (oldMe.training_approved ?? 0)) {
+                    playSoundType = 'academy';
+                    addNotification({
+                        type: 'academy',
+                        title: 'Training Module Approved!',
+                        message: 'An administrator approved your training. Your next module is now unlocked!',
+                    });
+                } else if ((newMe.training_rejected ?? 0) > (oldMe.training_rejected ?? 0)) {
+                    playSoundType = 'warning';
+                    addNotification({
+                        type: 'warning',
+                        title: 'Training Revision Requested',
+                        message: 'Admin left feedback on your reflection. Please review and resubmit.',
+                    });
+                } else if (newMe.req_hash !== oldMe.req_hash) {
+                    playSoundType = 'academy';
+                    addNotification({
+                        type: 'academy',
+                        title: 'Requirements Progress Updated',
+                        message: 'Your verified rank requirements progress was just updated by Admin.',
+                    });
+                }
+            }
+
+            // Global Academy changes (new announcements, curriculum updates, leaderboard updates)
+            if (newAcad && oldAcad && newAcad.hash !== oldAcad.hash) {
+                needsReload = true;
+
+                const hasNewAnnouncement =
+                    newAcad.announcements?.latest_id &&
+                    newAcad.announcements.latest_id !== oldAcad.announcements?.latest_id &&
+                    (newAcad.announcements?.active_count ?? 0) >= (oldAcad.announcements?.active_count ?? 0);
+
+                if (hasNewAnnouncement && !playSoundType) {
+                    playSoundType = 'academy';
+                    addNotification({
+                        type: 'announcement',
+                        title: 'New Academy Announcement',
+                        message: newAcad.announcements?.latest_title || 'A new academy update has been posted.',
+                    });
+                } else if (newAcad.trainings_hash !== oldAcad.trainings_hash && !playSoundType) {
+                    playSoundType = 'default';
+                    addNotification({
+                        type: 'academy',
+                        title: 'Curriculum Updated',
+                        message: 'New or updated training modules are now available in your portal.',
+                    });
+                }
             }
         } else {
             // Public website: check if product catalog changed
@@ -145,19 +287,14 @@ export default function useRealtimeSync({
             }
         }
 
-        // Play audio chime if enabled and sound triggered
         if (playSoundType && soundEnabledRef.current) {
             playNotificationChime(playSoundType);
         }
 
-        // Trigger seamless Inertia reload without full page refresh or scroll reset
         if (needsReload) {
-            router.reload({
-                preserveScroll: true,
-                preserveState: true,
-            });
+            triggerSeamlessReload();
         }
-    }, [isAdmin, addNotification]);
+    }, [isAdmin, isAcademy, addNotification, triggerSeamlessReload]);
 
     // Fetch snapshot via AJAX pulse
     const fetchPulse = useCallback(async () => {
@@ -165,10 +302,11 @@ export default function useRealtimeSync({
             setIsSyncing(true);
             const res = await fetch('/realtime/pulse', {
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 cache: 'no-store',
+                credentials: 'same-origin',
             });
 
             if (res.ok) {
@@ -187,80 +325,115 @@ export default function useRealtimeSync({
     // Manual sync trigger button
     const syncNow = useCallback(() => {
         fetchPulse().then(() => {
-            router.reload({
-                preserveScroll: true,
-                preserveState: true,
-            });
+            triggerSeamlessReload();
         });
-    }, [fetchPulse]);
+    }, [fetchPulse, triggerSeamlessReload]);
 
-    // Setup Server-Sent Events (SSE) and interval fallback
+    // Broadcast to other open browser tabs whenever a mutation (POST/PUT/PATCH/DELETE) finishes
     useEffect(() => {
-        // Initial immediate fetch
+        if (!isAdmin && !isAcademy) return;
+        const removeListener = router.on('finish', (event) => {
+            const method = (event?.detail?.visit?.method || '').toLowerCase();
+            if (method && method !== 'get') {
+                broadcastRealtimePing(isAdmin ? 'admin' : 'academy');
+            }
+        });
+        return () => {
+            if (typeof removeListener === 'function') removeListener();
+        };
+    }, [isAdmin, isAcademy]);
+
+    // Setup SSE, BroadcastChannel instant cross-tab sync, and polling fallback
+    useEffect(() => {
         fetchPulse();
 
-        // 1. Try Native Server-Sent Events stream for zero-latency instant updates
-        let es = null;
-        try {
-            if (typeof window !== 'undefined' && window.EventSource) {
-                es = new EventSource('/realtime/stream');
-                sseRef.current = es;
-
-                es.addEventListener('update', (e) => {
-                    try {
-                        const data = JSON.parse(e.data);
-                        handleSnapshot(data);
-                    } catch (err) {
-                        // ignore malformed event
-                    }
-                });
-
-                es.onopen = () => {
-                    setConnected(true);
-                };
-
-                es.onerror = () => {
-                    // SSE connection closed or reconnecting; fallback timer covers this
-                    setConnected(false);
-                };
-            }
-        } catch (e) {
-            // SSE not supported or blocked, timer fallback runs smoothly
-        }
-
-        // 2. High-reliability Polling Timer (acts as heartbeat and fallback)
-        const pollTime = isAdmin ? intervalMs : Math.max(intervalMs, 10000);
-        timerRef.current = setInterval(fetchPulse, pollTime);
-
-        // 3. Tab Visibility Handler: immediately check when user tabs back into the page
-        const handleVisibilityChange = () => {
+        const unsubscribeBroadcast = subscribeRealtimeBroadcast(() => {
             if (document.visibilityState === 'visible') {
                 fetchPulse();
+            }
+        });
+
+        const closeSse = () => {
+            if (sseRef.current) {
+                sseRef.current.close();
+                sseRef.current = null;
+            }
+        };
+
+        const openSse = () => {
+            if (sseRef.current) return;
+            try {
+                if (typeof window !== 'undefined' && window.EventSource) {
+                    const es = new EventSource('/realtime/stream');
+                    sseRef.current = es;
+
+                    es.addEventListener('update', (e) => {
+                        try {
+                            handleSnapshot(JSON.parse(e.data));
+                        } catch (err) {
+                            // ignore malformed event
+                        }
+                    });
+
+                    es.onopen = () => setConnected(true);
+                    es.onerror = () => {
+                        // SSE closed/reconnecting; polling heartbeat keeps data fresh seamlessly
+                    };
+                }
+            } catch (e) {
+                // SSE unavailable; polling runs smoothly
+            }
+        };
+
+        if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+            openSse();
+        }
+
+        const pollTime = isAdmin || isAcademy ? intervalMs : Math.max(intervalMs, 10000);
+        timerRef.current = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchPulse();
+            }
+        }, pollTime);
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                openSse();
+                fetchPulse();
+            } else {
+                closeSse();
             }
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        // 4. Online/Offline network handlers
-        const handleOnline = () => {
-            setConnected(true);
+        const handleFocus = () => {
             fetchPulse();
         };
-        const handleOffline = () => setConnected(false);
+        window.addEventListener('focus', handleFocus);
+
+        const handleOnline = () => {
+            setConnected(true);
+            openSse();
+            fetchPulse();
+        };
+        const handleOffline = () => {
+            setConnected(false);
+            closeSse();
+        };
 
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
 
         return () => {
+            unsubscribeBroadcast();
             if (timerRef.current) clearInterval(timerRef.current);
-            if (sseRef.current) {
-                sseRef.current.close();
-                sseRef.current = null;
-            }
+            closeSse();
             document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
         };
-    }, [fetchPulse, handleSnapshot, intervalMs, isAdmin]);
+    }, [fetchPulse, handleSnapshot, intervalMs, isAdmin, isAcademy]);
 
     return {
         connected,
@@ -273,4 +446,3 @@ export default function useRealtimeSync({
         syncNow,
     };
 }
-

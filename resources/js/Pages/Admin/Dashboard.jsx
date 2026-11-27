@@ -646,7 +646,7 @@ export default function Dashboard({
             {/* MANUAL MARKETING DISPATCH MODAL */}
             {showMarketingModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative space-y-4 text-left">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative space-y-4 text-left">
                         {/* Modal Header */}
                         <div className="flex items-center justify-between pb-3.5 border-b border-slate-200">
                             <div className="flex items-center gap-3">

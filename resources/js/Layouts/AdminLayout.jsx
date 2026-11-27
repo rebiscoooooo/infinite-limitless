@@ -41,7 +41,6 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
     const currentUrl = page.url || '';
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [currentTime, setCurrentTime] = useState({ time: '', date: '' });
-    const [isTestingEmail, setIsTestingEmail] = useState(false);
 
     // Realtime Synchronization Engine
     const {
@@ -55,7 +54,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
         syncNow,
     } = useRealtimeSync({
         isAdmin: true,
-        intervalMs: 3500,
+        intervalMs: 2500,
     });
 
     // Live Clock (PHT) formatted exactly like reference portal
@@ -150,25 +149,16 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
         router.post('/admin/logout');
     };
 
-    const handleTestEmail = async () => {
-        setIsTestingEmail(true);
-        try {
-            const res = await fetch('/api/mail/test', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                alert(`✓ SMTP Connection Verified!\n\n${data.message}`);
-            } else {
-                alert(`✗ SMTP Ping Error:\n\n${data.message}`);
-            }
-        } catch (err) {
-            alert(`SMTP Test Failed: ${err.message}`);
-        } finally {
-            setIsTestingEmail(false);
-        }
-    };
+    useEffect(() => {
+        if (!showPasswordModal && !sidebarOpen) return;
+        const onKeyDown = (e) => {
+            if (e.key !== 'Escape') return;
+            if (showPasswordModal && !passwordForm.processing) setShowPasswordModal(false);
+            else if (sidebarOpen) setSidebarOpen(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [showPasswordModal, sidebarOpen, passwordForm.processing]);
 
     const navItems = [
         {
@@ -332,7 +322,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
 
                     {/* CLOCK PILL (MATCHING EXACT AMBER/GOLD THEME IN REFERENCE IMAGE) */}
                     {currentTime.time && (
-                        <div className="flex items-center gap-2.5 px-3.5 py-1.5 sm:py-2 rounded-2xl bg-amber-50/70 border border-amber-300/80 text-amber-900 shadow-sm">
+                        <div className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 sm:py-2 rounded-2xl bg-amber-50/70 border border-amber-300/80 text-amber-900 shadow-sm">
                             <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                             <div className="text-right leading-none">
                                 <div className="text-xs font-black font-mono tracking-tight text-slate-900">
@@ -349,11 +339,11 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
 
             {/* MAIN SHELL: SIDEBAR + CONTENT CANVAS */}
             <div className="flex-1 flex min-w-0">
-                {/* Desktop Left Sidebar (Matching Reference Image) */}
-                <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-slate-200 p-4 xl:p-5 justify-between shrink-0 min-h-[calc(100vh-5rem)] sticky top-20 z-20">
+                {/* Desktop Left Sidebar (Clean Borderless Soft Elevation) */}
+                <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-white p-4 xl:p-5 justify-between shrink-0 h-[calc(100dvh-5rem)] sticky top-20 z-20 overflow-y-auto shadow-[2px_0_16px_rgba(15,23,42,0.03)]">
                     <div className="space-y-6">
-                        {/* USER PROFILE BOX (MATCHING EXACT HIGHLIGHT BOX IN REFERENCE SCREENSHOT) */}
-                        <div className="rounded-2xl p-3.5 bg-gradient-to-r from-teal-50/50 via-white to-slate-50 border border-slate-200/90 border-l-4 border-l-[#f59e0b] shadow-sm space-y-2">
+                        {/* USER PROFILE BOX */}
+                        <div className="rounded-2xl p-3.5 bg-gradient-to-r from-teal-50/60 via-slate-50/70 to-slate-50 shadow-[inset_4px_0_0_#f59e0b] space-y-2">
                             <div>
                                 <h3 className="text-xs font-black text-slate-900 uppercase tracking-tight truncate">
                                     {adminFullName}
@@ -363,11 +353,13 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                 </p>
                             </div>
 
-                            <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs">
+                            <div className="h-px bg-slate-200/70 w-full" />
+
+                            <div className="flex items-center justify-between text-xs">
                                 <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono">
                                     ADMIN ID
                                 </span>
-                                <span className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 font-mono font-bold text-xs text-[#0f766e] shadow-xs">
+                                <span className="px-2 py-0.5 rounded-lg bg-white font-mono font-bold text-xs text-[#0f766e] shadow-xs">
                                     ADM-{auth?.admin?.id || '01'}
                                 </span>
                             </div>
@@ -389,7 +381,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                             href={item.href}
                                             className={`group relative flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 text-decoration-none ${
                                                 active
-                                                    ? 'bg-[#f0fdfa] text-[#0f766e] font-bold border-l-4 border-l-[#0f766e] shadow-xs'
+                                                    ? 'bg-[#f0fdfa] text-[#0f766e] font-bold shadow-[inset_3px_0_0_#0f766e]'
                                                     : 'text-slate-600 hover:text-[#0f766e] hover:bg-slate-50'
                                             }`}
                                         >
@@ -428,14 +420,15 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                     <span>Update Password</span>
                                 </button>
 
-                                <Link
+                                <a
                                     href="/"
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-[#0f766e] hover:bg-slate-50 transition-colors no-underline border-0"
                                 >
                                     <ExternalLink className="w-4 h-4 text-slate-400" />
                                     <span>Public Website</span>
-                                </Link>
+                                </a>
 
                                 <button
                                     type="button"
@@ -475,15 +468,17 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                         </div>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => setSidebarOpen(false)}
-                                        className="p-2 rounded-xl text-slate-400 hover:text-slate-800 bg-slate-100"
+                                        aria-label="Close navigation"
+                                        className="p-2 rounded-xl text-slate-400 hover:text-slate-800 bg-slate-100 cursor-pointer border-0"
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
 
                                 {/* User box */}
-                                <div className="rounded-2xl p-3.5 bg-slate-50 border border-slate-200 border-l-4 border-l-[#f59e0b] shadow-xs">
+                                <div className="rounded-2xl p-3.5 bg-slate-50 shadow-[inset_4px_0_0_#f59e0b]">
                                     <h3 className="text-xs font-black text-slate-900 uppercase truncate">
                                         {adminFullName}
                                     </h3>
@@ -501,7 +496,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                                 onClick={() => setSidebarOpen(false)}
                                                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-decoration-none ${
                                                     active
-                                                        ? 'bg-[#f0fdfa] text-[#0f766e] border-l-4 border-l-[#0f766e]'
+                                                        ? 'bg-[#f0fdfa] text-[#0f766e] shadow-[inset_3px_0_0_#0f766e]'
                                                         : 'text-slate-600 hover:bg-slate-50'
                                                 }`}
                                             >
@@ -514,13 +509,28 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                             </div>
 
                             <div className="pt-4 border-t border-slate-200 space-y-2">
+                                {currentTime.time && (
+                                    <div className="px-3 py-2 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between text-[11px] font-mono text-amber-900">
+                                        <span className="font-bold">{currentTime.time}</span>
+                                        <span className="text-[10px] text-amber-700">{currentTime.date}</span>
+                                    </div>
+                                )}
+                                <a
+                                    href="/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-xs font-bold text-[#0f766e] no-underline"
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    <span>Public Website</span>
+                                </a>
                                 <button
                                     type="button"
                                     onClick={() => {
                                         setSidebarOpen(false);
                                         openPasswordModal();
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border-0"
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 border-0 cursor-pointer"
                                 >
                                     <KeyRound className="w-4 h-4" />
                                     <span>Change Password</span>
@@ -528,7 +538,7 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
                                 <button
                                     type="button"
                                     onClick={handleLogout}
-                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 border-0"
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 border-0 cursor-pointer"
                                 >
                                     <LogOut className="w-4 h-4" />
                                     <span>Logout</span>
@@ -545,11 +555,59 @@ export default function AdminLayout({ children, title = 'Executive Console', sub
             </div>
 
             {/* ========================================================
+                REALTIME LIVE NOTIFICATION TOASTS (INQUIRIES / WORLD PLAN / ACADEMY)
+            ======================================================== */}
+            {notifications.length > 0 && (
+                <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2.5 w-[calc(100vw-2rem)] max-w-sm pointer-events-none">
+                    {notifications.map((n) => (
+                        <div
+                            key={n.id}
+                            className={`pointer-events-auto rounded-2xl bg-white p-4 flex items-start gap-3 animate-in fade-in slide-in-from-bottom-3 ${
+                                n.type === 'world_plan'
+                                    ? 'shadow-[inset_4px_0_0_#f59e0b,0_14px_30px_rgba(15,23,42,0.14)]'
+                                    : n.type === 'academy'
+                                        ? 'shadow-[inset_4px_0_0_#9333ea,0_14px_30px_rgba(15,23,42,0.14)]'
+                                        : 'shadow-[inset_4px_0_0_#0f766e,0_14px_30px_rgba(15,23,42,0.14)]'
+                            }`}
+                        >
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                                n.type === 'world_plan'
+                                    ? 'bg-amber-50 text-amber-600'
+                                    : n.type === 'academy'
+                                        ? 'bg-purple-50 text-purple-600'
+                                        : 'bg-teal-50 text-[#0f766e]'
+                            }`}>
+                                <Bell className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <div className="text-xs font-black text-slate-900">{n.title}</div>
+                                <p className="text-[11px] text-slate-600 mt-0.5 leading-snug">{n.message}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => dismissNotification(n.id)}
+                                aria-label="Dismiss notification"
+                                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 bg-transparent border-0 cursor-pointer shrink-0"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* ========================================================
                 CHANGE ADMIN PASSWORD MODAL (CLEAN LIGHT THEME)
             ======================================================== */}
             {showPasswordModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-2xl relative overflow-hidden space-y-4 text-left">
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+                    onClick={() => { if (!passwordForm.processing) setShowPasswordModal(false); }}
+                >
+                    <div
+                        className="bg-white border border-slate-200 rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative space-y-4 text-left"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {/* Top Accent Stripe */}
                         <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 

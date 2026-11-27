@@ -2,6 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\AcademyCertificate;
+use App\Models\AcademyMember;
+use App\Models\AcademyTraining;
+use App\Models\AcademyTrainingProgress;
+use App\Models\AdminUser;
 use App\Models\Inquiry;
 use App\Models\Product;
 use App\Models\WorldPlanRegistration;
@@ -120,5 +125,89 @@ class RealtimeSyncTest extends TestCase
 
         $this->assertNotEquals($initialHash, $newHash);
         $this->assertEquals(1, $updatedRes->json('products.count'));
+    }
+
+    public function test_academy_member_and_training_changes_update_realtime_snapshot_instantly(): void
+    {
+        $this->seed(\Database\Seeders\AcademyCurriculumSeeder::class);
+
+        $admin = AdminUser::create([
+            'username' => 'rtadmin',
+            'name' => 'Realtime Admin',
+            'email' => 'rtadmin@example.com',
+            'password' => bcrypt('Secret123!'),
+            'role' => 'Super Admin',
+            'status' => 'Active',
+        ]);
+
+        // Initial snapshot baseline (warms the 1s cache)
+        $before = $this->get('/realtime/pulse')->assertStatus(200);
+        $initialAcademyHash = $before->json('academy.hash');
+        $this->assertNotEmpty($initialAcademyHash);
+
+        // Create approved member & authenticate as Academy member
+        $member = AcademyMember::create([
+            'first_name' => 'Liza',
+            'last_name' => 'Reyes',
+            'phone_country_code' => '+63',
+            'phone_number' => '9171234567',
+            'email' => 'liza.rt@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Manila',
+            'status' => 'Approved',
+            'rank_tier' => 'Rookie',
+            'approved_at' => now(),
+        ]);
+        $member->initializeRankProgression('Rookie');
+        \App\Http\Controllers\RealtimeController::flushAcademyCache();
+
+        $this->actingAs($member, 'academy');
+        $afterMember = $this->get('/realtime/pulse')->assertStatus(200);
+        $this->assertNotEquals($initialAcademyHash, $afterMember->json('academy.hash'));
+        $this->assertEquals(1, $afterMember->json('academy.members.count'));
+        $this->assertEquals($member->id, $afterMember->json('academy_member.id'));
+        $initialMemberHash = $afterMember->json('academy_member.hash');
+
+        // Member submits reflection -> must bust cache and update both admin & member snapshots immediately
+        $training1 = AcademyTraining::where('rank_tier', 'Rookie')->where('order', 1)->first();
+        $this->post(route('academy.trainings.reflect', $training1->id), [
+            'reflection_submission' => 'Deep reflection on foundational leadership module 1 for realtime verification.',
+        ])->assertSessionHasNoErrors();
+
+        $afterReflect = $this->get('/realtime/pulse')->assertStatus(200);
+        $this->assertEquals(1, $afterReflect->json('academy.reflections.pending_count'));
+        $this->assertEquals(1, $afterReflect->json('academy_member.training_submitted'));
+        $this->assertNotEquals($initialMemberHash, $afterReflect->json('academy_member.hash'));
+        $hashAfterReflect = $afterReflect->json('academy_member.hash');
+
+        // Admin approves reflection -> must bust cache and immediately reflect in member's pulse
+        $prog = AcademyTrainingProgress::where('member_id', $member->id)->where('training_id', $training1->id)->first();
+        $this->actingAs($admin, 'admin');
+        $this->post(route('admin.academy.trainings.review', $prog->id), [
+            'action' => 'approve',
+            'admin_feedback' => 'Great job!',
+        ])->assertSessionHasNoErrors();
+
+        $this->actingAs($member, 'academy');
+        $afterApprove = $this->get('/realtime/pulse')->assertStatus(200);
+        $this->assertEquals(0, $afterApprove->json('academy.reflections.pending_count'));
+        $this->assertEquals(1, $afterApprove->json('academy_member.training_approved'));
+        $this->assertNotEquals($hashAfterReflect, $afterApprove->json('academy_member.hash'));
+
+        // Certificate conferral updates certificates hash immediately
+        $certHashBefore = $afterApprove->json('academy_member.certificates_hash');
+        AcademyCertificate::create([
+            'member_id' => $member->id,
+            'rank_tier' => 'Rookie',
+            'certificate_type' => 'training',
+            'certificate_number' => 'LCAC-ROOKIE-99999-2026',
+            'issued_at' => now(),
+            'template_design' => 'classic-gold',
+        ]);
+        \App\Http\Controllers\RealtimeController::flushAcademyCache();
+
+        $afterCert = $this->get('/realtime/pulse')->assertStatus(200);
+        $this->assertEquals(1, $afterCert->json('academy_member.certificates_count'));
+        $this->assertNotEquals($certHashBefore, $afterCert->json('academy_member.certificates_hash'));
     }
 }

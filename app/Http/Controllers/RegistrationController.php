@@ -181,7 +181,7 @@ class RegistrationController extends Controller
 
         // Send confirmation email to applicant and notification to administrator
         try {
-            $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
+            $adminEmail = config('mail.admin_address', 'infinitelimitless123@gmail.com');
             Mail::to($adminEmail)->queue(new WorldPlanReceivedAdminMail($registration));
             Mail::to($registration->email)->queue(new WorldPlanReceivedConfirmationMail($registration, isUpdate: false));
         } catch (\Throwable $e) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { resetAnnouncementPopup } from '../../Layouts/AcademyLayout';
 import {
     GraduationCap,
     Mail,
@@ -56,6 +57,7 @@ export default function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        resetAnnouncementPopup();
         post('/academy-login', {
             preserveScroll: true,
         });
@@ -114,9 +116,10 @@ export default function Login() {
 
                         <Link
                             href="/academy-register"
-                            className="text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0f766e] bg-slate-100 hover:bg-slate-200/80 py-2 px-3.5 sm:px-4 rounded-xl transition-all border-0 no-underline"
+                            className="text-xs sm:text-sm font-bold text-slate-700 hover:text-[#0f766e] bg-slate-100 hover:bg-slate-200/80 py-2 px-3 sm:px-4 rounded-xl transition-all border-0 no-underline whitespace-nowrap"
                         >
-                            Apply for Membership &rarr;
+                            <span className="sm:hidden">Apply &rarr;</span>
+                            <span className="hidden sm:inline">Apply for Membership &rarr;</span>
                         </Link>
                     </div>
                 </div>
@@ -213,6 +216,7 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                                     className="absolute right-3 top-3 text-slate-400 hover:text-slate-700 cursor-pointer border-0 bg-transparent outline-none shadow-none"
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

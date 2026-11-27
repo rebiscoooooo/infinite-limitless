@@ -1313,7 +1313,7 @@ export default function Products({ products = { data: [] }, categories = [], sta
             ======================================================== */}
             {deleteModalProduct && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md p-6 sm:p-7 shadow-2xl text-center relative overflow-hidden">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl text-center relative">
                         <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-rose-500 via-rose-400 to-[#f59e0b]" />
 
                         <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-xs">

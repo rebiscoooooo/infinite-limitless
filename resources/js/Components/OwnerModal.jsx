@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const ownerData = {
     primo: {
@@ -16,13 +16,22 @@ const ownerData = {
 };
 
 export default function OwnerModal({ isOpen, onClose, ownerKey = 'primo' }) {
+    useEffect(() => {
+        if (!isOpen) return;
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') onClose?.();
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     const data = ownerData[ownerKey] || ownerData.primo;
 
     return (
         <div
-            className="modal fade show"
+            className="modal fade show overflow-y-auto"
             style={{
                 display: 'block',
                 backgroundColor: 'rgba(15, 23, 42, 0.85)',

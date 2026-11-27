@@ -1116,7 +1116,7 @@ export default function WorldPlanRegistrations({
             {/* MODAL 2: APPROVE REGISTRATION */}
             {approveModalItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative space-y-4">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative space-y-4">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
                                 <h3 className="font-bold text-slate-900 text-base mb-0">Approve World Plan Registration</h3>
@@ -1189,7 +1189,7 @@ export default function WorldPlanRegistrations({
             {/* MODAL 3: REJECT REGISTRATION */}
             {rejectModalItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl relative space-y-4">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative space-y-4">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
                                 <h3 className="font-bold text-slate-900 text-base mb-0">Reject Registration</h3>
@@ -1243,7 +1243,7 @@ export default function WorldPlanRegistrations({
             {/* MODAL 5: SEND LOGIN CREDENTIALS */}
             {credentialsModalItem && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-lg rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-7 text-left">
+                    <div className="relative w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-2xl sm:rounded-3xl bg-white border border-slate-200 shadow-2xl p-5 sm:p-7 text-left">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-[#0f766e] shadow-xs shrink-0">

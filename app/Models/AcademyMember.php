@@ -30,6 +30,12 @@ class AcademyMember extends Authenticatable
         'rejection_reason',
         'admin_notes',
         'agreed_terms',
+        'preferred_language',
+        'program_start_date',
+        'program_target_date',
+        'program_status',
+        'eligible_for_promotion',
+        'promoted_at',
         'approved_at',
         'last_login_at',
         'last_login_ip',
@@ -45,6 +51,7 @@ class AcademyMember extends Authenticatable
         'avatar_url',
         'rank_details',
         'country_info',
+        'next_rank',
     ];
 
     protected function casts(): array
@@ -53,6 +60,10 @@ class AcademyMember extends Authenticatable
             'password' => 'hashed',
             'approved_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'program_start_date' => 'date',
+            'program_target_date' => 'date',
+            'eligible_for_promotion' => 'boolean',
+            'promoted_at' => 'datetime',
         ];
     }
 
@@ -62,7 +73,7 @@ class AcademyMember extends Authenticatable
 
         static::creating(function ($member) {
             if (empty($member->member_id)) {
-                $lastId = static::max('id') ?? 0;
+                $lastId = static::withTrashed()->max('id') ?? 0;
                 $member->member_id = 'LCA-' . str_pad((string) ($lastId + 1), 5, '0', STR_PAD_LEFT);
             }
         });
@@ -217,8 +228,326 @@ class AcademyMember extends Authenticatable
         return $map[$clean] ?? ['flag' => '🌐', 'country' => 'International', 'code' => 'INTL', 'dial' => $clean];
     }
 
-    public function toSharedArray(): array
+    public function requirementProgress(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
+        return $this->hasMany(AcademyMemberRequirementProgress::class, 'member_id');
+    }
+
+    public function trainingProgress(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcademyTrainingProgress::class, 'member_id');
+    }
+
+    public function certificates(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AcademyCertificate::class, 'member_id');
+    }
+
+    public function getNextRankAttribute(): ?string
+    {
+        $current = strtolower(trim($this->rank_tier ?? 'Rookie'));
+        return match ($current) {
+            'rookie' => 'Elite',
+            'elite' => 'Master',
+            'master' => 'Grand Master',
+            'grand master' => 'Legend',
+            default => null,
+        };
+    }
+
+    /**
+     * Compute training, requirements, program and promotion data in ONE pass
+     * (5 queries total instead of ~12 when the accessors are used one by one).
+     */
+    public function progressSnapshot(): array
+    {
+        $training = $this->computeTrainingStats();
+        $requirements = $this->computeRequirementsStats();
+
+        return [
+            'training' => $training,
+            'requirements' => $requirements,
+            'program' => $this->computeProgramProgress($training, $requirements),
+            'promotion' => $this->computePromotionEligibility($training, $requirements),
+        ];
+    }
+
+    public function getProgramProgressAttribute(): array
+    {
+        return $this->computeProgramProgress($this->computeTrainingStats(), $this->computeRequirementsStats());
+    }
+
+    protected function computeProgramProgress(array $trainingStats, array $requirementsStats): array
+    {
+        $startDate = $this->program_start_date ?? ($this->approved_at ? $this->approved_at->toDateString() : $this->created_at->toDateString());
+        $start = \Carbon\Carbon::parse($startDate)->startOfDay();
+        $targetDate = $this->program_target_date ?? $start->copy()->addDays(60)->toDateString();
+        $target = \Carbon\Carbon::parse($targetDate)->startOfDay();
+
+        $daysElapsed = max(0, (int) $start->diffInDays(now()->startOfDay(), false));
+        $currentDay = min(60, $daysElapsed + 1);
+        $daysRemaining = max(0, 60 - $daysElapsed);
+
+        $trainPct = $trainingStats['percentage'] ?? 0;
+        $reqPct = $requirementsStats['percentage'] ?? 0;
+        $isCompletedEarly = ($trainPct === 100 && $reqPct === 100);
+
+        $status = $isCompletedEarly ? 'Completed' : ($daysElapsed >= 60 ? 'Extended' : ($this->program_status ?: 'Active'));
+
+        return [
+            'start_date' => $start->format('M d, Y'),
+            'target_date' => $target->format('M d, Y'),
+            'current_day' => $currentDay,
+            'days_remaining' => $daysRemaining,
+            'days_elapsed' => $daysElapsed,
+            'status' => $status,
+            'is_ahead' => $isCompletedEarly && $daysRemaining > 0,
+            'progress_percentage' => min(100, (int) round(($currentDay / 60) * 100)),
+        ];
+    }
+
+    public function getTrainingStatsAttribute(): array
+    {
+        return $this->computeTrainingStats();
+    }
+
+    public function computeTrainingStats(): array
+    {
+        $rank = $this->rank_tier ?? 'Rookie';
+        $trainings = AcademyTraining::where(function ($q) use ($rank) {
+                $q->where(function ($sub) use ($rank) {
+                    $sub->where('rank_tier', $rank)
+                        ->whereNull('target_member_id');
+                })->orWhere('target_member_id', $this->id);
+            })
+            ->where('is_published', true)
+            ->orderBy('order')
+            ->get();
+
+        $total = $trainings->count();
+        if ($total === 0) {
+            return [
+                'total' => 0,
+                'completed' => 0,
+                'pending' => 0,
+                'percentage' => 100,
+                'has_certificate' => false,
+                'certificate_id' => null,
+                'certificate_number' => null,
+            ];
+        }
+
+        $progressList = $this->trainingProgress()->whereIn('training_id', $trainings->pluck('id'))->get()->keyBy('training_id');
+
+        $completed = 0;
+        $pending = 0;
+        $items = [];
+        foreach ($trainings as $t) {
+            $prog = $progressList->get($t->id);
+            $status = $prog ? $prog->status : 'not_started';
+            if ($prog && $prog->status === 'approved') {
+                $completed++;
+            } elseif ($prog && $prog->status === 'submitted') {
+                $pending++;
+            }
+            $items[] = [
+                'id' => $t->id,
+                'order' => $t->order,
+                'title_en' => $t->title_en,
+                'title_tl' => $t->title_tl,
+                'duration_minutes' => $t->duration_minutes,
+                'status' => $status,
+                'reviewed_by' => $prog?->reviewed_by,
+                'reviewed_at' => $prog?->reviewed_at?->format('M d, Y h:i A'),
+                'reflection' => $prog?->reflection_submission,
+                'admin_feedback' => $prog?->admin_feedback,
+                'progress_id' => $prog?->id,
+            ];
+        }
+
+        $pct = $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+
+        $cert = $this->certificates()
+            ->where('rank_tier', $rank)
+            ->where('certificate_type', 'training')
+            ->first();
+
+        return [
+            'total' => $total,
+            'completed' => $completed,
+            'pending' => $pending,
+            'percentage' => $pct,
+            'has_certificate' => (bool) $cert,
+            'certificate_id' => $cert?->id,
+            'certificate_number' => $cert?->certificate_number,
+            'items' => $items,
+        ];
+    }
+
+    public function getRequirementsStatsAttribute(): array
+    {
+        return $this->computeRequirementsStats();
+    }
+
+    public function computeRequirementsStats(): array
+    {
+        $rank = $this->rank_tier ?? 'Rookie';
+        $requirements = AcademyRankRequirement::where('rank_tier', $rank)
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        $total = $requirements->count();
+        if ($total === 0) {
+            return [
+                'total' => 0,
+                'completed' => 0,
+                'remaining' => 0,
+                'percentage' => 100,
+                'items' => [],
+            ];
+        }
+
+        $memberProgress = $this->requirementProgress()->whereIn('requirement_id', $requirements->pluck('id'))->get()->keyBy('requirement_id');
+
+        $completedCount = 0;
+        $items = [];
+
+        foreach ($requirements as $req) {
+            $prog = $memberProgress->get($req->id);
+            $curVal = $prog ? $prog->current_value : 0;
+            $isVerified = $prog ? (bool) $prog->is_verified : false;
+            $remaining = max(0, $req->target_value - $curVal);
+            $pct = $req->target_value > 0 ? min(100, (int) round(($curVal / $req->target_value) * 100)) : 100;
+            $isDone = ($curVal >= $req->target_value) && $isVerified;
+
+            if ($isDone) {
+                $completedCount++;
+            }
+
+            $items[] = [
+                'id' => $req->id,
+                'code' => $req->code,
+                'title_en' => $req->title_en,
+                'title_tl' => $req->title_tl,
+                'description_en' => $req->description_en,
+                'description_tl' => $req->description_tl,
+                'target_value' => $req->target_value,
+                'unit' => $req->unit,
+                'current_value' => $curVal,
+                'remaining' => $remaining,
+                'percentage' => $pct,
+                'is_verified' => $isVerified,
+                'is_completed' => $isDone,
+                'admin_notes' => $prog?->admin_notes,
+                'verified_at' => $prog?->verified_at?->format('M d, Y'),
+            ];
+        }
+
+        $overallPct = $total > 0 ? (int) round(($completedCount / $total) * 100) : 0;
+
+        return [
+            'total' => $total,
+            'completed' => $completedCount,
+            'remaining' => $total - $completedCount,
+            'percentage' => $overallPct,
+            'items' => $items,
+        ];
+    }
+
+    public function getPromotionEligibilityAttribute(): array
+    {
+        return $this->computePromotionEligibility($this->computeTrainingStats(), $this->computeRequirementsStats());
+    }
+
+    protected function computePromotionEligibility(array $training, array $reqs): array
+    {
+        $next = $this->next_rank;
+
+        $isEligible = ($training['percentage'] === 100) && ($reqs['percentage'] === 100) && ($next !== null);
+
+        return [
+            'is_eligible' => $isEligible,
+            'current_rank' => $this->rank_tier ?? 'Rookie',
+            'next_rank' => $next,
+            'training_completed' => $training['percentage'] === 100,
+            'requirements_completed' => $reqs['percentage'] === 100,
+            'message' => $isEligible
+                ? "Congratulations! You have satisfied 100% of both Training and Requirements for {$this->rank_tier}. You are eligible for promotion to {$next}."
+                : ($next === null
+                    ? "You have reached the apex rank of LEGEND in the Academy."
+                    : "Complete all required trainings and fulfill all rank requirements to become eligible for {$next}."),
+        ];
+    }
+
+    public function initializeRankProgression(?string $rank = null): void
+    {
+        $rank = $rank ?? ($this->rank_tier ?: 'Rookie');
+        $this->rank_tier = $rank;
+
+        if (!$this->program_start_date) {
+            $this->program_start_date = now()->toDateString();
+            $this->program_target_date = now()->addDays(60)->toDateString();
+            $this->program_status = 'Active';
+        }
+        $this->eligible_for_promotion = false;
+        $this->save();
+
+        // Seed initial requirement progress records for this rank
+        $requirements = AcademyRankRequirement::where('rank_tier', $rank)->get();
+        foreach ($requirements as $req) {
+            AcademyMemberRequirementProgress::firstOrCreate(
+                [
+                    'member_id' => $this->id,
+                    'requirement_id' => $req->id,
+                ],
+                [
+                    'current_value' => 0,
+                    'is_verified' => false,
+                ]
+            );
+        }
+
+        // Seed initial training progress records for this rank
+        $trainings = AcademyTraining::where('rank_tier', $rank)->orderBy('order')->get();
+        foreach ($trainings as $t) {
+            AcademyTrainingProgress::firstOrCreate(
+                [
+                    'member_id' => $this->id,
+                    'training_id' => $t->id,
+                ],
+                [
+                    'status' => 'not_started',
+                ]
+            );
+        }
+    }
+
+    public function promoteToNextRank(?string $adminName = null): bool
+    {
+        $nextRank = $this->next_rank;
+        if (!$nextRank) {
+            return false;
+        }
+
+        $this->rank_tier = $nextRank;
+        $this->promoted_at = now();
+        $this->program_start_date = now()->toDateString();
+        $this->program_target_date = now()->addDays(60)->toDateString();
+        $this->program_status = 'Active';
+        $this->eligible_for_promotion = false;
+        $this->save();
+
+        $this->initializeRankProgression($nextRank);
+
+        return true;
+    }
+
+    public function toSharedArray(?array $snapshot = null): array
+    {
+        $snapshot ??= $this->progressSnapshot();
+        $rankDetails = $this->rank_details;
+
         return [
             'id' => $this->id,
             'member_id' => $this->member_id,
@@ -234,9 +563,15 @@ class AcademyMember extends Authenticatable
             'avatar_url' => $this->avatar_url,
             'status' => $this->status,
             'rank_tier' => $this->rank_tier,
-            'rank_details' => $this->rank_details,
-            'badge_image' => $this->rank_details['badge_image'] ?? '/assets/image/academy/badge-rookie.png',
+            'rank_details' => $rankDetails,
+            'badge_image' => $rankDetails['badge_image'] ?? '/assets/image/academy/badge-rookie.png',
             'country_info' => $this->country_info,
+            'preferred_language' => $this->preferred_language ?? 'en',
+            'program_progress' => $snapshot['program'],
+            'training_stats' => $snapshot['training'],
+            'requirements_stats' => $snapshot['requirements'],
+            'next_rank' => $this->next_rank,
+            'promotion_eligibility' => $snapshot['promotion'],
             'rejection_reason' => $this->rejection_reason,
             'approved_at' => $this->approved_at?->format('M d, Y h:i A'),
             'created_at' => $this->created_at?->format('M d, Y'),

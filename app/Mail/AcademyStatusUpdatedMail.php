@@ -32,31 +32,39 @@ class AcademyStatusUpdatedMail extends Mailable implements ShouldQueue
         $memberId = $this->member->member_id ?? ('LCA-' . str_pad((string) $this->member->id, 5, '0', STR_PAD_LEFT));
         $name = $this->member->full_name;
         $rank = $this->member->rank_tier ? strtoupper($this->member->rank_tier) : 'MEMBER';
-        $timeStr = now()->format('M d, g:i A');
+        $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
 
         $subject = $status === 'Approved'
             ? "👑 Welcome to Legacy Club Academy! Approved as [{$rank}] ({$memberId}) - {$name} | INFINITE"
             : "Update Regarding Your Legacy Club Academy Application ({$memberId}) - {$name} | INFINITE";
 
         return new Envelope(
-            subject: $subject,
+            from: new Address($fromAddress, 'Legacy Club Academy'),
             replyTo: [
-                new Address(
-                    config('mail.from.address', 'academy@infinite-limitless.com'),
-                    config('mail.from.name', 'Legacy Club Academy')
-                ),
+                new Address($fromAddress, 'Legacy Club Academy'),
             ],
+            subject: $subject,
         );
     }
 
     /**
-     * Anti-threading headers.
+     * Anti-spam & deliverability headers (Gmail/Yahoo/Outlook 2024-2026 compliant).
      */
     public function headers(): Headers
     {
+        $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
+        $portalUrl = url('/academy-portal');
+
         return new Headers(
             text: [
                 'X-Entity-Ref-ID' => 'LCA-' . $this->member->id . '-' . time(),
+                'X-Auto-Response-Suppress' => 'All',
+                'Precedence' => 'bulk',
+                'Auto-Submitted' => 'auto-generated',
+                'List-Unsubscribe' => '<mailto:' . $fromAddress . '?subject=unsubscribe>, <' . $portalUrl . '>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'X-Report-Abuse' => 'Please report abuse to ' . $fromAddress,
+                'Feedback-ID' => 'LCA-STATUS:INFINITE:hostinger',
             ],
         );
     }
@@ -68,6 +76,7 @@ class AcademyStatusUpdatedMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.academy_status',
+            text: 'emails.plain.academy_status',
             with: [
                 'member' => $this->member,
                 'rankDetails' => $this->member->rank_details,

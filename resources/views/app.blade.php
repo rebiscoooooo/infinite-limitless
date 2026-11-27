@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title inertia>{{ config('app.name', 'Infinite | Live Limitless') }}</title>
     <meta name="description" content="Infinite builds limitless opportunities through leadership, premium skincare and wellness products, and global expansion.">
     <link rel="canonical" href="https://infinite-limitless.com/">

@@ -56,7 +56,7 @@ class EmailApiController extends Controller
             'is_read' => false,
         ]);
 
-        $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
+        $adminEmail = config('mail.admin_address', 'infinitelimitless123@gmail.com');
         $emailsDispatched = [];
         $emailErrors = [];
 
@@ -237,7 +237,7 @@ class EmailApiController extends Controller
             'edit_token' => \Illuminate\Support\Str::random(40),
         ]);
 
-        $adminEmail = config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
+        $adminEmail = config('mail.admin_address', 'infinitelimitless123@gmail.com');
         $emailsDispatched = [];
 
         try {
@@ -379,7 +379,7 @@ class EmailApiController extends Controller
      */
     public function testEmail(Request $request): JsonResponse
     {
-        $targetEmail = $request->input('recipient') ?: config('mail.admin_address', env('ADMIN_EMAIL', 'infinitelimitless123@gmail.com'));
+        $targetEmail = $request->input('recipient') ?: config('mail.admin_address', 'infinitelimitless123@gmail.com');
 
         try {
             Mail::raw("This is a verified test email sent from the Infinite Limitless Backend system at " . now()->toRfc2822String() . ".\n\nSMTP Host: " . config('mail.mailers.smtp.host') . "\nSMTP Port: " . config('mail.mailers.smtp.port') . "\nFrom: " . config('mail.from.address'), function ($msg) use ($targetEmail) {

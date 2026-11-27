@@ -10,6 +10,7 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\ProductSeeder;
 use Database\Seeders\StatsSeeder;
 use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -39,8 +40,17 @@ class AppServiceProvider extends ServiceProvider
             $this->autoSeedIfNeeded();
         });
 
-        // 2. Auto-seed everywhere outside testing (web requests, tinker, dev server, production)
-        $this->autoSeedIfNeeded();
+        // 2. Auto-seed everywhere outside testing (web requests, tinker, dev server, production).
+        // Run the 4+ existence queries at most once per 10 minutes instead of on every request.
+        try {
+            if (!Cache::get('baseline_seed_checked')) {
+                $this->autoSeedIfNeeded();
+                Cache::put('baseline_seed_checked', true, 600);
+            }
+        } catch (\Throwable $e) {
+            // Cache table may not exist yet (fresh install before migrations)
+            $this->autoSeedIfNeeded();
+        }
     }
 
     /**

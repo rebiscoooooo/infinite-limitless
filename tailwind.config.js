@@ -29,9 +29,20 @@ export default {
         sans: ['"Barlow"', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
+        '2xs': '0 1px 0 0 rgba(15, 23, 42, 0.04)',
+        'xs': '0 1px 2px 0 rgba(15, 23, 42, 0.06)',
         'modern-card': '0 35px 70px rgba(0, 0, 0, 0.5)',
         'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
         'glow-teal': '0 0 25px rgba(20, 184, 166, 0.4)',
+      },
+      backdropBlur: {
+        'xs': '4px',
+      },
+      dropShadow: {
+        'xs': '0 1px 1px rgba(15, 23, 42, 0.08)',
+      },
+      spacing: {
+        '0.2': '0.125rem',
       },
       backgroundImage: {
         'radial-dots': 'radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0)',

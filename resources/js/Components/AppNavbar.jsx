@@ -174,10 +174,10 @@ export default function AppNavbar() {
                     </Link>
                     <Link
                         href="/select-country"
-                        className="btn-nav-order nav-link d-none d-lg-inline-flex text-decoration-none"
+                        className="btn-nav-order nav-link d-none d-lg-inline-flex text-decoration-none !text-white"
                         style={{
                             background: 'var(--ch-teal, #14b8a6)',
-                            color: '#fff !important',
+                            color: '#ffffff',
                             borderColor: 'var(--ch-teal, #14b8a6)',
                         }}
                     >

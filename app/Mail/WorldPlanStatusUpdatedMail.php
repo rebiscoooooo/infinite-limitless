@@ -40,25 +40,34 @@ class WorldPlanStatusUpdatedMail extends Mailable implements ShouldQueue
             ? "🎉 Congratulations! World Plan Approved [Ref #WP-{$regId}] - {$name} ({$timeStr}) | Welcome to INFINITE"
             : "Update Regarding Your World Plan Application [Ref #WP-{$regId}] - {$name} ({$timeStr}) | INFINITE";
 
+        $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
+
         return new Envelope(
-            subject: $subject,
+            from: new Address($fromAddress, 'Infinite Support Team'),
             replyTo: [
-                new Address(
-                    config('mail.from.address', 'admin@infinite-limitless.com'),
-                    config('mail.from.name', 'Infinite Support Team')
-                ),
+                new Address($fromAddress, 'Infinite Support Team'),
             ],
+            subject: $subject,
         );
     }
 
     /**
-     * Get the message headers to prevent client-side threading and quoting.
+     * Anti-spam & deliverability headers (Gmail/Yahoo/Outlook compliant).
      */
     public function headers(): Headers
     {
+        $fromAddress = config('mail.from.address', 'admin@infinite-limitless.com');
+
         return new Headers(
             text: [
                 'X-Entity-Ref-ID' => 'WP-STATUS-' . $this->registration->id . '-' . time(),
+                'X-Auto-Response-Suppress' => 'All',
+                'Precedence' => 'bulk',
+                'Auto-Submitted' => 'auto-generated',
+                'List-Unsubscribe' => '<mailto:' . $fromAddress . '?subject=unsubscribe>, <' . url('/unsubscribe') . '>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'X-Report-Abuse' => 'Please report abuse to ' . $fromAddress,
+                'Feedback-ID' => 'WORLDPLAN-STATUS:INFINITE:hostinger',
             ],
         );
     }
@@ -70,6 +79,7 @@ class WorldPlanStatusUpdatedMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.world_plan_status',
+            text: 'emails.plain.world_plan_status',
         );
     }
 

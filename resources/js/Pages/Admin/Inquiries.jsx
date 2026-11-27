@@ -726,7 +726,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
             {/* MODAL 1: VIEW INQUIRY */}
             {selectedInquiry && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg p-6 shadow-2xl relative space-y-4">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-lg max-h-[90dvh] overflow-y-auto p-5 sm:p-6 shadow-2xl relative space-y-4">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <span className="text-xs uppercase font-extrabold text-[#0f766e] tracking-wider flex items-center gap-1.5">
                                 <MessageSquare className="w-4 h-4 text-[#0f766e]" />
@@ -789,7 +789,7 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
             {/* MODAL 2: REPLY TO INQUIRY */}
             {replyInquiry && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-xl p-6 sm:p-7 shadow-2xl relative space-y-4">
+                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-xl max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl relative space-y-4">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                             <div>
                                 <h3 className="text-base font-bold text-slate-900 mb-0 flex items-center gap-2">

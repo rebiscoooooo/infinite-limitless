@@ -8,10 +8,13 @@ use App\Models\SiteStat;
 use App\Models\WorldPlanRegistration;
 use App\Providers\AppServiceProvider;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AutoSeederTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * Test that empty tables are automatically seeded without manual intervention.
      */

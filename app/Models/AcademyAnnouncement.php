@@ -16,8 +16,13 @@ class AcademyAnnouncement extends Model
     protected $fillable = [
         'title',
         'content',
+        'type', // announcement, recognition, weekly_achiever, training_finisher
+        'featured_member_id',
+        'badge_text',
         'image_path',
         'is_active',
+        'published_at',
+        'archived_at',
         'created_by',
     ];
 
@@ -29,7 +34,14 @@ class AcademyAnnouncement extends Model
     {
         return [
             'is_active' => 'boolean',
+            'published_at' => 'datetime',
+            'archived_at' => 'datetime',
         ];
+    }
+
+    public function featuredMember(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AcademyMember::class, 'featured_member_id');
     }
 
     public function getImageUrlAttribute(): ?string

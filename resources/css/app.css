@@ -13,12 +13,39 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: clip;
   }
 
   body {
     background-color: #fff;
     color: #0f172a;
     font-family: 'Barlow', sans-serif;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Cross-browser touch & interaction polish */
+  a, button, input, select, textarea, label {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Smooth momentum scrolling on iOS Safari for scrollable panels & tables */
+  .overflow-y-auto,
+  .overflow-x-auto,
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Consistent modern dynamic viewport height across iOS Safari, Chrome, Firefox, Edge */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* ========================================================
@@ -49,7 +76,13 @@
   input[type="submit"],
   input[type="reset"] {
     border-style: none;
-    outline: none !important;
+    outline: none;
+  }
+
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid rgba(15, 118, 110, 0.45);
+    outline-offset: 2px;
   }
 
   a, button, span, label, p {
@@ -264,19 +297,75 @@
 
 /* =========================================================
    EXECUTIVE INSTITUTIONAL PORTAL SUITE (Admin & Academy Member)
-   Matches high-end institutional light design with system palette
+   Clean borderless soft-elevation UI across BOTH portals:
+   removes cluttered borders around text, pills, badges, cards,
+   buttons, and dividers while keeping subtle form input framing.
 ========================================================= */
-.admin-console {
+.admin-console,
+.academy-console {
   background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
+/* Remove harsh borders on text, badges, pills, cards, headers, sidebars, and buttons */
+.admin-console :is(div, section, article, aside, header, main, nav, ul, li, span, a, button, p, h1, h2, h3, h4, h5, h6, label, table, thead, tbody, tr, th, td),
+.academy-console :is(div, section, article, aside, header, main, nav, ul, li, span, a, button, p, h1, h2, h3, h4, h5, h6, label, table, thead, tbody, tr, th, td) {
+  border-color: transparent !important;
+  border-width: 0 !important;
+  border-style: none !important;
+}
+
+/* Subtle horizontal row separation inside tables without boxy borders */
+.admin-console tbody tr + tr,
+.academy-console tbody tr + tr {
+  box-shadow: inset 0 1px 0 0 #f1f5f9;
+}
+
+/* Soft subtle elevation on white cards & modals inside both portals (zero specificity so explicit Tailwind shadow-* utilities win cleanly) */
+:where(.admin-console, .academy-console) :where(.bg-white) {
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.045);
+}
+
+/* Clean subtle framing ONLY for form inputs, dropdowns, textareas & upload dropzones */
+.admin-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-console select,
+.admin-console textarea,
+.academy-console input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.academy-console select,
+.academy-console textarea {
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
 .admin-console input:focus,
 .admin-console select:focus,
-.admin-console textarea:focus {
+.admin-console textarea:focus,
+.academy-console input:focus,
+.academy-console select:focus,
+.academy-console textarea:focus {
   border-color: #0f766e !important;
+  background-color: #ffffff !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.25) !important;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18) !important;
+}
+
+/* Preserve CSS circle spinner animation inside loading buttons (never on SVG icons) */
+.admin-console div.animate-spin,
+.admin-console span.animate-spin,
+.academy-console div.animate-spin,
+.academy-console span.animate-spin {
+  border-width: 2px !important;
+  border-style: solid !important;
+  border-color: currentColor !important;
+  border-top-color: transparent !important;
+}
+
+/* Subtle dashed frame for file upload dropzones only */
+.admin-console .portal-dropzone,
+.academy-console .portal-dropzone,
+.portal-dropzone {
+  border: 1.5px dashed #cbd5e1 !important;
 }
 
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { getCountryInfo } from '../../Utils/academyBadges';
+import useRealtimeSync from '../../Hooks/useRealtimeSync';
 import {
     GraduationCap,
     Clock,
@@ -21,6 +22,13 @@ import {
 export default function Verify({ submittedMember }) {
     const country = submittedMember ? (submittedMember.country_info || getCountryInfo(submittedMember.phone_country_code)) : null;
     const [currentTime, setCurrentTime] = useState({ time: '', date: '' });
+    const memberStatus = submittedMember?.status || 'Pending';
+
+    // Automatically refresh status live when Admin approves or reviews the application
+    useRealtimeSync({
+        isAcademy: true,
+        intervalMs: 3000,
+    });
 
     useEffect(() => {
         const updateClock = () => {
@@ -99,9 +107,9 @@ export default function Verify({ submittedMember }) {
 
                         <Link
                             href="/academy-login"
-                            className="inline-flex items-center gap-2 text-xs font-bold text-[#0f766e] hover:text-[#115e59] py-2 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 border-0 transition-all no-underline"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0f766e] hover:text-[#115e59] py-2 px-3 sm:px-4 rounded-xl bg-teal-50 hover:bg-teal-100 border-0 transition-all no-underline whitespace-nowrap"
                         >
-                            <LogIn className="w-4 h-4" /> Go to Login
+                            <LogIn className="w-4 h-4 shrink-0" /> <span>Login</span>
                         </Link>
                     </div>
                 </div>
@@ -113,20 +121,39 @@ export default function Verify({ submittedMember }) {
                     {/* Top accent bar */}
                     <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0f766e] via-[#14b8a6] to-[#f59e0b]" />
 
-                    {/* Pending Animated Icon Badge */}
-                    <div className="w-20 h-20 rounded-3xl bg-amber-50 border-2 border-amber-300 flex items-center justify-center mx-auto mb-6 text-amber-600 shadow-xs relative">
-                        <Clock className="w-10 h-10 animate-pulse" />
-                        <div className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-sm">
-                            Under Review
+                    {/* Status Icon Badge (Updates Live) */}
+                    {memberStatus === 'Approved' ? (
+                        <div className="w-20 h-20 rounded-3xl bg-emerald-50 border-2 border-emerald-400 flex items-center justify-center mx-auto mb-6 text-emerald-600 shadow-xs relative">
+                            <CheckCircle2 className="w-10 h-10" />
+                            <div className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-emerald-600 text-white font-black text-[10px] uppercase tracking-wider shadow-sm">
+                                Approved!
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="w-20 h-20 rounded-3xl bg-amber-50 border-2 border-amber-300 flex items-center justify-center mx-auto mb-6 text-amber-600 shadow-xs relative">
+                            <Clock className="w-10 h-10 animate-pulse" />
+                            <div className="absolute -bottom-2.5 px-3 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] uppercase tracking-wider shadow-sm">
+                                {memberStatus === 'Rejected' ? 'Not Approved' : 'Under Review'}
+                            </div>
+                        </div>
+                    )}
 
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                        Application Successfully Submitted
+                        {memberStatus === 'Approved'
+                            ? 'Membership Officially Approved!'
+                            : memberStatus === 'Rejected'
+                                ? 'Application Requires Attention'
+                                : 'Application Successfully Submitted'}
                     </h1>
 
                     <p className="mt-3 text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-                        Your registration for the <strong className="text-slate-900">Legacy Club Academy</strong> is now queued for verification. The Executive Board is reviewing your profile and will assign your official rank tier.
+                        {memberStatus === 'Approved' ? (
+                            <>Congratulations! Your <strong className="text-slate-900">Legacy Club Academy</strong> account is now active ({submittedMember?.rank_tier || 'Rookie'} Tier). You can sign in to your Member Portal immediately!</>
+                        ) : memberStatus === 'Rejected' ? (
+                            <>{submittedMember?.rejection_reason || 'Your application was not approved by administration. Please contact support for assistance.'}</>
+                        ) : (
+                            <>Your registration for the <strong className="text-slate-900">Legacy Club Academy</strong> is now queued for verification. This page updates automatically as soon as the Executive Board approves your account.</>
+                        )}
                     </p>
 
                     {/* Applicant Information Summary (Reference User Card Style) */}
@@ -136,26 +163,32 @@ export default function Verify({ submittedMember }) {
                                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#0f766e] flex items-center gap-1.5">
                                     <UserCheck className="w-4 h-4" /> Official Application Receipt
                                 </div>
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
-                                    Pending Approval
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    memberStatus === 'Approved'
+                                        ? 'bg-emerald-100 text-emerald-800'
+                                        : memberStatus === 'Rejected'
+                                            ? 'bg-rose-100 text-rose-800'
+                                            : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                    {memberStatus === 'Approved' ? 'Approved & Active' : memberStatus === 'Rejected' ? 'Not Approved' : 'Pending Approval'}
                                 </span>
                             </div>
 
                             <div className="space-y-2.5 text-xs">
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div className="flex flex-wrap items-center justify-between gap-1 border-b border-slate-100 pb-2">
                                     <span className="text-slate-500 font-medium">Tracking Member ID:</span>
                                     <span className="text-[#0f766e] font-mono font-bold text-sm">{submittedMember.member_id}</span>
                                 </div>
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div className="flex flex-wrap items-center justify-between gap-1 border-b border-slate-100 pb-2">
                                     <span className="text-slate-500 font-medium">Applicant Legal Name:</span>
-                                    <span className="text-slate-900 font-bold">{submittedMember.full_name}</span>
+                                    <span className="text-slate-900 font-bold break-words">{submittedMember.full_name}</span>
                                 </div>
-                                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div className="flex flex-wrap items-center justify-between gap-1 border-b border-slate-100 pb-2">
                                     <span className="text-slate-500 font-medium">Notification Email:</span>
-                                    <span className="text-slate-700 font-mono">{submittedMember.email}</span>
+                                    <span className="text-slate-700 font-mono break-all">{submittedMember.email}</span>
                                 </div>
                                 {country && (
-                                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <div className="flex flex-wrap items-center justify-between gap-1 border-b border-slate-100 pb-2">
                                         <span className="text-slate-500 font-medium">Applicant Country / Region:</span>
                                         <span className="inline-flex items-center gap-1.5 font-bold text-slate-800">
                                             <span className="text-base leading-none">{country.flag}</span>
@@ -165,7 +198,7 @@ export default function Verify({ submittedMember }) {
                                     </div>
                                 )}
                                 {submittedMember.created_at && (
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex flex-wrap items-center justify-between gap-1">
                                         <span className="text-slate-500 font-medium">Submitted At:</span>
                                         <span className="text-slate-600 font-mono text-[11px]">
                                             {new Date(submittedMember.created_at).toLocaleString('en-PH', {
