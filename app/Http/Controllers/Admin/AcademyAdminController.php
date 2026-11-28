@@ -163,13 +163,12 @@ class AcademyAdminController extends Controller
                 return $arr;
             });
 
-        // Tier commandments managed by admin
-        $rankCommandments = \Illuminate\Support\Facades\Schema::hasTable('academy_commandments')
-            ? AcademyCommandment::orderBy('rank_tier')
-                ->orderBy('order')
-                ->orderBy('id')
-                ->get()
-            : collect();
+        // Tier commandments managed by admin (auto-ensure table exists so CRUD works immediately)
+        AcademyCommandment::ensureTableExists();
+        $rankCommandments = AcademyCommandment::orderBy('rank_tier')
+            ->orderBy('order')
+            ->orderBy('id')
+            ->get();
 
         // Announcements and Recognitions
         $announcements = AcademyAnnouncement::with('featuredMember')
@@ -181,6 +180,7 @@ class AcademyAdminController extends Controller
                 'content' => $a->content,
                 'type' => $a->type ?? 'announcement',
                 'badge_text' => $a->badge_text,
+                'featured_member_id' => $a->featured_member_id,
                 'image_url' => $a->image_path ? asset('storage/' . $a->image_path) : null,
                 'is_active' => (bool) $a->is_active,
                 'created_by' => $a->created_by,
@@ -587,6 +587,55 @@ class AcademyAdminController extends Controller
     }
 
     /**
+     * Create a new Academy member directly from the Admin Console.
+     */
+    public function storeMember(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:100'],
+            'middle_initial' => ['nullable', 'string', 'max:10'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'phone_country_code' => ['required', 'string', 'max:10'],
+            'phone_number' => ['required', 'string', 'max:25'],
+            'email' => ['required', 'email', 'max:150', 'unique:academy_members,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'address' => ['required', 'string', 'max:1000'],
+            'status' => ['required', 'in:Pending,Approved,Rejected'],
+            'rank_tier' => ['nullable', 'in:Rookie,Elite,Master,Grand Master,Legend'],
+            'preferred_language' => ['nullable', 'in:en,tl'],
+            'admin_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $rank = $validated['rank_tier'] ?: 'Rookie';
+        $status = $validated['status'];
+
+        $member = AcademyMember::create([
+            'first_name' => trim($validated['first_name']),
+            'middle_initial' => !empty($validated['middle_initial']) ? strtoupper(trim(str_replace('.', '', $validated['middle_initial']))) : null,
+            'last_name' => trim($validated['last_name']),
+            'phone_country_code' => trim($validated['phone_country_code']),
+            'phone_number' => trim($validated['phone_number']),
+            'email' => strtolower(trim($validated['email'])),
+            'password' => $validated['password'],
+            'address' => trim($validated['address']),
+            'status' => $status,
+            'rank_tier' => $rank,
+            'preferred_language' => $validated['preferred_language'] ?? 'en',
+            'admin_notes' => $validated['admin_notes'] ?? null,
+            'agreed_terms' => 'Yes',
+            'approved_at' => $status === 'Approved' ? now() : null,
+            'program_start_date' => now()->toDateString(),
+            'program_target_date' => now()->addDays(60)->toDateString(),
+            'program_status' => 'Active',
+        ]);
+
+        $member->initializeRankProgression($rank);
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', "Member {$member->full_name} ({$member->member_id}) has been created successfully as [{$member->rank_tier}].");
+    }
+
+    /**
      * Edit full member details from Admin.
      */
     public function update(Request $request, AcademyMember $member): RedirectResponse
@@ -680,7 +729,53 @@ class AcademyAdminController extends Controller
 
         RealtimeController::flushAcademyCache();
 
-        return back()->with('success', 'Announcement / Recognition published successfully.');
+        return back()->with('success', 'Announcement published successfully.');
+    }
+
+    /**
+     * Update an existing announcement or recognition post.
+     */
+    public function updateAnnouncement(Request $request, AcademyAnnouncement $announcement): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'type' => ['nullable', 'in:announcement,recognition,weekly_achiever,training_finisher'],
+            'badge_text' => ['nullable', 'string', 'max:60'],
+            'featured_member_id' => ['nullable', 'exists:academy_members,id'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:5120'],
+            'remove_image' => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        $imagePath = $announcement->image_path;
+        if ($request->boolean('remove_image') && $imagePath && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+            $imagePath = null;
+        }
+
+        if ($request->hasFile('image')) {
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $file = $request->file('image');
+            $filename = 'announcement_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $imagePath = $file->storeAs('academy_announcements', $filename, 'public');
+        }
+
+        $announcement->update([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'type' => $validated['type'] ?? $announcement->type ?? 'announcement',
+            'badge_text' => $validated['badge_text'] ?? null,
+            'featured_member_id' => $validated['featured_member_id'] ?? null,
+            'image_path' => $imagePath,
+            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : $announcement->is_active,
+        ]);
+
+        RealtimeController::flushAcademyCache();
+
+        return back()->with('success', 'Announcement updated successfully.');
     }
 
     /**
@@ -715,22 +810,24 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Store new training module (bilingual) with optional multi-file attachments.
+     * Store new training module (bilingual, Filipino optional) with optional multi-file attachments.
      */
     public function storeTraining(Request $request): RedirectResponse
     {
+        AcademyTraining::ensureAttachmentsColumn();
+
         $validated = $request->validate([
             'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
             'target_member_id' => ['nullable', 'exists:academy_members,id'],
             'order' => ['required', 'integer', 'min:1'],
             'title_en' => ['required', 'string', 'max:255'],
-            'title_tl' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
             'description_en' => ['nullable', 'string'],
             'description_tl' => ['nullable', 'string'],
             'content_en' => ['required', 'string'],
-            'content_tl' => ['required', 'string'],
+            'content_tl' => ['nullable', 'string'],
             'video_url' => ['nullable', 'string', 'max:500'],
-            'duration_minutes' => ['required', 'integer', 'min:5'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
             'reflection_prompt_en' => ['nullable', 'string'],
             'reflection_prompt_tl' => ['nullable', 'string'],
             'is_published' => ['nullable', 'boolean'],
@@ -743,15 +840,18 @@ class AcademyAdminController extends Controller
         ]);
 
         unset($validated['attachments']);
+        $validated['title_en'] = trim($validated['title_en']);
+        $validated['title_tl'] = !empty($validated['title_tl']) ? trim($validated['title_tl']) : $validated['title_en'];
+        $validated['description_en'] = isset($validated['description_en']) ? trim((string) $validated['description_en']) : null;
+        $validated['description_tl'] = !empty($validated['description_tl']) ? trim($validated['description_tl']) : $validated['description_en'];
+        $validated['content_en'] = trim($validated['content_en']);
+        $validated['content_tl'] = !empty($validated['content_tl']) ? trim($validated['content_tl']) : $validated['content_en'];
+        $validated['reflection_prompt_en'] = !empty($validated['reflection_prompt_en']) ? trim($validated['reflection_prompt_en']) : null;
+        $validated['reflection_prompt_tl'] = !empty($validated['reflection_prompt_tl']) ? trim($validated['reflection_prompt_tl']) : $validated['reflection_prompt_en'];
         $validated['is_published'] = $request->boolean('is_published', true);
 
         $uploadedFiles = $request->file('attachments', []);
         if (!empty($uploadedFiles)) {
-            if (!\Illuminate\Support\Facades\Schema::hasColumn('academy_trainings', 'attachments')) {
-                return back()->withErrors([
-                    'attachments' => 'Database migration required for training attachments. Please run php artisan migrate.',
-                ]);
-            }
             $validated['attachments'] = AcademyTraining::storeUploadedAttachments(
                 is_array($uploadedFiles) ? $uploadedFiles : [$uploadedFiles]
             );
@@ -767,7 +867,7 @@ class AcademyAdminController extends Controller
             $member = AcademyMember::find($validated['target_member_id']);
             RealtimeController::flushAcademyCache();
 
-            return back()->with('success', "Training module \"{$training->title_en}\" specifically created and assigned to {$member?->full_name}.");
+            return back()->with('success', "Training module \"{$training->title_en}\" was created and assigned to {$member?->full_name}.");
         }
 
         RealtimeController::flushAcademyCache();
@@ -776,22 +876,24 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Update training module (bilingual) including adding/removing attachments.
+     * Update training module (bilingual, Filipino optional) including adding/removing attachments.
      */
     public function updateTraining(Request $request, AcademyTraining $training): RedirectResponse
     {
+        AcademyTraining::ensureAttachmentsColumn();
+
         $validated = $request->validate([
             'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
             'target_member_id' => ['nullable', 'exists:academy_members,id'],
             'order' => ['required', 'integer', 'min:1'],
             'title_en' => ['required', 'string', 'max:255'],
-            'title_tl' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
             'description_en' => ['nullable', 'string'],
             'description_tl' => ['nullable', 'string'],
             'content_en' => ['required', 'string'],
-            'content_tl' => ['required', 'string'],
+            'content_tl' => ['nullable', 'string'],
             'video_url' => ['nullable', 'string', 'max:500'],
-            'duration_minutes' => ['required', 'integer', 'min:5'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
             'reflection_prompt_en' => ['nullable', 'string'],
             'reflection_prompt_tl' => ['nullable', 'string'],
             'is_published' => ['nullable', 'boolean'],
@@ -806,42 +908,41 @@ class AcademyAdminController extends Controller
         ]);
 
         unset($validated['attachments'], $validated['remove_attachments']);
+        $validated['title_en'] = trim($validated['title_en']);
+        $validated['title_tl'] = !empty($validated['title_tl']) ? trim($validated['title_tl']) : $validated['title_en'];
+        $validated['description_en'] = isset($validated['description_en']) ? trim((string) $validated['description_en']) : null;
+        $validated['description_tl'] = !empty($validated['description_tl']) ? trim($validated['description_tl']) : $validated['description_en'];
+        $validated['content_en'] = trim($validated['content_en']);
+        $validated['content_tl'] = !empty($validated['content_tl']) ? trim($validated['content_tl']) : $validated['content_en'];
+        $validated['reflection_prompt_en'] = !empty($validated['reflection_prompt_en']) ? trim($validated['reflection_prompt_en']) : null;
+        $validated['reflection_prompt_tl'] = !empty($validated['reflection_prompt_tl']) ? trim($validated['reflection_prompt_tl']) : $validated['reflection_prompt_en'];
         $validated['is_published'] = $request->boolean('is_published', (bool) $training->is_published);
 
-        $hasAttachmentsColumn = \Illuminate\Support\Facades\Schema::hasColumn('academy_trainings', 'attachments');
         $uploadedFiles = $request->file('attachments', []);
         $removeIds = array_map('strval', $request->input('remove_attachments', []));
 
-        if ((!empty($uploadedFiles) || !empty($removeIds)) && !$hasAttachmentsColumn) {
-            return back()->withErrors([
-                'attachments' => 'Database migration required for training attachments. Please run php artisan migrate.',
-            ]);
-        }
+        $current = is_array($training->attachments) ? $training->attachments : [];
+        $kept = [];
 
-        if ($hasAttachmentsColumn) {
-            $current = is_array($training->attachments) ? $training->attachments : [];
-            $kept = [];
-
-            foreach ($current as $item) {
-                $itemId = isset($item['id']) ? (string) $item['id'] : '';
-                if ($itemId !== '' && in_array($itemId, $removeIds, true)) {
-                    if (!empty($item['path']) && Storage::disk('public')->exists($item['path'])) {
-                        Storage::disk('public')->delete($item['path']);
-                    }
-                    continue;
+        foreach ($current as $item) {
+            $itemId = isset($item['id']) ? (string) $item['id'] : '';
+            if ($itemId !== '' && in_array($itemId, $removeIds, true)) {
+                if (!empty($item['path']) && Storage::disk('public')->exists($item['path'])) {
+                    Storage::disk('public')->delete($item['path']);
                 }
-                $kept[] = $item;
+                continue;
             }
-
-            if (!empty($uploadedFiles)) {
-                $newItems = AcademyTraining::storeUploadedAttachments(
-                    is_array($uploadedFiles) ? $uploadedFiles : [$uploadedFiles]
-                );
-                $kept = array_merge($kept, $newItems);
-            }
-
-            $validated['attachments'] = array_values($kept);
+            $kept[] = $item;
         }
+
+        if (!empty($uploadedFiles)) {
+            $newItems = AcademyTraining::storeUploadedAttachments(
+                is_array($uploadedFiles) ? $uploadedFiles : [$uploadedFiles]
+            );
+            $kept = array_merge($kept, $newItems);
+        }
+
+        $validated['attachments'] = array_values($kept);
 
         $training->update($validated);
 
@@ -889,7 +990,7 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Store rank requirement definition.
+     * Store rank requirement definition (Filipino optional, defaults to English).
      */
     public function storeRequirement(Request $request): RedirectResponse
     {
@@ -897,7 +998,7 @@ class AcademyAdminController extends Controller
             'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
             'code' => ['required', 'string', 'max:50', 'unique:academy_rank_requirements,code'],
             'title_en' => ['required', 'string', 'max:255'],
-            'title_tl' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
             'description_en' => ['nullable', 'string'],
             'description_tl' => ['nullable', 'string'],
             'target_value' => ['required', 'integer', 'min:1'],
@@ -905,6 +1006,13 @@ class AcademyAdminController extends Controller
             'order' => ['required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],
         ]);
+
+        $validated['code'] = strtoupper(trim($validated['code']));
+        $validated['title_en'] = trim($validated['title_en']);
+        $validated['title_tl'] = !empty($validated['title_tl']) ? trim($validated['title_tl']) : $validated['title_en'];
+        $validated['description_en'] = isset($validated['description_en']) ? trim((string) $validated['description_en']) : null;
+        $validated['description_tl'] = !empty($validated['description_tl']) ? trim($validated['description_tl']) : $validated['description_en'];
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
 
         AcademyRankRequirement::create($validated);
 
@@ -914,14 +1022,15 @@ class AcademyAdminController extends Controller
     }
 
     /**
-     * Update rank requirement definition.
+     * Update rank requirement definition (Filipino optional, defaults to English).
      */
     public function updateRequirement(Request $request, AcademyRankRequirement $requirement): RedirectResponse
     {
         $validated = $request->validate([
             'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
+            'code' => ['nullable', 'string', 'max:50', 'unique:academy_rank_requirements,code,' . $requirement->id],
             'title_en' => ['required', 'string', 'max:255'],
-            'title_tl' => ['required', 'string', 'max:255'],
+            'title_tl' => ['nullable', 'string', 'max:255'],
             'description_en' => ['nullable', 'string'],
             'description_tl' => ['nullable', 'string'],
             'target_value' => ['required', 'integer', 'min:1'],
@@ -929,6 +1038,17 @@ class AcademyAdminController extends Controller
             'order' => ['required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],
         ]);
+
+        if (!empty($validated['code'])) {
+            $validated['code'] = strtoupper(trim($validated['code']));
+        } else {
+            unset($validated['code']);
+        }
+        $validated['title_en'] = trim($validated['title_en']);
+        $validated['title_tl'] = !empty($validated['title_tl']) ? trim($validated['title_tl']) : $validated['title_en'];
+        $validated['description_en'] = isset($validated['description_en']) ? trim((string) $validated['description_en']) : null;
+        $validated['description_tl'] = !empty($validated['description_tl']) ? trim($validated['description_tl']) : $validated['description_en'];
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : $requirement->is_active;
 
         $requirement->update($validated);
 
@@ -945,7 +1065,7 @@ class AcademyAdminController extends Controller
         $requirement->delete();
         RealtimeController::flushAcademyCache();
 
-        return back()->with('success', 'Rank requirement deleted.');
+        return back()->with('success', 'Rank requirement deleted successfully.');
     }
 
     /**
@@ -953,6 +1073,8 @@ class AcademyAdminController extends Controller
      */
     public function storeCommandment(Request $request): RedirectResponse
     {
+        AcademyCommandment::ensureTableExists();
+
         $validated = $request->validate([
             'rank_tier' => ['required', 'in:Rookie,Elite,Master,Grand Master,Legend'],
             'order' => ['nullable', 'integer', 'min:1', 'max:999'],

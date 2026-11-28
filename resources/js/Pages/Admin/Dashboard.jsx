@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Users,
     FileText,
@@ -47,6 +48,8 @@ export default function Dashboard({
     const [showMarketingModal, setShowMarketingModal] = useState(false);
     const [testEmailInput, setTestEmailInput] = useState('');
     const [isDispatching, setIsDispatching] = useState(false);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     const handleMarketingSubmit = (e) => {
         e.preventDefault();
@@ -64,9 +67,20 @@ export default function Dashboard({
     };
 
     const deleteInquiry = (id) => {
-        if (confirm('Permanently delete this inquiry from the database?')) {
-            router.delete(`/admin/inquiries/${id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: 'Are you sure you want to permanently delete this inquiry? This action cannot be undone.',
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/inquiries/${id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const toggleInquiryRead = (id) => {
@@ -747,6 +761,18 @@ export default function Dashboard({
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

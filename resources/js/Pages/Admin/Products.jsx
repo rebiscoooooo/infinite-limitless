@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Package,
     Plus,
@@ -44,6 +45,8 @@ export default function Products({ products = { data: [] }, categories = [], sta
     const [editingProduct, setEditingProduct] = useState(null);
     const [deleteModalProduct, setDeleteModalProduct] = useState(null);
     const [viewProduct, setViewProduct] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     // Filter submit
     const applyFilters = (newParams = {}) => {
@@ -86,11 +89,22 @@ export default function Products({ products = { data: [] }, categories = [], sta
     // Bulk actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected product(s)? They will be hidden from public landing page view.`)) {
-            router.post('/admin/products/bulk-archive', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to archive ${selectedIds.length} selected product(s)? They will be hidden from the public storefront.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'warning',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/products/bulk-archive', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleBulkRestore = () => {
@@ -102,11 +116,22 @@ export default function Products({ products = { data: [] }, categories = [], sta
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Are you sure you want to permanently delete ${selectedIds.length} selected product(s)? This cannot be undone.`)) {
-            router.post('/admin/products/bulk-delete', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete ${selectedIds.length} selected product(s)? This action cannot be undone.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/products/bulk-delete', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     // Toggle Single Product Live Status
@@ -206,8 +231,10 @@ export default function Products({ products = { data: [] }, categories = [], sta
 
     const confirmDelete = () => {
         if (!deleteModalProduct) return;
+        setConfirmProcessing(true);
         router.delete(`/admin/products/${deleteModalProduct.id}`, {
             onSuccess: () => setDeleteModalProduct(null),
+            onFinish: () => setConfirmProcessing(false),
         });
     };
 
@@ -1309,39 +1336,34 @@ export default function Products({ products = { data: [] }, categories = [], sta
             )}
 
             {/* ========================================================
-                MODAL 4: DELETE CONFIRMATION
+                MODAL 4: FLOWBITE DELETE & BULK ACTION CONFIRMATIONS
             ======================================================== */}
-            {deleteModalProduct && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl text-center relative">
-                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-rose-500 via-rose-400 to-[#f59e0b]" />
+            <ConfirmModal
+                isOpen={Boolean(deleteModalProduct)}
+                onClose={() => !confirmProcessing && setDeleteModalProduct(null)}
+                onConfirm={confirmDelete}
+                message={
+                    deleteModalProduct
+                        ? `Are you sure you want to permanently delete "${deleteModalProduct.name}" from your product catalog?`
+                        : ''
+                }
+                confirmLabel="Yes, I'm sure"
+                cancelLabel="No, cancel"
+                variant="danger"
+                processing={confirmProcessing}
+            />
 
-                        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-xs">
-                            <Trash2 className="w-7 h-7" />
-                        </div>
-                        <h4 className="text-lg font-bold text-slate-900 mb-2">Delete Product from Catalog?</h4>
-                        <p className="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed">
-                            Are you sure you want to permanently delete <strong className="text-slate-900">{deleteModalProduct.name}</strong> from the database? This item will be removed immediately.
-                        </p>
-                        <div className="flex items-center justify-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setDeleteModalProduct(null)}
-                                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={confirmDelete}
-                                className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 border-0 shadow-xs cursor-pointer"
-                            >
-                                Delete Product
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

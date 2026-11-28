@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AcademyTraining extends Model
@@ -14,6 +16,20 @@ class AcademyTraining extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'academy_trainings';
+
+    /**
+     * Ensure the attachments JSON column exists even if migrations have not yet been run manually.
+     */
+    public static function ensureAttachmentsColumn(): void
+    {
+        if (!Schema::hasTable('academy_trainings') || Schema::hasColumn('academy_trainings', 'attachments')) {
+            return;
+        }
+
+        Schema::table('academy_trainings', function (Blueprint $table) {
+            $table->json('attachments')->nullable()->after('video_url');
+        });
+    }
 
     protected $fillable = [
         'rank_tier',

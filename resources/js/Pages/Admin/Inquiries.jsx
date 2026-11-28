@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Search,
     Mail,
@@ -38,6 +39,8 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
     const [replySubject, setReplySubject] = useState('');
     const [replyMessage, setReplyMessage] = useState('');
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     const inquiryList = inquiries.data || [];
 
@@ -79,11 +82,22 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
     // Bulk actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected customer inquiry/inquiries?`)) {
-            router.post('/admin/inquiries/bulk-archive', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to archive ${selectedIds.length} selected customer inquiry/inquiries?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'warning',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/inquiries/bulk-archive', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleBulkRestore = () => {
@@ -95,11 +109,22 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selectedIds.length} selected inquiry/inquiries from the database? This cannot be undone.`)) {
-            router.post('/admin/inquiries/bulk-delete', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete ${selectedIds.length} selected inquiry/inquiries? This action cannot be undone.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/inquiries/bulk-delete', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     // Single item actions
@@ -108,9 +133,20 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
     };
 
     const handleDelete = (id, name) => {
-        if (confirm(`Permanently delete inquiry from "${name}"?`)) {
-            router.delete(`/admin/inquiries/${id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete the inquiry from "${name}"?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/inquiries/${id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const openViewModal = (inq) => {
@@ -856,6 +892,18 @@ export default function Inquiries({ inquiries = { data: [] }, counts = {}, filte
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

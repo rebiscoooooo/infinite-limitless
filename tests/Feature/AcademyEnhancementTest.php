@@ -1013,4 +1013,186 @@ class AcademyEnhancementTest extends TestCase
         $this->get(route('academy.trainings.attachments.download', [$module2->id, $lockedAtt['id']]))
             ->assertStatus(200);
     }
+
+    public function test_admin_academy_full_crud_works_end_to_end(): void
+    {
+        $admin = AdminUser::first();
+        $this->actingAs($admin, 'admin');
+
+        // 1. Members CRUD: Create, Update, Delete
+        $this->post(route('admin.academy.members.store'), [
+            'first_name' => 'Elena',
+            'middle_initial' => 'R',
+            'last_name' => 'Vargas',
+            'phone_country_code' => '+63',
+            'phone_number' => '9175550199',
+            'email' => 'elena.vargas99@gmail.com',
+            'password' => 'StrongPass123!',
+            'address' => 'Cebu City, Philippines',
+            'status' => 'Approved',
+            'rank_tier' => 'Elite',
+        ])->assertSessionHasNoErrors();
+
+        $member = AcademyMember::where('email', 'elena.vargas99@gmail.com')->first();
+        $this->assertNotNull($member);
+        $this->assertEquals('ELENA.VARGAS99', $member->member_id);
+        $this->assertEquals('Elite', $member->rank_tier);
+        $this->assertEquals('Approved', $member->status);
+        $this->assertNotNull($member->program_start_date);
+
+        $this->put(route('admin.academy.update', $member->id), [
+            'first_name' => 'Elena',
+            'middle_initial' => 'R',
+            'last_name' => 'Vargas-Cruz',
+            'phone_country_code' => '+63',
+            'phone_number' => '9175550199',
+            'email' => 'elena.cruz@gmail.com',
+            'address' => 'Makati City, Philippines',
+            'status' => 'Approved',
+            'rank_tier' => 'Master',
+        ])->assertSessionHasNoErrors();
+
+        $member->refresh();
+        $this->assertEquals('Vargas-Cruz', $member->last_name);
+        $this->assertEquals('ELENA.CRUZ', $member->member_id);
+        $this->assertEquals('Master', $member->rank_tier);
+
+        // 2. Trainings CRUD: English-only fields auto-fill Filipino fields
+        $this->post(route('admin.academy.trainings.store'), [
+            'rank_tier' => 'Rookie',
+            'order' => 12,
+            'title_en' => 'Leadership Foundations',
+            'content_en' => 'Core leadership training content in English.',
+            'duration_minutes' => 3,
+            'is_published' => 1,
+        ])->assertSessionHasNoErrors();
+
+        $training = AcademyTraining::where('title_en', 'Leadership Foundations')->first();
+        $this->assertNotNull($training);
+        $this->assertEquals('Leadership Foundations', $training->title_tl);
+        $this->assertEquals('Core leadership training content in English.', $training->content_tl);
+
+        $this->post(route('admin.academy.trainings.update', $training->id), [
+            '_method' => 'PUT',
+            'rank_tier' => 'Rookie',
+            'order' => 13,
+            'title_en' => 'Leadership Foundations Updated',
+            'content_en' => 'Updated training syllabus content.',
+            'duration_minutes' => 15,
+            'is_published' => 1,
+        ])->assertSessionHasNoErrors();
+
+        $training->refresh();
+        $this->assertEquals('Leadership Foundations Updated', $training->title_en);
+        $this->assertEquals('Leadership Foundations Updated', $training->title_tl);
+
+        $this->delete(route('admin.academy.trainings.destroy', $training->id))
+            ->assertSessionHasNoErrors();
+        $this->assertSoftDeleted('academy_trainings', ['id' => $training->id]);
+
+        // 3. Requirements CRUD: English-only fields + updating code
+        $this->post(route('admin.academy.requirements.store'), [
+            'rank_tier' => 'Rookie',
+            'code' => 'ROOKIE-CUSTOM-1',
+            'title_en' => 'Attend 2 Live Briefings',
+            'description_en' => 'Join two official weekly leadership calls.',
+            'target_value' => 2,
+            'unit' => 'Briefings',
+            'order' => 9,
+            'is_active' => true,
+        ])->assertSessionHasNoErrors();
+
+        $req = AcademyRankRequirement::where('code', 'ROOKIE-CUSTOM-1')->first();
+        $this->assertNotNull($req);
+        $this->assertEquals('Attend 2 Live Briefings', $req->title_tl);
+
+        $this->put(route('admin.academy.requirements.definition.update', $req->id), [
+            'rank_tier' => 'Rookie',
+            'code' => 'ROOKIE-CUSTOM-2',
+            'title_en' => 'Attend 3 Live Briefings',
+            'description_en' => 'Updated briefing goal.',
+            'target_value' => 3,
+            'unit' => 'Briefings',
+            'order' => 10,
+            'is_active' => true,
+        ])->assertSessionHasNoErrors();
+
+        $req->refresh();
+        $this->assertEquals('ROOKIE-CUSTOM-2', $req->code);
+        $this->assertEquals(3, $req->target_value);
+
+        $this->delete(route('admin.academy.requirements.destroy', $req->id))
+            ->assertSessionHasNoErrors();
+        $this->assertNull(AcademyRankRequirement::find($req->id));
+
+        // 4. Announcements CRUD: Create, Update, Toggle, Delete
+        $this->post(route('admin.academy.announcements.store'), [
+            'title' => 'Global Summit Announcement',
+            'content' => 'Join us for the annual leadership summit.',
+            'type' => 'announcement',
+            'badge_text' => 'OFFICIAL',
+            'is_active' => 1,
+        ])->assertSessionHasNoErrors();
+
+        $announcement = \App\Models\AcademyAnnouncement::where('title', 'Global Summit Announcement')->first();
+        $this->assertNotNull($announcement);
+        $this->assertTrue((bool) $announcement->is_active);
+
+        $this->post(route('admin.academy.announcements.update', $announcement->id), [
+            '_method' => 'PUT',
+            'title' => 'Global Summit Updated',
+            'content' => 'Updated summit details and schedule.',
+            'type' => 'recognition',
+            'badge_text' => 'UPDATED',
+            'is_active' => 1,
+        ])->assertSessionHasNoErrors();
+
+        $announcement->refresh();
+        $this->assertEquals('Global Summit Updated', $announcement->title);
+        $this->assertEquals('recognition', $announcement->type);
+
+        $this->patch(route('admin.academy.announcements.toggle', $announcement->id))
+            ->assertSessionHasNoErrors();
+        $this->assertFalse((bool) $announcement->fresh()->is_active);
+
+        $this->delete(route('admin.academy.announcements.destroy', $announcement->id))
+            ->assertSessionHasNoErrors();
+        $this->assertNull(\App\Models\AcademyAnnouncement::find($announcement->id));
+
+        // 5. Commandments CRUD: Create, Update, Toggle, Delete
+        $this->post(route('admin.academy.commandments.store'), [
+            'rank_tier' => 'Rookie',
+            'order' => 20,
+            'title_en' => 'Lead With Integrity',
+            'description_en' => 'Always keep your commitments.',
+            'is_active' => true,
+        ])->assertSessionHasNoErrors();
+
+        $commandment = \App\Models\AcademyCommandment::where('title_en', 'Lead With Integrity')->first();
+        $this->assertNotNull($commandment);
+        $this->assertEquals('Lead With Integrity', $commandment->title_tl);
+
+        $this->put(route('admin.academy.commandments.update', $commandment->id), [
+            'rank_tier' => 'Rookie',
+            'order' => 21,
+            'title_en' => 'Lead With Full Integrity',
+            'description_en' => 'Keep every promise you make.',
+            'is_active' => true,
+        ])->assertSessionHasNoErrors();
+
+        $this->assertEquals('Lead With Full Integrity', $commandment->fresh()->title_en);
+
+        $this->patch(route('admin.academy.commandments.toggle', $commandment->id))
+            ->assertSessionHasNoErrors();
+        $this->assertFalse((bool) $commandment->fresh()->is_active);
+
+        $this->delete(route('admin.academy.commandments.destroy', $commandment->id))
+            ->assertSessionHasNoErrors();
+        $this->assertNull(\App\Models\AcademyCommandment::find($commandment->id));
+
+        // 6. Delete member last
+        $this->delete(route('admin.academy.destroy', $member->id))
+            ->assertSessionHasNoErrors();
+        $this->assertNull(AcademyMember::find($member->id));
+    }
 }

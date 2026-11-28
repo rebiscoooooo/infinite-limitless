@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 class AcademyCommandment extends Model
@@ -11,6 +12,30 @@ class AcademyCommandment extends Model
     use HasFactory;
 
     public const TIERS = ['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'];
+
+    /**
+     * Ensure the academy_commandments table exists even if migrations have not yet been run manually.
+     */
+    public static function ensureTableExists(): void
+    {
+        if (Schema::hasTable('academy_commandments')) {
+            return;
+        }
+
+        Schema::create('academy_commandments', function (Blueprint $table) {
+            $table->id();
+            $table->string('rank_tier', 50)->index();
+            $table->unsignedInteger('order')->default(1);
+            $table->string('title_en', 255);
+            $table->string('title_tl', 255)->nullable();
+            $table->text('description_en')->nullable();
+            $table->text('description_tl')->nullable();
+            $table->boolean('is_active')->default(true)->index();
+            $table->string('created_by', 120)->nullable();
+            $table->timestamps();
+            $table->index(['rank_tier', 'is_active', 'order'], 'acmd_tier_active_order_idx');
+        });
+    }
 
     protected $fillable = [
         'rank_tier',

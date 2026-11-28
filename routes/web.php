@@ -153,6 +153,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Legacy Club Academy Members & Verification
         Route::get('/verify-academy', [AcademyAdminController::class, 'index'])->name('academy.index');
+        Route::post('/verify-academy/members', [AcademyAdminController::class, 'storeMember'])->name('academy.members.store');
         Route::patch('/verify-academy/{member}/status', [AcademyAdminController::class, 'updateStatus'])->name('academy.status');
         Route::match(['put', 'patch'], '/verify-academy/{member}', [AcademyAdminController::class, 'update'])->name('academy.update');
         Route::delete('/verify-academy/{member}', [AcademyAdminController::class, 'destroy'])->name('academy.destroy');
@@ -176,6 +177,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/verify-academy/certificates/{certificate}/download', [AcademyAdminController::class, 'downloadCertificate'])->name('academy.admin.certificates.download');
         Route::post('/verify-academy/members/{member}/certificates/upload', [AcademyAdminController::class, 'uploadMemberCertificate'])->name('academy.certificates.upload');
         Route::post('/verify-academy/announcements', [AcademyAdminController::class, 'storeAnnouncement'])->name('academy.announcements.store');
+        Route::match(['post', 'put', 'patch'], '/verify-academy/announcements/{announcement}', [AcademyAdminController::class, 'updateAnnouncement'])->name('academy.announcements.update');
         Route::patch('/verify-academy/announcements/{announcement}/toggle', [AcademyAdminController::class, 'toggleAnnouncement'])->name('academy.announcements.toggle');
         Route::delete('/verify-academy/announcements/{announcement}', [AcademyAdminController::class, 'deleteAnnouncement'])->name('academy.announcements.destroy');
 

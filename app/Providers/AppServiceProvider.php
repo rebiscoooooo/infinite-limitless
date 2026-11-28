@@ -80,6 +80,12 @@ class AppServiceProvider extends ServiceProvider
             if (Schema::hasTable('site_stats') && SiteStat::count() === 0) {
                 (new StatsSeeder())->run();
             }
+
+            // Ensure Academy enhancement schema additions exist without manual intervention
+            if (Schema::hasTable('academy_trainings')) {
+                \App\Models\AcademyTraining::ensureAttachmentsColumn();
+                \App\Models\AcademyCommandment::ensureTableExists();
+            }
         } catch (\Throwable $e) {
             // Gracefully catch during initial table creation or migrations
         }

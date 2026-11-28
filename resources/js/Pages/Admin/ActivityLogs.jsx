@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Search,
     Monitor,
@@ -29,6 +30,8 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
 
     // Multi-select state
     const [selectedIds, setSelectedIds] = useState([]);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     const logList = logs.data || [];
 
@@ -75,11 +78,22 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
     // Bulk actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected activity log(s)?`)) {
-            router.post('/admin/activity-logs/bulk-archive', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to archive ${selectedIds.length} selected activity log(s)?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'warning',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/activity-logs/bulk-archive', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleBulkRestore = () => {
@@ -91,12 +105,23 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selectedIds.length} selected activity log(s) from the database? This cannot be undone.`)) {
-            router.delete('/admin/activity-logs/bulk-delete', {
-                data: { ids: selectedIds },
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete ${selectedIds.length} selected activity log(s)? This action cannot be undone.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete('/admin/activity-logs/bulk-delete', {
+                    data: { ids: selectedIds },
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const getDeviceIcon = (dev) => {
@@ -665,6 +690,18 @@ export default function ActivityLogs({ logs = { data: [] }, counts = {}, filters
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

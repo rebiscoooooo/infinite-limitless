@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Search,
     FileText,
@@ -64,6 +65,8 @@ export default function WorldPlanRegistrations({
     const [credPassword, setCredPassword] = useState('');
     const [showCredPassword, setShowCredPassword] = useState(false);
     const [sendingCredentials, setSendingCredentials] = useState(false);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     const openCredentialsModal = (item) => {
         setCredentialsModalItem(item);
@@ -85,11 +88,23 @@ export default function WorldPlanRegistrations({
         e.preventDefault();
         if (!credentialsModalItem) return;
         if (!credUsername.trim()) {
-            alert('Please enter a username.');
+            setConfirmDialog({
+                alertOnly: true,
+                variant: 'warning',
+                title: 'Missing Username',
+                message: 'Please enter a username before sending login credentials.',
+                confirmLabel: 'OK, got it',
+            });
             return;
         }
         if (!credPassword.trim()) {
-            alert('Please enter a password.');
+            setConfirmDialog({
+                alertOnly: true,
+                variant: 'warning',
+                title: 'Missing Password',
+                message: 'Please enter a password before sending login credentials.',
+                confirmLabel: 'OK, got it',
+            });
             return;
         }
 
@@ -109,7 +124,13 @@ export default function WorldPlanRegistrations({
                 },
                 onError: (errors) => {
                     setSendingCredentials(false);
-                    alert(Object.values(errors).flat().join('\n') || 'Failed to dispatch credentials.');
+                    setConfirmDialog({
+                        alertOnly: true,
+                        variant: 'danger',
+                        title: 'Unable to Send Credentials',
+                        message: Object.values(errors).flat().join(' ') || 'Failed to dispatch credentials. Please try again.',
+                        confirmLabel: 'OK, got it',
+                    });
                 },
             }
         );
@@ -162,11 +183,22 @@ export default function WorldPlanRegistrations({
     // Bulk Actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected registration(s)?`)) {
-            router.post('/admin/world-plan/bulk-archive', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to archive ${selectedIds.length} selected registration(s)?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'warning',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/world-plan/bulk-archive', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleBulkRestore = () => {
@@ -178,19 +210,39 @@ export default function WorldPlanRegistrations({
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selectedIds.length} registration(s)? This will also erase associated receipt attachments.`)) {
-            router.post('/admin/world-plan/bulk-delete', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete ${selectedIds.length} selected registration(s)? Associated receipt files will also be removed.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/world-plan/bulk-delete', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleDelete = (id, name) => {
-        if (confirm(`Are you sure you want to delete the registration of "${name}"?`)) {
-            router.delete(`/admin/world-plan/${id}`, {
-                preserveScroll: true,
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete the registration for "${name}"?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/world-plan/${id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleApproveSubmit = (e) => {
@@ -1579,6 +1631,19 @@ export default function WorldPlanRegistrations({
                     </div>
                 );
             })()}
+
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                alertOnly={Boolean(confirmDialog?.alertOnly)}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

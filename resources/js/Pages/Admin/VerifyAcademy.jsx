@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import { getCountryInfo, getTierDetails, ACADEMY_TIERS } from '../../Utils/academyBadges';
 import {
     Users,
@@ -88,7 +89,9 @@ export default function VerifyAcademy({
     const [trainingMemberModal, setTrainingMemberModal] = useState(null);
     const [uploadCertificateModal, setUploadCertificateModal] = useState(null);
 
+    const [showCreateMember, setShowCreateMember] = useState(false);
     const [showCreateAnnouncement, setShowCreateAnnouncement] = useState(false);
+    const [editingAnnouncement, setEditingAnnouncement] = useState(null);
     const [showCreateTraining, setShowCreateTraining] = useState(false);
     const [editingTraining, setEditingTraining] = useState(null);
     const [showCreateRequirement, setShowCreateRequirement] = useState(false);
@@ -96,6 +99,8 @@ export default function VerifyAcademy({
     const [showCreateCommandment, setShowCreateCommandment] = useState(false);
     const [editingCommandment, setEditingCommandment] = useState(null);
     const [commandmentTierFilter, setCommandmentTierFilter] = useState('All');
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     // Filter submit
     const handleFilterSubmit = (e) => {
@@ -134,6 +139,21 @@ export default function VerifyAcademy({
     });
 
     const promoteForm = useForm({});
+
+    const createMemberForm = useForm({
+        first_name: '',
+        middle_initial: '',
+        last_name: '',
+        phone_country_code: '+63',
+        phone_number: '',
+        email: '',
+        password: '',
+        address: '',
+        status: 'Approved',
+        rank_tier: 'Rookie',
+        preferred_language: 'en',
+        admin_notes: '',
+    });
 
     const editForm = useForm({
         first_name: '',
@@ -236,8 +256,26 @@ export default function VerifyAcademy({
         });
     };
 
+    const openCreateMemberModal = () => {
+        createMemberForm.clearErrors();
+        createMemberForm.reset();
+        setShowCreateMember(true);
+    };
+
+    const handleCreateMemberSubmit = (e) => {
+        e.preventDefault();
+        createMemberForm.post('/admin/verify-academy/members', {
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowCreateMember(false);
+                createMemberForm.reset();
+            },
+        });
+    };
+
     const openEditModal = (m) => {
         setEditMember(m);
+        editForm.clearErrors();
         editForm.setData({
             first_name: m.first_name || '',
             middle_initial: m.middle_initial || '',
@@ -247,7 +285,7 @@ export default function VerifyAcademy({
             email: m.email || '',
             address: m.address || '',
             status: m.status || 'Pending',
-            rank_tier: m.rank_tier || '',
+            rank_tier: m.rank_tier || 'Rookie',
             admin_notes: m.admin_notes || '',
         });
     };
@@ -301,29 +339,49 @@ export default function VerifyAcademy({
     };
 
     const handleGrantAllMemberTrainings = (member) => {
-        if (confirm(`Grant and approve ALL training modules for ${member.full_name}?`)) {
-            router.post(
-                `/admin/verify-academy/members/${member.id}/trainings/grant-all`,
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: (page) => {
-                        const updated = page?.props?.members?.data?.find((m) => m.id === member.id);
-                        if (updated) setTrainingMemberModal(updated);
-                    },
-                }
-            );
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to grant and approve all training modules for ${member.full_name}?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'primary',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post(
+                    `/admin/verify-academy/members/${member.id}/trainings/grant-all`,
+                    {},
+                    {
+                        preserveScroll: true,
+                        onSuccess: (page) => {
+                            const updated = page?.props?.members?.data?.find((m) => m.id === member.id);
+                            if (updated) setTrainingMemberModal(updated);
+                            setConfirmDialog(null);
+                        },
+                        onFinish: () => setConfirmProcessing(false),
+                    }
+                );
+            },
+        });
     };
 
     const handleGrantTrainingToRank = (training) => {
-        if (confirm(`Grant and complete training module #${training.order} "${training.title_en}" for ALL active ${training.rank_tier} members?`)) {
-            router.post(
-                `/admin/verify-academy/trainings/${training.id}/grant-all`,
-                {},
-                { preserveScroll: true }
-            );
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to grant training module #${training.order} "${training.title_en}" to all active ${training.rank_tier} members?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'primary',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post(
+                    `/admin/verify-academy/trainings/${training.id}/grant-all`,
+                    {},
+                    {
+                        preserveScroll: true,
+                        onSuccess: () => setConfirmDialog(null),
+                        onFinish: () => setConfirmProcessing(false),
+                    }
+                );
+            },
+        });
     };
 
     const handleApproveSubmit = (e) => {
@@ -360,9 +418,11 @@ export default function VerifyAcademy({
 
     const handleDeleteSubmit = () => {
         if (!deleteMember) return;
+        setConfirmProcessing(true);
         router.delete(`/admin/verify-academy/${deleteMember.id}`, {
             preserveScroll: true,
             onSuccess: () => setDeleteMember(null),
+            onFinish: () => setConfirmProcessing(false),
         });
     };
 
@@ -437,17 +497,18 @@ export default function VerifyAcademy({
         const hasModal = Boolean(
             viewMember || approveMember || rejectMember || editMember || deleteMember ||
             promoteMemberModal || reviewReflectionModal || requirementMemberModal ||
-            trainingMemberModal || uploadCertificateModal || showCreateAnnouncement ||
-            showCreateTraining || showCreateRequirement || showCreateCommandment
+            trainingMemberModal || uploadCertificateModal || showCreateMember ||
+            showCreateAnnouncement || showCreateTraining || showCreateRequirement || showCreateCommandment
         );
         if (!hasModal) return;
         const onKeyDown = (e) => {
-            if (e.key !== 'Escape') return;
+            if (e.key !== 'Escape' || confirmDialog) return;
             if (uploadCertificateModal) setUploadCertificateModal(null);
             else if (showCreateCommandment) { setShowCreateCommandment(false); setEditingCommandment(null); }
             else if (showCreateTraining) { setShowCreateTraining(false); setEditingTraining(null); }
             else if (showCreateRequirement) { setShowCreateRequirement(false); setEditingRequirement(null); }
-            else if (showCreateAnnouncement) setShowCreateAnnouncement(false);
+            else if (showCreateAnnouncement) { setShowCreateAnnouncement(false); setEditingAnnouncement(null); }
+            else if (showCreateMember) setShowCreateMember(false);
             else if (trainingMemberModal) setTrainingMemberModal(null);
             else if (requirementMemberModal) { setRequirementMemberModal(null); setSelectedRequirement(null); }
             else if (reviewReflectionModal) setReviewReflectionModal(null);
@@ -460,7 +521,7 @@ export default function VerifyAcademy({
         };
         window.addEventListener('keydown', onKeyDown);
         return () => window.removeEventListener('keydown', onKeyDown);
-    }, [viewMember, approveMember, rejectMember, editMember, deleteMember, promoteMemberModal, reviewReflectionModal, requirementMemberModal, trainingMemberModal, uploadCertificateModal, showCreateAnnouncement, showCreateTraining, showCreateRequirement, showCreateCommandment]);
+    }, [viewMember, approveMember, rejectMember, editMember, deleteMember, promoteMemberModal, reviewReflectionModal, requirementMemberModal, trainingMemberModal, uploadCertificateModal, showCreateMember, showCreateAnnouncement, showCreateTraining, showCreateRequirement, showCreateCommandment, confirmDialog]);
 
     const handleCertificateUploadSubmit = (e) => {
         e.preventDefault();
@@ -489,30 +550,103 @@ export default function VerifyAcademy({
         );
     };
 
+    const openCreateAnnouncement = () => {
+        setEditingAnnouncement(null);
+        announcementForm.clearErrors();
+        announcementForm.setData({
+            title: '',
+            content: '',
+            type: 'announcement',
+            badge_text: '',
+            featured_member_id: '',
+            image: null,
+            is_active: true,
+        });
+        setShowCreateAnnouncement(true);
+    };
+
+    const openEditAnnouncement = (ann) => {
+        setEditingAnnouncement(ann);
+        announcementForm.clearErrors();
+        announcementForm.setData({
+            title: ann.title || '',
+            content: ann.content || '',
+            type: ann.type || 'announcement',
+            badge_text: ann.badge_text || '',
+            featured_member_id: ann.featured_member_id || ann.featured_member?.id || '',
+            image: null,
+            is_active: ann.is_active ?? true,
+        });
+        setShowCreateAnnouncement(true);
+    };
+
     const handleAnnouncementSubmit = (e) => {
         e.preventDefault();
-        announcementForm.post('/admin/verify-academy/announcements', {
-            forceFormData: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setShowCreateAnnouncement(false);
-                announcementForm.reset();
-            },
-        });
+        if (editingAnnouncement) {
+            announcementForm.transform((data) => ({
+                ...data,
+                is_active: data.is_active ? 1 : 0,
+                _method: 'PUT',
+            }));
+            announcementForm.post(`/admin/verify-academy/announcements/${editingAnnouncement.id}`, {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowCreateAnnouncement(false);
+                    setEditingAnnouncement(null);
+                    announcementForm.reset();
+                },
+            });
+        } else {
+            announcementForm.transform((data) => ({
+                ...data,
+                is_active: data.is_active ? 1 : 0,
+            }));
+            announcementForm.post('/admin/verify-academy/announcements', {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setShowCreateAnnouncement(false);
+                    announcementForm.reset();
+                },
+            });
+        }
+    };
+
+    const buildSuggestedRequirementMeta = (tier) => {
+        const tierItems = rankRequirements.filter((r) => r.rank_tier === tier);
+        const nextOrder = tierItems.length > 0 ? Math.max(...tierItems.map((r) => Number(r.order) || 0)) + 1 : 1;
+        const prefix = tier.toUpperCase().replace(/\s+/g, '-');
+        const existingCodes = new Set(rankRequirements.map((r) => String(r.code || '').toUpperCase()));
+        let seq = nextOrder;
+        let code = `${prefix}-REQ-${seq}`;
+        while (existingCodes.has(code)) {
+            seq += 1;
+            code = `${prefix}-REQ-${seq}`;
+        }
+        return { order: nextOrder, code };
+    };
+
+    const getNextTrainingOrder = (tier) => {
+        const tierItems = rankTrainings.filter((t) => t.rank_tier === tier && !t.target_member_id);
+        if (tierItems.length === 0) return 1;
+        return Math.max(...tierItems.map((t) => Number(t.order) || 0)) + 1;
     };
 
     const openCreateRequirement = () => {
         setEditingRequirement(null);
+        requirementDefForm.clearErrors();
+        const meta = buildSuggestedRequirementMeta('Rookie');
         requirementDefForm.setData({
             rank_tier: 'Rookie',
-            code: '',
+            code: meta.code,
             title_en: '',
             title_tl: '',
             description_en: '',
             description_tl: '',
             target_value: 1,
             unit: 'Personal Sponsors',
-            order: 1,
+            order: meta.order,
             is_active: true,
         });
         setShowCreateRequirement(true);
@@ -521,10 +655,11 @@ export default function VerifyAcademy({
     const openCreateTraining = (targetMember = null) => {
         setEditingTraining(null);
         trainingForm.clearErrors();
+        const defaultTier = targetMember ? (targetMember.rank_tier || 'Rookie') : 'Rookie';
         trainingForm.setData({
-            rank_tier: targetMember ? (targetMember.rank_tier || 'Rookie') : 'Rookie',
+            rank_tier: defaultTier,
             target_member_id: targetMember ? targetMember.id : '',
-            order: targetMember ? ((targetMember.training_stats?.items?.length || 0) + 1) : 1,
+            order: targetMember ? ((targetMember.training_stats?.items?.length || 0) + 1) : getNextTrainingOrder(defaultTier),
             title_en: '',
             title_tl: '',
             description_en: '',
@@ -544,6 +679,7 @@ export default function VerifyAcademy({
 
     const openEditRequirement = (r) => {
         setEditingRequirement(r);
+        requirementDefForm.clearErrors();
         requirementDefForm.setData({
             rank_tier: r.rank_tier || 'Rookie',
             code: r.code || '',
@@ -670,9 +806,20 @@ export default function VerifyAcademy({
     };
 
     const handleDeleteRequirement = (r) => {
-        if (confirm(`Are you sure you want to delete requirement "${r.title_en}" (${r.code})?`)) {
-            router.delete(`/admin/verify-academy/requirements/${r.id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to delete the requirement "${r.title_en}" (${r.code})?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/verify-academy/requirements/${r.id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const getNextCommandmentOrder = (tier) => {
@@ -739,15 +886,37 @@ export default function VerifyAcademy({
     };
 
     const handleDeleteCommandment = (cmd) => {
-        if (confirm(`Delete commandment "${cmd.title_en}" from ${cmd.rank_tier} tier?`)) {
-            router.delete(`/admin/verify-academy/commandments/${cmd.id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to delete the commandment "${cmd.title_en}" from the ${cmd.rank_tier} tier?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/verify-academy/commandments/${cmd.id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleDeleteTraining = (t) => {
-        if (confirm(`Are you sure you want to delete training module "${t.title_en}"?`)) {
-            router.delete(`/admin/verify-academy/trainings/${t.id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to delete the training module "${t.title_en}"?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/verify-academy/trainings/${t.id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleToggleAnnouncement = (ann) => {
@@ -755,9 +924,20 @@ export default function VerifyAcademy({
     };
 
     const handleDeleteAnnouncement = (ann) => {
-        if (confirm(`Are you sure you want to delete announcement "${ann.title}"?`)) {
-            router.delete(`/admin/verify-academy/announcements/${ann.id}`, { preserveScroll: true });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to delete the announcement "${ann.title}"?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.delete(`/admin/verify-academy/announcements/${ann.id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => setConfirmDialog(null),
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     return (
@@ -1016,6 +1196,14 @@ export default function VerifyAcademy({
                                     </button>
                                 )}
                             </form>
+
+                            <button
+                                type="button"
+                                onClick={openCreateMemberModal}
+                                className="px-4 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold uppercase tracking-wider shadow-xs cursor-pointer border-0 outline-none flex items-center gap-1.5 shrink-0 w-full md:w-auto justify-center"
+                            >
+                                <Plus className="w-4 h-4" /> Add Member
+                            </button>
                         </div>
 
                         {/* MEMBERS TABLE */}
@@ -1712,7 +1900,7 @@ export default function VerifyAcademy({
                             </div>
                             <button
                                 type="button"
-                                onClick={() => setShowCreateAnnouncement(true)}
+                                onClick={openCreateAnnouncement}
                                 className="px-4 py-2 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-bold uppercase tracking-wider shadow-xs cursor-pointer border-0 outline-none flex items-center gap-1.5 shrink-0"
                             >
                                 <Plus className="w-4 h-4" /> Publish Announcement
@@ -1748,13 +1936,24 @@ export default function VerifyAcademy({
                                         >
                                             {ann.is_active ? 'Active' : 'Hidden'}
                                         </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDeleteAnnouncement(ann)}
-                                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 border-0 bg-transparent cursor-pointer"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                onClick={() => openEditAnnouncement(ann)}
+                                                title="Edit Announcement"
+                                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#0f766e] border-0 bg-transparent cursor-pointer"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteAnnouncement(ann)}
+                                                title="Delete Announcement"
+                                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 border-0 bg-transparent cursor-pointer"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -2026,7 +2225,7 @@ export default function VerifyAcademy({
                                 <img src="/assets/image/academy/logo-black-trimmed.png?v=2" alt="Legacy Club" className="w-5 h-5 object-contain" />
                                 Member Details: {viewMember.full_name}
                             </h3>
-                            <button onClick={() => setViewMember(null)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
+                            <button type="button" onClick={() => setViewMember(null)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -2071,7 +2270,7 @@ export default function VerifyAcademy({
                         </div>
 
                         <div className="p-4 border-t border-slate-200 flex justify-end bg-slate-50">
-                            <button onClick={() => setViewMember(null)} className="px-5 py-2 rounded-xl bg-slate-200 text-slate-800 text-xs font-bold uppercase cursor-pointer border-0">
+                            <button type="button" onClick={() => setViewMember(null)} className="px-5 py-2 rounded-xl bg-slate-200 text-slate-800 text-xs font-bold uppercase cursor-pointer border-0">
                                 Close
                             </button>
                         </div>
@@ -2099,7 +2298,7 @@ export default function VerifyAcademy({
                                     Approve Membership: {approveMember.full_name}
                                 </h3>
                             </div>
-                            <button onClick={() => setApproveMember(null)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
+                            <button type="button" onClick={() => setApproveMember(null)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
@@ -2203,10 +2402,181 @@ export default function VerifyAcademy({
             )}
 
             {/* ============================================================== */}
+            {/* MODAL: CREATE NEW ACADEMY MEMBER */}
+            {/* ============================================================== */}
+            {showCreateMember && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" onClick={() => !createMemberForm.processing && setShowCreateMember(false)}>
+                    <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <h3 className="text-base font-bold text-slate-900 uppercase font-mono flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-[#0f766e]" /> Add New Academy Member
+                            </h3>
+                            <button type="button" onClick={() => setShowCreateMember(false)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {Object.keys(createMemberForm.errors).length > 0 && (
+                            <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                <div className="space-y-0.5">
+                                    <div className="font-bold">Please fix the following errors:</div>
+                                    <ul className="list-disc list-inside space-y-0.5 m-0">
+                                        {Object.entries(createMemberForm.errors).map(([k, msg]) => (
+                                            <li key={k}>{msg}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleCreateMemberSubmit} className="space-y-3.5">
+                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                                <div className="sm:col-span-5">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">First Name *</label>
+                                    <input
+                                        type="text"
+                                        value={createMemberForm.data.first_name}
+                                        onChange={(e) => createMemberForm.setData('first_name', e.target.value)}
+                                        placeholder="e.g. Alexander"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900"
+                                        required
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">M.I.</label>
+                                    <input
+                                        type="text"
+                                        maxLength="2"
+                                        value={createMemberForm.data.middle_initial}
+                                        onChange={(e) => createMemberForm.setData('middle_initial', e.target.value)}
+                                        placeholder="M"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-center uppercase text-slate-900"
+                                    />
+                                </div>
+                                <div className="sm:col-span-5">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Last Name *</label>
+                                    <input
+                                        type="text"
+                                        value={createMemberForm.data.last_name}
+                                        onChange={(e) => createMemberForm.setData('last_name', e.target.value)}
+                                        placeholder="e.g. Mercer"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Email Address *</label>
+                                    <input
+                                        type="email"
+                                        value={createMemberForm.data.email}
+                                        onChange={(e) => createMemberForm.setData('email', e.target.value)}
+                                        placeholder="member@example.com"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Portal Password (Min 8 chars) *</label>
+                                    <input
+                                        type="text"
+                                        minLength={8}
+                                        value={createMemberForm.data.password}
+                                        onChange={(e) => createMemberForm.setData('password', e.target.value)}
+                                        placeholder="Enter initial password..."
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Country Code *</label>
+                                    <input
+                                        type="text"
+                                        value={createMemberForm.data.phone_country_code}
+                                        onChange={(e) => createMemberForm.setData('phone_country_code', e.target.value)}
+                                        placeholder="+63"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                        required
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number *</label>
+                                    <input
+                                        type="tel"
+                                        value={createMemberForm.data.phone_number}
+                                        onChange={(e) => createMemberForm.setData('phone_number', e.target.value)}
+                                        placeholder="9171234567"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">Complete Address *</label>
+                                <textarea
+                                    rows="2"
+                                    value={createMemberForm.data.address}
+                                    onChange={(e) => createMemberForm.setData('address', e.target.value)}
+                                    placeholder="City, Province / State, Country"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm sm:text-xs text-slate-900"
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Status</label>
+                                    <select
+                                        value={createMemberForm.data.status}
+                                        onChange={(e) => createMemberForm.setData('status', e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900"
+                                    >
+                                        <option value="Approved">Approved</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Initial Rank Tier</label>
+                                    <select
+                                        value={createMemberForm.data.rank_tier}
+                                        onChange={(e) => createMemberForm.setData('rank_tier', e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                    >
+                                        <option value="Rookie">Rookie</option>
+                                        <option value="Elite">Elite</option>
+                                        <option value="Master">Master</option>
+                                        <option value="Grand Master">Grand Master</option>
+                                        <option value="Legend">Legend</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="pt-2 flex flex-wrap justify-end gap-3 border-t border-slate-100">
+                                <button type="button" onClick={() => setShowCreateMember(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border-0 cursor-pointer">
+                                    Cancel
+                                </button>
+                                <button type="submit" disabled={createMemberForm.processing} className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-black uppercase tracking-wider shadow-sm border-0 cursor-pointer disabled:opacity-50">
+                                    {createMemberForm.processing ? 'Creating...' : 'Create Member'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ============================================================== */}
             {/* MODAL: EDIT MEMBER */}
             {/* ============================================================== */}
             {editMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" onClick={() => setEditMember(null)}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" onClick={() => !editForm.processing && setEditMember(null)}>
                     <div className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                             <h3 className="text-base font-bold text-slate-900 uppercase font-mono flex items-center gap-2">
@@ -2217,10 +2587,24 @@ export default function VerifyAcademy({
                             </button>
                         </div>
 
+                        {Object.keys(editForm.errors).length > 0 && (
+                            <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                <div className="space-y-0.5">
+                                    <div className="font-bold">Please fix the following errors:</div>
+                                    <ul className="list-disc list-inside space-y-0.5 m-0">
+                                        {Object.entries(editForm.errors).map(([k, msg]) => (
+                                            <li key={k}>{msg}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
+
                         <form onSubmit={handleEditSubmit} className="space-y-3">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">First Name</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                                <div className="sm:col-span-5">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">First Name *</label>
                                     <input
                                         type="text"
                                         value={editForm.data.first_name}
@@ -2229,8 +2613,18 @@ export default function VerifyAcademy({
                                         required
                                     />
                                 </div>
-                                <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">Last Name</label>
+                                <div className="sm:col-span-2">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">M.I.</label>
+                                    <input
+                                        type="text"
+                                        maxLength="2"
+                                        value={editForm.data.middle_initial}
+                                        onChange={(e) => editForm.setData('middle_initial', e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-center uppercase text-slate-900"
+                                    />
+                                </div>
+                                <div className="sm:col-span-5">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Last Name *</label>
                                     <input
                                         type="text"
                                         value={editForm.data.last_name}
@@ -2239,6 +2633,51 @@ export default function VerifyAcademy({
                                         required
                                     />
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">Email Address *</label>
+                                <input
+                                    type="email"
+                                    value={editForm.data.email}
+                                    onChange={(e) => editForm.setData('email', e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900"
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Country Code *</label>
+                                    <input
+                                        type="text"
+                                        value={editForm.data.phone_country_code}
+                                        onChange={(e) => editForm.setData('phone_country_code', e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                        required
+                                    />
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Phone Number *</label>
+                                    <input
+                                        type="tel"
+                                        value={editForm.data.phone_number}
+                                        onChange={(e) => editForm.setData('phone_number', e.target.value)}
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm sm:text-xs text-slate-900 font-mono"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">Complete Address *</label>
+                                <textarea
+                                    rows="2"
+                                    value={editForm.data.address}
+                                    onChange={(e) => editForm.setData('address', e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm sm:text-xs text-slate-900"
+                                    required
+                                />
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2284,44 +2723,67 @@ export default function VerifyAcademy({
             )}
 
             {/* ============================================================== */}
-            {/* MODAL: DELETE CONFIRMATION */}
+            {/* MODAL: FLOWBITE DELETE MEMBER CONFIRMATION */}
             {/* ============================================================== */}
-            {deleteMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" onClick={() => setDeleteMember(null)}>
-                    <div className="bg-white border border-slate-200 rounded-3xl max-w-sm w-full max-h-[90dvh] overflow-y-auto p-6 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
-                        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
-                            <Trash2 className="w-6 h-6" />
-                        </div>
-                        <h4 className="font-bold text-slate-900 text-base">Delete Academy Member?</h4>
-                        <p className="text-xs text-slate-500">
-                            Are you sure you want to remove <strong>{deleteMember.full_name}</strong>? This action cannot be undone.
-                        </p>
-                        <div className="pt-2 flex justify-center gap-3">
-                            <button type="button" onClick={() => setDeleteMember(null)} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border-0 cursor-pointer">
-                                Cancel
-                            </button>
-                            <button type="button" onClick={handleDeleteSubmit} className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider border-0 cursor-pointer">
-                                Yes, Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={Boolean(deleteMember)}
+                onClose={() => !confirmProcessing && setDeleteMember(null)}
+                onConfirm={handleDeleteSubmit}
+                message={
+                    deleteMember
+                        ? `Are you sure you want to delete ${deleteMember.full_name} from the Academy? This action cannot be undone.`
+                        : ''
+                }
+                confirmLabel="Yes, I'm sure"
+                cancelLabel="No, cancel"
+                variant="danger"
+                processing={confirmProcessing}
+            />
 
             {/* ============================================================== */}
-            {/* MODAL: CREATE ANNOUNCEMENT / RECOGNITION */}
+            {/* MODAL: CREATE / EDIT ANNOUNCEMENT OR RECOGNITION */}
             {/* ============================================================== */}
             {showCreateAnnouncement && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs" onClick={() => setShowCreateAnnouncement(false)}>
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+                    onClick={() => {
+                        if (!announcementForm.processing) {
+                            setShowCreateAnnouncement(false);
+                            setEditingAnnouncement(null);
+                        }
+                    }}
+                >
                     <div className="bg-white border border-slate-200 rounded-3xl max-w-lg w-full max-h-[90dvh] overflow-y-auto p-5 sm:p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                             <h3 className="text-sm sm:text-base font-bold text-slate-900 uppercase font-mono flex items-center gap-2">
-                                <Bell className="w-5 h-5 text-[#0f766e] shrink-0" /> Publish Announcement or Recognition
+                                <Bell className="w-5 h-5 text-[#0f766e] shrink-0" />
+                                {editingAnnouncement ? 'Edit Announcement' : 'Publish Announcement or Recognition'}
                             </h3>
-                            <button type="button" onClick={() => setShowCreateAnnouncement(false)} className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowCreateAnnouncement(false);
+                                    setEditingAnnouncement(null);
+                                }}
+                                className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer"
+                            >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
+
+                        {Object.keys(announcementForm.errors).length > 0 && (
+                            <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                <div className="space-y-0.5">
+                                    <div className="font-bold">Please fix the following errors:</div>
+                                    <ul className="list-disc list-inside space-y-0.5 m-0">
+                                        {Object.entries(announcementForm.errors).map(([k, msg]) => (
+                                            <li key={k}>{msg}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        )}
 
                         <form onSubmit={handleAnnouncementSubmit} className="space-y-3">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2375,21 +2837,40 @@ export default function VerifyAcademy({
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-slate-700 block mb-1">Banner Image (Optional)</label>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Banner Image <span className="font-normal text-slate-400">(Optional — leave empty to keep existing)</span>
+                                </label>
                                 <input
                                     type="file"
-                                    onChange={(e) => announcementForm.setData('image', e.target.files[0])}
+                                    onChange={(e) => announcementForm.setData('image', e.target.files?.[0] || null)}
                                     accept="image/*"
                                     className="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-teal-50 file:text-[#0f766e] file:font-bold"
                                 />
                             </div>
 
+                            <label className="flex items-center gap-2 cursor-pointer pt-1">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(announcementForm.data.is_active)}
+                                    onChange={(e) => announcementForm.setData('is_active', e.target.checked)}
+                                    className="rounded border-slate-300 text-[#0f766e] focus:ring-[#0f766e]"
+                                />
+                                <span className="text-xs font-bold text-slate-700">Active (Visible in Legacy Member Portal)</span>
+                            </label>
+
                             <div className="pt-2 flex justify-end gap-3 border-t border-slate-100">
-                                <button type="button" onClick={() => setShowCreateAnnouncement(false)} className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border-0 cursor-pointer">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowCreateAnnouncement(false);
+                                        setEditingAnnouncement(null);
+                                    }}
+                                    className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border-0 cursor-pointer"
+                                >
                                     Cancel
                                 </button>
-                                <button type="submit" disabled={announcementForm.processing} className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-black uppercase tracking-wider shadow-sm border-0 cursor-pointer">
-                                    {announcementForm.processing ? 'Publishing...' : 'Publish'}
+                                <button type="submit" disabled={announcementForm.processing} className="px-5 py-2.5 rounded-xl bg-[#0f766e] hover:bg-[#115e59] text-white text-xs font-black uppercase tracking-wider shadow-sm border-0 cursor-pointer disabled:opacity-50">
+                                    {announcementForm.processing ? 'Saving...' : editingAnnouncement ? 'Save Changes' : 'Publish'}
                                 </button>
                             </div>
                         </form>
@@ -2415,6 +2896,7 @@ export default function VerifyAcademy({
                                 {editingRequirement ? 'Edit Rank Requirement' : 'Define New Rank Requirement'}
                             </h3>
                             <button
+                                type="button"
                                 onClick={() => {
                                     setShowCreateRequirement(false);
                                     setEditingRequirement(null);
@@ -2426,12 +2908,39 @@ export default function VerifyAcademy({
                         </div>
 
                         <form onSubmit={handleRequirementDefSubmit} className="p-6 overflow-y-auto space-y-3.5">
-                            <div className="grid grid-cols-2 gap-3">
+                            {Object.keys(requirementDefForm.errors).length > 0 && (
+                                <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                    <div className="space-y-0.5">
+                                        <div className="font-bold">Please fix the following errors:</div>
+                                        <ul className="list-disc list-inside space-y-0.5 m-0">
+                                            {Object.entries(requirementDefForm.errors).map(([k, msg]) => (
+                                                <li key={k}>{msg}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Rank Tier *</label>
                                     <select
                                         value={requirementDefForm.data.rank_tier}
-                                        onChange={(e) => requirementDefForm.setData('rank_tier', e.target.value)}
+                                        onChange={(e) => {
+                                            const nextTier = e.target.value;
+                                            if (editingRequirement) {
+                                                requirementDefForm.setData('rank_tier', nextTier);
+                                            } else {
+                                                const meta = buildSuggestedRequirementMeta(nextTier);
+                                                requirementDefForm.setData((prev) => ({
+                                                    ...prev,
+                                                    rank_tier: nextTier,
+                                                    order: meta.order,
+                                                    code: meta.code,
+                                                }));
+                                            }
+                                        }}
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono"
                                         required
                                     >
@@ -2504,14 +3013,15 @@ export default function VerifyAcademy({
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-slate-700 block mb-1">Title (Filipino) *</label>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Title (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={requirementDefForm.data.title_tl}
                                     onChange={(e) => requirementDefForm.setData('title_tl', e.target.value)}
-                                    placeholder="e.g. Personal na Sponsor"
+                                    placeholder="Leave blank to use English title..."
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
-                                    required
                                 />
                             </div>
 
@@ -2521,16 +3031,20 @@ export default function VerifyAcademy({
                                     rows="2"
                                     value={requirementDefForm.data.description_en}
                                     onChange={(e) => requirementDefForm.setData('description_en', e.target.value)}
+                                    placeholder="Describe how members fulfill this requirement..."
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-slate-700 block mb-1">Description (Filipino)</label>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Description (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                </label>
                                 <textarea
                                     rows="2"
                                     value={requirementDefForm.data.description_tl}
                                     onChange={(e) => requirementDefForm.setData('description_tl', e.target.value)}
+                                    placeholder="Leave blank to use English description..."
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                 />
                             </div>
@@ -2587,6 +3101,7 @@ export default function VerifyAcademy({
                                 {editingTraining ? 'Edit Training Module' : 'Add New Training Module'}
                             </h3>
                             <button
+                                type="button"
                                 onClick={() => {
                                     setShowCreateTraining(false);
                                     setEditingTraining(null);
@@ -2598,6 +3113,20 @@ export default function VerifyAcademy({
                         </div>
 
                         <form onSubmit={handleTrainingSubmit} className="p-6 overflow-y-auto space-y-3.5">
+                            {Object.keys(trainingForm.errors).length > 0 && (
+                                <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                    <div className="space-y-0.5">
+                                        <div className="font-bold">Please fix the following errors:</div>
+                                        <ul className="list-disc list-inside space-y-0.5 m-0">
+                                            {Object.entries(trainingForm.errors).map(([k, msg]) => (
+                                                <li key={k}>{msg}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Member Assignment Selector */}
                             <div>
                                 <label className="text-xs font-bold text-slate-700 block mb-1">
@@ -2608,14 +3137,20 @@ export default function VerifyAcademy({
                                     onChange={(e) => {
                                         const val = e.target.value;
                                         if (val === 'all_rank') {
-                                            trainingForm.setData('target_member_id', '');
+                                            trainingForm.setData((prev) => ({
+                                                ...prev,
+                                                target_member_id: '',
+                                                order: !editingTraining ? getNextTrainingOrder(prev.rank_tier) : prev.order,
+                                            }));
                                         } else {
                                             const memberId = val.replace('member_', '');
-                                            trainingForm.setData('target_member_id', memberId);
-                                            const mem = members.data.find((m) => m.id === parseInt(memberId));
-                                            if (mem) {
-                                                trainingForm.setData('rank_tier', mem.rank_tier || 'Rookie');
-                                            }
+                                            const mem = members.data.find((m) => m.id === parseInt(memberId, 10));
+                                            trainingForm.setData((prev) => ({
+                                                ...prev,
+                                                target_member_id: memberId,
+                                                rank_tier: mem ? (mem.rank_tier || 'Rookie') : prev.rank_tier,
+                                                order: !editingTraining && mem ? ((mem.training_stats?.items?.length || 0) + 1) : prev.order,
+                                            }));
                                         }
                                     }}
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
@@ -2636,7 +3171,18 @@ export default function VerifyAcademy({
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Rank Tier *</label>
                                     <select
                                         value={trainingForm.data.rank_tier}
-                                        onChange={(e) => trainingForm.setData('rank_tier', e.target.value)}
+                                        onChange={(e) => {
+                                            const nextTier = e.target.value;
+                                            if (!editingTraining && !trainingForm.data.target_member_id) {
+                                                trainingForm.setData((prev) => ({
+                                                    ...prev,
+                                                    rank_tier: nextTier,
+                                                    order: getNextTrainingOrder(nextTier),
+                                                }));
+                                            } else {
+                                                trainingForm.setData('rank_tier', nextTier);
+                                            }
+                                        }}
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono"
                                         required
                                     >
@@ -2648,13 +3194,13 @@ export default function VerifyAcademy({
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">Step Order (1-5) *</label>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">Step Order # *</label>
                                     <input
                                         type="number"
                                         min="1"
-                                        max="10"
+                                        max="999"
                                         value={trainingForm.data.order}
-                                        onChange={(e) => trainingForm.setData('order', parseInt(e.target.value) || 1)}
+                                        onChange={(e) => trainingForm.setData('order', parseInt(e.target.value, 10) || 1)}
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono"
                                         required
                                     />
@@ -2663,9 +3209,9 @@ export default function VerifyAcademy({
                                     <label className="text-xs font-bold text-slate-700 block mb-1">Duration (Mins) *</label>
                                     <input
                                         type="number"
-                                        min="5"
+                                        min="1"
                                         value={trainingForm.data.duration_minutes}
-                                        onChange={(e) => trainingForm.setData('duration_minutes', parseInt(e.target.value) || 30)}
+                                        onChange={(e) => trainingForm.setData('duration_minutes', parseInt(e.target.value, 10) || 1)}
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 font-mono"
                                         required
                                     />
@@ -2685,14 +3231,15 @@ export default function VerifyAcademy({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">Title (Filipino) *</label>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Title (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                    </label>
                                     <input
                                         type="text"
                                         value={trainingForm.data.title_tl}
                                         onChange={(e) => trainingForm.setData('title_tl', e.target.value)}
-                                        placeholder="Pamagat sa Filipino..."
+                                        placeholder="Leave blank to use English title..."
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900"
-                                        required
                                     />
                                 </div>
                             </div>
@@ -2704,15 +3251,19 @@ export default function VerifyAcademy({
                                         rows="2"
                                         value={trainingForm.data.description_en}
                                         onChange={(e) => trainingForm.setData('description_en', e.target.value)}
+                                        placeholder="Brief module overview..."
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">Summary (Filipino)</label>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Summary (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                    </label>
                                     <textarea
                                         rows="2"
                                         value={trainingForm.data.description_tl}
                                         onChange={(e) => trainingForm.setData('description_tl', e.target.value)}
+                                        placeholder="Leave blank to use English summary..."
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                     />
                                 </div>
@@ -2724,21 +3275,22 @@ export default function VerifyAcademy({
                                     rows="4"
                                     value={trainingForm.data.content_en}
                                     onChange={(e) => trainingForm.setData('content_en', e.target.value)}
-                                    placeholder="Detailed training syllabus, concepts, instructions..."
+                                    placeholder="Detailed training syllabus, concepts, and instructions..."
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-bold text-slate-700 block mb-1">Curriculum Content &amp; Guide (Filipino) *</label>
+                                <label className="text-xs font-bold text-slate-700 block mb-1">
+                                    Curriculum Content &amp; Guide (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                </label>
                                 <textarea
-                                    rows="4"
+                                    rows="3"
                                     value={trainingForm.data.content_tl}
                                     onChange={(e) => trainingForm.setData('content_tl', e.target.value)}
-                                    placeholder="Detalyadong gabay at mga aralin sa Filipino..."
+                                    placeholder="Leave blank to use English content..."
                                     className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
-                                    required
                                 />
                             </div>
 
@@ -2747,7 +3299,7 @@ export default function VerifyAcademy({
                                     Video URL <span className="font-normal text-slate-400">(Optional — YouTube, Vimeo, Google Drive, or MP4)</span>
                                 </label>
                                 <input
-                                    type="url"
+                                    type="text"
                                     value={trainingForm.data.video_url}
                                     onChange={(e) => trainingForm.setData('video_url', e.target.value)}
                                     placeholder="https://www.youtube.com/watch?v=..."
@@ -2916,12 +3468,14 @@ export default function VerifyAcademy({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-bold text-slate-700 block mb-1">Reflection Prompt (Filipino)</label>
+                                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                                        Reflection Prompt (Filipino Translation) <span className="font-normal text-slate-400">(Optional)</span>
+                                    </label>
                                     <textarea
                                         rows="2"
                                         value={trainingForm.data.reflection_prompt_tl}
                                         onChange={(e) => trainingForm.setData('reflection_prompt_tl', e.target.value)}
-                                        placeholder="Katanungan para sa pagbabalik-tanaw..."
+                                        placeholder="Leave blank to use English reflection prompt..."
                                         className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-900"
                                     />
                                 </div>
@@ -2982,6 +3536,7 @@ export default function VerifyAcademy({
                                 </h3>
                             </div>
                             <button
+                                type="button"
                                 onClick={() => {
                                     setRequirementMemberModal(null);
                                     setSelectedRequirement(null);
@@ -2993,6 +3548,19 @@ export default function VerifyAcademy({
                         </div>
 
                         <form onSubmit={handleRequirementProgressSubmit} className="p-6 overflow-y-auto space-y-4">
+                            {Object.keys(requirementProgressForm.errors).length > 0 && (
+                                <div className="p-3.5 rounded-2xl bg-rose-50 text-rose-800 text-xs flex items-start gap-2.5">
+                                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                                    <div className="space-y-0.5">
+                                        <div className="font-bold">Please fix the following errors:</div>
+                                        <ul className="list-disc list-inside space-y-0.5 m-0">
+                                            {Object.entries(requirementProgressForm.errors).map(([k, msg]) => (
+                                                <li key={k}>{msg}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
                             <div>
                                 <label className="text-xs font-bold text-slate-700 block mb-1">Select Requirement Criteria *</label>
                                 <select
@@ -3112,6 +3680,7 @@ export default function VerifyAcademy({
                                 </h3>
                             </div>
                             <button
+                                type="button"
                                 onClick={() => setTrainingMemberModal(null)}
                                 className="text-slate-400 hover:text-slate-700 border-0 bg-transparent cursor-pointer"
                             >
@@ -3340,7 +3909,7 @@ export default function VerifyAcademy({
                                         type="text"
                                         value={commandmentForm.data.title_tl}
                                         onChange={(e) => commandmentForm.setData('title_tl', e.target.value)}
-                                        placeholder="e.g. Dumalo Palagi"
+                                        placeholder="Optional Filipino title (leave blank to use English)..."
                                         className="w-full bg-white rounded-xl px-3 py-2 text-xs text-slate-900 outline-none"
                                     />
                                 </div>
@@ -3505,6 +4074,20 @@ export default function VerifyAcademy({
                     </div>
                 </div>
             )}
+            {/* ============================================================== */}
+            {/* UNIFIED FLOWBITE CONFIRMATION MODAL (DELETE / BULK GRANT) */}
+            {/* ============================================================== */}
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                processing={confirmProcessing}
+            />
         </AdminLayout>
     );
 }

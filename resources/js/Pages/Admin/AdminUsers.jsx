@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router, useForm } from '@inertiajs/react';
 import AdminLayout from '../../Layouts/AdminLayout';
+import ConfirmModal from '../../Components/ConfirmModal';
 import {
     Users,
     UserPlus,
@@ -46,6 +47,8 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState(null);
     const [deleteModalAdmin, setDeleteModalAdmin] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [confirmProcessing, setConfirmProcessing] = useState(false);
 
     // Password visibility toggles
     const [showCreatePass, setShowCreatePass] = useState(false);
@@ -154,11 +157,22 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
     // Bulk actions
     const handleBulkArchive = () => {
         if (!selectedIds.length) return;
-        if (confirm(`Archive ${selectedIds.length} selected administrator(s)?`)) {
-            router.post('/admin/admins/bulk-archive', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to archive ${selectedIds.length} selected administrator account(s)?`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'warning',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/admins/bulk-archive', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     const handleBulkRestore = () => {
@@ -170,17 +184,34 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
     const handleBulkDelete = () => {
         if (!selectedIds.length) return;
-        if (confirm(`WARNING: Permanently delete ${selectedIds.length} selected administrator(s) from database? This cannot be undone.`)) {
-            router.post('/admin/admins/bulk-delete', { ids: selectedIds }, {
-                onSuccess: () => setSelectedIds([]),
-            });
-        }
+        setConfirmDialog({
+            message: `Are you sure you want to permanently delete ${selectedIds.length} selected administrator account(s)? This action cannot be undone.`,
+            confirmLabel: "Yes, I'm sure",
+            cancelLabel: 'No, cancel',
+            variant: 'danger',
+            onConfirm: () => {
+                setConfirmProcessing(true);
+                router.post('/admin/admins/bulk-delete', { ids: selectedIds }, {
+                    onSuccess: () => {
+                        setSelectedIds([]);
+                        setConfirmDialog(null);
+                    },
+                    onFinish: () => setConfirmProcessing(false),
+                });
+            },
+        });
     };
 
     // Single item toggle
     const handleToggleStatus = (admin) => {
         if (admin.id === currentAdminId) {
-            alert('You cannot deactivate your own logged-in account.');
+            setConfirmDialog({
+                alertOnly: true,
+                variant: 'warning',
+                title: 'Action Not Allowed',
+                message: 'You cannot deactivate your own currently signed-in administrator account.',
+                confirmLabel: 'OK, got it',
+            });
             return;
         }
         router.patch(`/admin/admins/${admin.id}/toggle-status`, {}, { preserveScroll: true });
@@ -244,8 +275,10 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
 
     const confirmDelete = () => {
         if (!deleteModalAdmin) return;
+        setConfirmProcessing(true);
         router.delete(`/admin/admins/${deleteModalAdmin.id}`, {
             onSuccess: () => setDeleteModalAdmin(null),
+            onFinish: () => setConfirmProcessing(false),
         });
     };
 
@@ -1307,41 +1340,35 @@ export default function AdminUsers({ admins = { data: [] }, currentAdminId = nul
             )}
 
             {/* ========================================================
-                MODAL 3: DELETE CONFIRMATION
+                MODAL 3: FLOWBITE DELETE & ACTION CONFIRMATION
             ======================================================== */}
-            {deleteModalAdmin && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-                    <div className="bg-white border border-slate-200 rounded-2xl sm:rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto p-5 sm:p-7 shadow-2xl text-center relative">
-                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-rose-500 via-rose-400 to-[#f59e0b]" />
+            <ConfirmModal
+                isOpen={Boolean(deleteModalAdmin)}
+                onClose={() => !confirmProcessing && setDeleteModalAdmin(null)}
+                onConfirm={confirmDelete}
+                message={
+                    deleteModalAdmin
+                        ? `Are you sure you want to permanently delete administrator account @${deleteModalAdmin.username} (${deleteModalAdmin.name})? They will immediately lose all portal access.`
+                        : ''
+                }
+                confirmLabel="Yes, I'm sure"
+                cancelLabel="No, cancel"
+                variant="danger"
+                processing={confirmProcessing}
+            />
 
-                        <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto mb-4 shadow-xs">
-                            <Trash2 className="w-7 h-7" />
-                        </div>
-                        <h4 className="text-lg font-bold text-slate-900 mb-2">Delete Administrator Account?</h4>
-                        <p className="text-xs sm:text-sm text-slate-600 mb-6 leading-relaxed">
-                            Are you sure you want to permanently delete account{' '}
-                            <strong className="text-slate-900">@{deleteModalAdmin.username}</strong> ({deleteModalAdmin.name})?
-                            This administrator will immediately lose all portal access.
-                        </p>
-                        <div className="flex items-center justify-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => setDeleteModalAdmin(null)}
-                                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 cursor-pointer"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={confirmDelete}
-                                className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-rose-600 hover:bg-rose-500 border-0 shadow-xs cursor-pointer"
-                            >
-                                Delete Account
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={Boolean(confirmDialog)}
+                onClose={() => !confirmProcessing && setConfirmDialog(null)}
+                onConfirm={() => confirmDialog?.onConfirm?.()}
+                title={confirmDialog?.title || ''}
+                message={confirmDialog?.message || ''}
+                confirmLabel={confirmDialog?.confirmLabel || "Yes, I'm sure"}
+                cancelLabel={confirmDialog?.cancelLabel || 'No, cancel'}
+                variant={confirmDialog?.variant || 'danger'}
+                alertOnly={Boolean(confirmDialog?.alertOnly)}
+                processing={confirmProcessing}
+            />
 
             {/* ========================================================
                 MODAL 4: RESET ADMIN PASSWORD

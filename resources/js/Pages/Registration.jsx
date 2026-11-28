@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
+import ConfirmModal from '../Components/ConfirmModal';
 
 // Official World Plan pricing and inclusions transcribed from the three supplied screenshots.
 // These are fixed market prices, not exchange-rate conversions.
@@ -61,6 +62,7 @@ export default function Registration({
     // Current step in the registration wizard: 1 = Terms & Privacy, 2 = Application Form, 3 = Completed
     const [currentStep, setCurrentStep] = useState(1);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [alertModal, setAlertModal] = useState(null);
     const countryCurrencies = { Philippines: 'PHP', 'United States': 'USD', 'Papua New Guinea': 'PGK' };
 
     const { data, setData, post, transform, processing, errors, reset, recentlySuccessful } = useForm({
@@ -155,7 +157,12 @@ export default function Registration({
             onError: (validationErrors) => {
                 console.error('Registration validation errors:', validationErrors);
                 const firstError = Object.values(validationErrors)[0];
-                if (firstError) alert(firstError);
+                if (firstError) {
+                    setAlertModal({
+                        title: 'Please Check Your Registration',
+                        message: Array.isArray(firstError) ? firstError[0] : String(firstError),
+                    });
+                }
             },
         });
     };
@@ -906,6 +913,15 @@ export default function Registration({
                     </p>
                 </div>
             </footer>
+            <ConfirmModal
+                isOpen={Boolean(alertModal)}
+                onClose={() => setAlertModal(null)}
+                alertOnly
+                variant="warning"
+                title={alertModal?.title || 'Validation Notice'}
+                message={alertModal?.message || ''}
+                confirmLabel="OK, got it"
+            />
         </div>
     );
 }
