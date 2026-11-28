@@ -400,3 +400,178 @@
 .portal-dropzone {
   border: 1.5px dashed #cbd5e1 !important;
 }
+
+/* =========================================================
+   EU WELLNESS HOME FEATURE — scoped to .european-wellness-home
+========================================================= */
+.european-wellness-home {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  overflow: hidden;
+  padding: clamp(64px, 7.5vw, 110px) 5%;
+  background: linear-gradient(125deg, #fffdf5 0%, #fff9de 52%, #fff6cb 100%);
+}
+.european-wellness-home::before,
+.european-wellness-home::after {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  pointer-events: none;
+  border-radius: 50%;
+}
+.european-wellness-home::before {
+  width: min(65vw, 850px);
+  height: min(65vw, 850px);
+  top: -45%;
+  left: -15%;
+  background: radial-gradient(circle, rgba(246, 217, 115, .22), transparent 67%);
+}
+.european-wellness-home::after {
+  width: min(50vw, 740px);
+  height: min(50vw, 740px);
+  bottom: -46%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(246, 207, 68, .20), transparent 67%);
+}
+.euw-home-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(35px, 5vw, 82px);
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: center;
+}
+.euw-home-media { min-width: 0; }
+.euw-home-image-panel {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  aspect-ratio: 1.27;
+  padding: clamp(22px, 4vw, 48px) clamp(16px, 2.5vw, 36px) 26px;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 52% 76%, #fffce9 0%, transparent 55%),
+    linear-gradient(145deg, #fffefb, #fff5d1);
+  border: 1px solid rgba(220, 171, 46, .13);
+  box-shadow: 0 25px 52px rgba(92, 71, 26, .11);
+  overflow: hidden;
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+.euw-home-image-panel:hover { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(92, 71, 26, .16); }
+.euw-home-image-panel::before {
+  position: absolute;
+  z-index: -1;
+  content: '';
+  width: 56%;
+  aspect-ratio: 1;
+  top: 23%; left: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 210, 91, .35), rgba(255, 255, 255, 0) 70%);
+}
+.euw-home-image-heading { display: flex; flex-direction: column; align-items: center; gap: 9px; text-align: center; }
+.euw-home-image-mark { font-family: 'Cinzel', Georgia, serif; color: #203a35; font-size: clamp(19px,2.4vw,29px); letter-spacing: .055em; font-weight: 800; }
+.euw-home-image-caption { color: #9b7d3d; font-size: clamp(11px,1.1vw,15px); font-weight: 700; letter-spacing: .045em; }
+.euw-home-lineup { display: block; width: 112%; max-width: none; height: auto; margin: auto -6%; filter: drop-shadow(0 12px 12px rgba(95, 70, 24, .10)); }
+.euw-home-image-count {
+  display: inline-flex;
+  padding: 8px 17px;
+  border: 1px solid #ebdbaf;
+  border-radius: 999px;
+  background: rgba(255,255,255,.8);
+  color: #8a681c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.euw-home-content { min-width: 0; max-width: 640px; }
+.euw-home-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 19px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(183, 143, 42, .25);
+  border-radius: 999px;
+  background: rgba(255,255,255,.67);
+  color: #98711e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .15em;
+  box-shadow: 0 6px 16px rgba(156, 115, 14, .05);
+}
+.euw-home-title {
+  color: #1e293b;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 900;
+  font-size: clamp(39px, 4.6vw, 71px);
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  margin: 0 0 7px;
+}
+.euw-home-title span {
+  display: block;
+  background: linear-gradient(120deg, #bc8b1d, #dfa827 48%, #e3bd52);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-top: 3px;
+}
+.euw-home-script {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(36px, 4vw, 62px);
+  line-height: 1.2;
+  color: #b48a24;
+  margin: 8px 0 22px;
+  font-weight: 400;
+}
+.euw-home-description {
+  max-width: 580px;
+  color: #556170;
+  font-size: clamp(16px, 1.15vw, 19px);
+  line-height: 1.75;
+  margin-bottom: 34px;
+}
+.euw-home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  text-decoration: none;
+  padding: 17px 30px;
+  border-radius: 999px;
+  border: 2px solid #c49b36;
+  background: linear-gradient(110deg, #b98b22, #d8aa3d);
+  color: #fff !important;
+  font-size: clamp(15px, 1.15vw, 18px);
+  font-weight: 800;
+  box-shadow: 0 12px 24px rgba(173, 123, 20, .22);
+  transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+}
+.euw-home-button:hover,
+.euw-home-button:focus-visible { color: #8d681a !important; background: #fff9e7; box-shadow: 0 14px 30px rgba(173,123,20,.19); transform: translateY(-4px); }
+.euw-home-button i { transition: transform .2s ease; }
+.euw-home-button:hover i { transform: translateX(5px); }
+.euw-home-button:focus-visible { outline: 3px solid #466e6a; outline-offset: 4px; }
+@media (max-width: 991px) {
+  .euw-home-container { grid-template-columns: 1fr; gap: 36px; }
+  .euw-home-media { width: 100%; max-width: 620px; margin: 0 auto; }
+  .euw-home-content { text-align: center; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+  .euw-home-description { max-width: 680px; }
+}
+@media (max-width: 600px) {
+  .european-wellness-home { padding: 62px 20px 75px; }
+  .euw-home-image-panel { aspect-ratio: 1.22; border-radius: 24px; padding: 22px 10px 22px; }
+  .euw-home-image-caption { max-width: 230px; line-height: 1.3; }
+  .euw-home-title { font-size: clamp(38px, 11vw, 56px); }
+  .euw-home-badge { font-size: 10px; letter-spacing: .1em; }
+  .euw-home-script { font-size: 44px; }
+  .euw-home-description { line-height: 1.65; }
+  .euw-home-button { width: 100%; max-width: 335px; padding: 17px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .euw-home-image-panel, .euw-home-button, .euw-home-button i { transition: none; }
+}

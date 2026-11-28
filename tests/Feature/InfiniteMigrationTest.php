@@ -50,6 +50,10 @@ class InfiniteMigrationTest extends TestCase
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page->component('Olamour'));
 
+        $this->get('/eu-wellness')
+            ->assertStatus(200)
+            ->assertInertia(fn (Assert $page) => $page->component('EUWellness'));
+
         $this->get('/info')
             ->assertStatus(200)
             ->assertInertia(fn (Assert $page) => $page

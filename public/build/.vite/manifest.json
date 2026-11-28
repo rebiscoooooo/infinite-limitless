@@ -109,7 +109,7 @@
     "name": "vendor-react"
   },
   "resources/css/app.css": {
-    "file": "assets/app-sA6LGaS9.css",
+    "file": "assets/app-dV5w_jer.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -414,8 +414,23 @@
       "_useRealtimeSync-D_6SPYxN.js"
     ]
   },
+  "resources/js/Pages/EUWellness.jsx": {
+    "file": "assets/EUWellness-DIAH2T_5.js",
+    "name": "EUWellness",
+    "src": "resources/js/Pages/EUWellness.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-react-BitYOay7.js",
+      "_vendor-inertia-CdEzcY59.js",
+      "_AppLayout-BAuNRAvz.js",
+      "_AppFooter-Df-4ZdKK.js",
+      "_FlashToast-CL3kjnck.js",
+      "_vendor-lucide-DtFTXs1D.js",
+      "_useRealtimeSync-D_6SPYxN.js"
+    ]
+  },
   "resources/js/Pages/Home.jsx": {
-    "file": "assets/Home-BlSHXace.js",
+    "file": "assets/Home-DoykZQeK.js",
     "name": "Home",
     "src": "resources/js/Pages/Home.jsx",
     "isDynamicEntry": true,
@@ -519,7 +534,7 @@
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-BbWTa2Xp.js",
+    "file": "assets/app-DobuMaW1.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -550,6 +565,7 @@
       "resources/js/Pages/Admin/WorldPlanRegistrations.jsx",
       "resources/js/Pages/Barley.jsx",
       "resources/js/Pages/CompanyProfile.jsx",
+      "resources/js/Pages/EUWellness.jsx",
       "resources/js/Pages/Home.jsx",
       "resources/js/Pages/Info.jsx",
       "resources/js/Pages/JoinCommunity.jsx",
@@ -560,7 +576,7 @@
       "resources/js/Pages/WorldPlan.jsx"
     ],
     "css": [
-      "assets/app-sA6LGaS9.css"
+      "assets/app-dV5w_jer.css"
     ]
   }
 }

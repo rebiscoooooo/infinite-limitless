@@ -173,4 +173,12 @@ class ProductController extends Controller
             'products' => $products,
         ]);
     }
+
+    /**
+     * Show European Wellness showcase.
+     */
+    public function euWellness(): Response
+    {
+        return Inertia::render('EUWellness');
+    }
 }

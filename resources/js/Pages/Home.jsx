@@ -661,6 +661,43 @@ export default function Home({ siteStats, products = [], catalogProducts = [], p
                 </div>
             </section>
 
+            {/* EUROPEAN WELLNESS — after Barley, before Testimonials */}
+            <section className="european-wellness-home" aria-labelledby="euw-home-title">
+                <div className="euw-home-container">
+                    <div className="barley-image-wrapper">
+                        <img
+                            src="/assets/image/eu-wellness/euhomeimage.png"
+                            alt="European Wellness"
+                            className="barley-img"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </div>
+
+                    <div className="euw-home-content">
+                        <span className="euw-home-badge">
+                            <i className="fa-solid fa-leaf" aria-hidden="true"></i>
+                            EUROPEAN WELLNESS
+                        </span>
+                        <h2 id="euw-home-title" className="euw-home-title">
+                            Nourish Every Stage with
+                            <span>EU WELLNESS</span>
+                        </h2>
+                        <p className="euw-home-script">Wellness Beyond Borders</p>
+                        <p className="euw-home-description">
+                            Discover a collection of six targeted dietary supplements for children,
+                            women, men, relaxation, metabolic wellness, and active lifestyles.
+                            Explore the formulas, key ingredients, and benefits designed for
+                            everyday well-being.
+                        </p>
+                        <Link href="/eu-wellness" className="euw-home-button">
+                            Explore European Wellness
+                            <i className="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
             {/* PRODUCTS TESTIMONY SECTION (#testimonials) */}
             <section id="testimonials" className="section-pad" style={{ backgroundColor: '#f8fafc' }}>
                 <div className="container-fluid px-3 px-lg-5">
