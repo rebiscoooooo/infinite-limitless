@@ -1195,4 +1195,58 @@ class AcademyEnhancementTest extends TestCase
             ->assertSessionHasNoErrors();
         $this->assertNull(AcademyMember::find($member->id));
     }
+
+    public function test_certificate_removes_philippines_text_and_embeds_rank_logo_in_ribbon_seal(): void
+    {
+        $member = AcademyMember::create([
+            'first_name' => 'Victoria',
+            'last_name' => 'Sterling',
+            'phone_country_code' => '+63',
+            'phone_number' => '9178889900',
+            'email' => 'victoria.sterling@example.com',
+            'password' => 'Secret1234!',
+            'address' => 'Global HQ',
+            'status' => 'Approved',
+            'rank_tier' => 'Legend',
+            'approved_at' => now(),
+        ]);
+
+        $cert = AcademyCertificate::create([
+            'member_id' => $member->id,
+            'rank_tier' => 'Legend',
+            'certificate_type' => 'training',
+            'certificate_number' => 'LCAC-LEGEND-00001-2026',
+            'issued_at' => now(),
+            'template_design' => 'classic-gold',
+        ]);
+
+        $service = app(AcademyCertificateService::class);
+        foreach (['Rookie', 'Elite', 'Master', 'Grand Master', 'Legend'] as $tierName) {
+            $cert->rank_tier = $tierName;
+            $pdf = $service->generatePdf($cert);
+            $binary = $pdf->output();
+            $this->assertStringStartsWith('%PDF-', $binary);
+            $this->assertGreaterThan(15000, strlen($binary), "Expected embedded rank badge JPEG in {$tierName} PDF.");
+        }
+
+        // Render the Blade view with the same variables to assert markup guarantees
+        $badgePath = public_path('assets/image/academy/cert-badge-legend.jpg');
+        $this->assertFileExists($badgePath);
+        $html = view('certificates.academy_training_completion', [
+            'certificate' => $cert,
+            'member' => $member,
+            'rank' => 'Legend',
+            'theme' => ['color' => '#f87171', 'gold' => '#f59e0b', 'stars' => '★★★★★', 'stars_count' => 5, 'title' => 'Supreme Sovereign Member'],
+            'certificateNumber' => $cert->certificate_number,
+            'issuedDate' => now()->format('F d, Y'),
+            'logoBase64' => null,
+            'badgeBase64' => 'data:image/jpeg;base64,' . base64_encode(file_get_contents($badgePath)),
+        ])->render();
+
+        $this->assertStringNotContainsStringIgnoringCase('PHILIPPINES', $html);
+        $this->assertStringContainsString('LEGACY CLUB', $html);
+        $this->assertStringContainsString('ACADEMY', $html);
+        $this->assertStringContainsString('alt="Legend Rank Badge"', $html);
+        $this->assertStringContainsString('data:image/jpeg;base64,', $html);
+    }
 }

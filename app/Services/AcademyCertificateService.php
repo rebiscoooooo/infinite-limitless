@@ -128,10 +128,15 @@ class AcademyCertificateService
         }
         $logoBase64 = file_exists($logoPath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) : null;
 
-        // Load rank badge as base64
+        // Load rank badge as base64 (prefer DomPDF-safe #072538-composited JPEG so rendering works even without PHP GD)
         $rankSlug = Str::slug($rank);
+        $certBadgeJpg = public_path("assets/image/academy/cert-badge-{$rankSlug}.jpg");
         $badgePath = public_path("assets/image/academy/badge-{$rankSlug}.png");
-        $badgeBase64 = file_exists($badgePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($badgePath)) : null;
+        if (file_exists($certBadgeJpg)) {
+            $badgeBase64 = 'data:image/jpeg;base64,' . base64_encode(file_get_contents($certBadgeJpg));
+        } else {
+            $badgeBase64 = $this->loadPngAsBase64($badgePath, 380);
+        }
 
         $rankThemes = [
             'Rookie' => [
@@ -189,5 +194,51 @@ class AcademyCertificateService
         $pdf->setOption(['isRemoteEnabled' => true, 'isHtml5ParserEnabled' => true]);
 
         return $pdf;
+    }
+
+    /**
+     * Load a transparent PNG as a base64 data URI when PHP GD is available.
+     * DomPDF requires GD to decode PNGs, so return null if GD is unavailable
+     * to allow the certificate template to gracefully fall back to vector art.
+     */
+    private function loadPngAsBase64(string $path, int $maxDimension = 380): ?string
+    {
+        if (!file_exists($path) || !function_exists('imagecreatefrompng')) {
+            return null;
+        }
+
+        if (function_exists('imagecreatetruecolor') && function_exists('imagecopyresampled')) {
+            $info = @getimagesize($path);
+            if ($info && ($info[0] > $maxDimension || $info[1] > $maxDimension)) {
+                $src = @imagecreatefrompng($path);
+                if ($src) {
+                    $srcW = imagesx($src);
+                    $srcH = imagesy($src);
+                    $scale = min($maxDimension / max(1, $srcW), $maxDimension / max(1, $srcH));
+                    $dstW = max(1, (int) round($srcW * $scale));
+                    $dstH = max(1, (int) round($srcH * $scale));
+
+                    $dst = imagecreatetruecolor($dstW, $dstH);
+                    imagealphablending($dst, false);
+                    imagesavealpha($dst, true);
+                    $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                    imagefilledrectangle($dst, 0, 0, $dstW, $dstH, $transparent);
+                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $dstW, $dstH, $srcW, $srcH);
+
+                    ob_start();
+                    imagepng($dst, null, 6);
+                    $binary = ob_get_clean();
+
+                    imagedestroy($src);
+                    imagedestroy($dst);
+
+                    if ($binary !== false && $binary !== '') {
+                        return 'data:image/png;base64,' . base64_encode($binary);
+                    }
+                }
+            }
+        }
+
+        return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
     }
 }

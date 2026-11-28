@@ -17,12 +17,12 @@
     $nameLen  = mb_strlen($member->full_name);
     $nameSize = $nameLen > 34 ? 30 : ($nameLen > 26 ? 36 : ($nameLen > 20 ? 42 : 48));
 
-    // Scalloped seal edge
+    // Scalloped seal edge (centered at 62, 60 inside 124x142 ribbon container)
     $sealEdge = [];
     for ($i = 0; $i < 48; $i++) {
-        $rad = ($i % 2 === 0) ? 52 : 48.5;
+        $rad = ($i % 2 === 0) ? 59 : 54.5;
         $ang = deg2rad($i * 7.5);
-        $sealEdge[] = round(55 + $rad * cos($ang), 2) . ',' . round(55 + $rad * sin($ang), 2);
+        $sealEdge[] = round(62 + $rad * cos($ang), 2) . ',' . round(60 + $rad * sin($ang), 2);
     }
     $sealEdge = implode(' ', $sealEdge);
 @endphp
@@ -93,7 +93,7 @@
     <!-- ============ BRAND ============ -->
     <div class="center" style="top:46pt;">
         <div style="font-family: Helvetica, Arial, sans-serif; font-size:15pt; font-weight:bold; letter-spacing:7pt; color:#24dbc3;">LEGACY CLUB</div>
-        <div style="font-size:6.8pt; font-weight:bold; letter-spacing:5pt; color:#f59e0b; margin-top:3pt;">PHILIPPINES &bull; ACADEMY</div>
+        <div style="font-size:7pt; font-weight:bold; letter-spacing:6pt; color:#f59e0b; margin-top:3pt;">ACADEMY</div>
     </div>
 
     <!-- ============ TITLE ============ -->
@@ -154,29 +154,45 @@
     </div>
 
     <!-- ============ OFFICIAL SEAL (CENTRE) ============ -->
-    <div class="abs" style="left:366pt; top:396pt; width:110pt; height:130pt;">
+    <div class="abs" style="left:359pt; top:390pt; width:124pt; height:142pt;">
+        {{-- Layer 1: Ribbon tails, scalloped gold medal, and solid navy medallion background --}}
         @php ob_start(); @endphp
-<svg width="110" height="130" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg">
+<svg width="124" height="142" viewBox="0 0 124 142" xmlns="http://www.w3.org/2000/svg">
             <!-- ribbon tails -->
-            <polygon points="36,88 58,94 52,126 44,117 34,122" fill="#0f766e"/>
-            <polygon points="52,94 74,88 76,122 66,117 58,126" fill="#115e59"/>
+            <polygon points="40,95 65,102 58,139 48,129 37,134" fill="#0f766e"/>
+            <polygon points="59,102 84,95 87,134 76,129 66,139" fill="#115e59"/>
 
             <!-- scalloped medal -->
             <polygon points="{{ $sealEdge }}" fill="#f59e0b"/>
-            <circle cx="55" cy="55" r="44" fill="#072538" stroke="{{ $accent }}" stroke-width="2.2"/>
-            <circle cx="55" cy="55" r="37" fill="none" stroke="#f59e0b" stroke-width="0.9" stroke-dasharray="2 2.5"/>
+            <circle cx="62" cy="60" r="50.5" fill="#072538"/>
 
-            <text x="55" y="53" text-anchor="middle" font-family="Helvetica" font-weight="bold" font-size="24" fill="#f59e0b">LC</text>
-            <text x="55" y="65" text-anchor="middle" font-family="Helvetica" font-weight="bold" font-size="5.6" fill="#24dbc3">ACADEMY</text>
+            @if (empty($badgeBase64))
+                <circle cx="62" cy="60" r="50.5" fill="none" stroke="{{ $accent }}" stroke-width="2.2"/>
+                <circle cx="62" cy="60" r="44.5" fill="none" stroke="#f59e0b" stroke-opacity="0.75" stroke-width="0.9" stroke-dasharray="2 2.5"/>
+                <text x="62" y="58" text-anchor="middle" font-family="Helvetica" font-weight="bold" font-size="24" fill="#f59e0b">LC</text>
+                <text x="62" y="70" text-anchor="middle" font-family="Helvetica" font-weight="bold" font-size="5.6" fill="#24dbc3">ACADEMY</text>
 
-            @php $gap = $starCount > 3 ? 10.5 : 13; $startX = 55 - (($starCount - 1) * $gap / 2); @endphp
-            @for ($i = 0; $i < $starCount; $i++)
-                <polygon points="{{ $star($startX + $i * $gap, 78, $starCount > 3 ? 4.4 : 5, 2) }}" fill="#f59e0b"/>
-            @endfor
-            <polygon points="{{ $star(55, 33, 4, 1.8) }}" fill="{{ $accent }}"/>
+                @php $gap = $starCount > 3 ? 10.5 : 13; $startX = 62 - (($starCount - 1) * $gap / 2); @endphp
+                @for ($i = 0; $i < $starCount; $i++)
+                    <polygon points="{{ $star($startX + $i * $gap, 83, $starCount > 3 ? 4.4 : 5, 2) }}" fill="#f59e0b"/>
+                @endfor
+                <polygon points="{{ $star(62, 37, 4, 1.8) }}" fill="{{ $accent }}"/>
+            @endif
         </svg>
-@php $__svg = ob_get_clean(); @endphp
-<img src="data:image/svg+xml;base64,{{ base64_encode($__svg) }}" style="width:110pt; height:130pt; vertical-align:bottom;" />
+@php $__svgBase = ob_get_clean(); @endphp
+<img src="data:image/svg+xml;base64,{{ base64_encode($__svgBase) }}" style="position:absolute; left:0; top:0; width:124pt; height:142pt; vertical-align:bottom;" />
+        @if (!empty($badgeBase64))
+            {{-- Layer 2: Large, centered rank/tier badge logo --}}
+            <img src="{{ $badgeBase64 }}" alt="{{ $rank }} Rank Badge" style="position:absolute; left:32.8pt; top:20pt; width:58.4pt; height:80pt;" />
+            {{-- Layer 3: Crisp accent border & inner gold dashed ring over medallion edge --}}
+            @php ob_start(); @endphp
+<svg width="124" height="142" viewBox="0 0 124 142" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="62" cy="60" r="50.5" fill="none" stroke="{{ $accent }}" stroke-width="2.2"/>
+                <circle cx="62" cy="60" r="44.5" fill="none" stroke="#f59e0b" stroke-opacity="0.8" stroke-width="1" stroke-dasharray="2.2 2.6"/>
+            </svg>
+@php $__svgRings = ob_get_clean(); @endphp
+<img src="data:image/svg+xml;base64,{{ base64_encode($__svgRings) }}" style="position:absolute; left:0; top:0; width:124pt; height:142pt; vertical-align:bottom;" />
+        @endif
     </div>
 
     <!-- ============ REGISTRY (RIGHT) ============ -->
