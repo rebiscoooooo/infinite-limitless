@@ -1024,445 +1024,573 @@ const quality = [
     { icon: 'check', name: 'GMP Certified' },
 ];
 
+const EU_WELLNESS_HERO_STYLES = String.raw`
+/* Match Home.jsx (#mainNav / index.css) navbar header pixel-for-pixel */
+#mainNav {
+  transition: all 0.3s ease;
+  padding: 15px 0;
+  background: transparent;
+}
+#mainNav.scrolled {
+  background: rgba(15, 23, 42, 0.95) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+#mainNav .text-logo span:first-child {
+  font-size: clamp(35px, 6vw, 50px) !important;
+}
+#mainNav .text-logo span:last-child {
+  font-size: clamp(9px, 1.5vw, 11px) !important;
+}
+#mainNav .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+#mainNav .nav-link:hover,
+#mainNav .nav-item.active .nav-link {
+  color: var(--ch-teal, #14b8a6) !important;
+  background: transparent;
+}
+#mainNav .btn-nav-order {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-radius: 50px;
+  padding: 8px 20px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+#mainNav .btn-nav-order:hover {
+  background: var(--ch-teal, #14b8a6) !important;
+  border-color: var(--ch-teal, #14b8a6);
+  color: #ffffff !important;
+  transform: none;
+}
+@media (max-width: 991px) {
+  #mainNav {
+    background: rgba(15, 23, 42, 0.95) !important;
+  }
+}
+
+/* System Hero Typography & Grid Lines */
+.ew-system-hero .hero-grid-lines {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, hsla(0, 0%, 100%, 0.15) 1px, transparent 0);
+  background-size: 40px 40px;
+  z-index: 1;
+}
+.ew-system-hero .ola-hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 8.5rem);
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 0;
+}
+.ew-system-hero .ola-script {
+  font-family: 'Great Vibes', cursive;
+  color: #5eead4;
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 1;
+  margin-bottom: 10px;
+  text-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+}
+@keyframes ew-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+.ew-system-hero .hero-eyebrow .dot {
+  width: 8px;
+  height: 8px;
+  background: #5eead4;
+  border-radius: 50%;
+  display: inline-block;
+  animation: ew-pulse-dot 2s infinite;
+}
+`;
+
 function Hero() {
     return (
-        <section className="ew-hero" aria-labelledby="ew-hero-title">
-            <div className="ew-hero-glow ew-hero-glow-left" />
-            <div className="ew-hero-glow ew-hero-glow-right" />
-            <div className="ew-container ew-hero-content">
-                <div className="ew-eyebrow">
-                    <span />
-                    European Wellness Science by Infinite
-                </div>
-                <div className="ew-hero-script">/holistic wellness/</div>
-                <h1 id="ew-hero-title">EU WELLNESS</h1>
-                <p>
-                    European wellness science for modern living. A complete collection of targeted
-                    nutritional support for every stage of life.
-                </p>
-                <a href="#products" className="ew-outline-btn">
-                    Explore the Collection <Icon name="down" size={17} />
-                </a>
-            </div>
-        </section>
-    );
-}
+                    <section
+                        id="hero"
+                        className="ew-system-hero"
+                        aria-labelledby="ew-hero-title"
+                        style={{ position: 'relative', overflow: 'hidden', paddingTop: '160px', paddingBottom: '100px' }}
+                    >
+                        <div
+                            className="hero-bg"
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                background:
+                                    "linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.95)), url('/assets/image/eu-wellness/euhomeimage.png') center center / cover no-repeat",
+                                zIndex: 0,
+                            }}
+                        >
+                            <div className="hero-grid-lines"></div>
+                        </div>
 
-// Entire luxury catalogue changes together when a visitor selects a product.
-// The page hero, FAQs, and AppLayout stay fixed.
-function ProductExperience() {
-    const [active, setActive] = useState(0);
-    const product = products[active];
-    const productQuality = ['artemis', 'nervana', 'peakolyte'].includes(product.id)
-        ? [...quality.slice(0, 1), { icon: 'leaf', name: 'Vegan Friendly' }, ...quality.slice(1)]
-        : quality;
-    const sections = [
-        { title: 'PURPOSEFUL FORMULATION', text: product.description, image: 'product' },
-        { title: 'ACTIVE INGREDIENTS', text: product.ingredientIntro, image: 'ingredients' },
-        { title: 'KEY BENEFITS', text: product.benefitIntro, image: 'benefits' },
-    ];
+                        <div
+                            className="container-fluid px-3 px-lg-5 hero-content reveal visible"
+                            style={{ position: 'relative', zIndex: 1 }}
+                        >
+                            <div className="row justify-content-center">
+                                <div className="col-12 col-md-11 col-xl-10 text-center">
+                                    <div className="hero-eyebrow justify-content-center mx-auto mb-3">
+                                        <span className="dot"></span>EUROPEAN WELLNESS SCIENCE BY INFINITE
+                                    </div>
 
-    return (
-        <section
-            className="ew-luxury-experience"
-            id="products"
-            aria-label="Interactive EU Wellness collection"
-            style={{
-                '--lux-accent': product.accent,
-                '--lux-soft': product.soft,
-                '--lux-dark': product.dark,
-            }}
-        >
-            <div className="ew-luxury-stage">
-                <div className="ew-luxury-inner ew-container">
-                    <div className="ew-luxury-scene" key={product.id}>
-                        <div className="ew-luxury-hero-copy">
-                            <span className="ew-luxury-eyebrow">EU WELLNESS · TARGETED NUTRITION</span>
-                            <h2>
-                                {product.name}
-                                <br />
-                                <em>{product.focus}</em>
-                            </h2>
-                            <span className="ew-luxury-rule" aria-hidden="true">
-                                ✧
-                            </span>
-                            <p>{product.description}</p>
-                            <div className="ew-luxury-picker-label">SELECT PRODUCT</div>
-                            <div
-                                className="ew-luxury-picker"
-                                role="group"
-                                aria-label="Select an EU Wellness product"
-                            >
-                                {products.map((item, i) => (
-                                    <button
-                                        type="button"
-                                        key={item.id}
-                                        className={'ew-luxury-choice' + (i === active ? ' active' : '')}
-                                        aria-label={`Show ${item.name}`}
-                                        aria-pressed={i === active}
-                                        title={item.name}
-                                        onClick={() => setActive(i)}
+                                    <p className="ola-script mt-2">/holistic wellness/</p>
+                                    <h1 id="ew-hero-title" className="ola-hero-title">
+                                        EU WELLNESS
+                                    </h1>
+
+                                    <p
+                                        className="hero-desc mx-auto text-white mt-4 px-2"
+                                        style={{ maxWidth: '800px', opacity: 0.9, lineHeight: 1.8, fontSize: '1.15rem' }}
                                     >
-                                        <img
-                                            src={`${IMAGE_ROOT}/${item.image}`}
-                                            alt=""
-                                            loading="lazy"
-                                        />
-                                        <span>{item.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="ew-luxury-hero-product">
-                            <div className="ew-luxury-sun" aria-hidden="true" />
-                            <img
-                                src={`${IMAGE_ROOT}/${product.image}`}
-                                alt={`${product.name} supplement`}
-                            />
-                            <span className="ew-luxury-product-stamp">
-                                EU
-                                <br />
-                                WELLNESS
-                            </span>
-                        </div>
-                    </div>
+                                        European wellness science for modern living. A complete collection of targeted
+                                        nutritional support for every stage of life.
+                                    </p>
 
-                    <div className="ew-luxury-benefit-bar" key={`${product.id}-benefits`}>
-                        {product.benefits.slice(0, 3).map((benefit) => (
-                            <div key={benefit.label}>
-                                <Icon name={benefit.icon} size={29} />
-                                <div>
-                                    <strong>{benefit.label}</strong>
-                                    <small>As described in the product presentation</small>
+                                    <a
+                                        href="#products"
+                                        className="btn btn-outline-light mt-4 fw-bold px-4 py-3"
+                                        style={{ borderRadius: '50px', borderWidth: '2px', letterSpacing: '1px' }}
+                                    >
+                                        Explore The Collection <i className="bi bi-arrow-down ms-2"></i>
+                                    </a>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    </section>
+                    );
+}
 
-                    <div
-                        className="ew-luxury-details ew-refined-details"
-                        key={`${product.id}-details`}
+                    // Entire luxury catalogue changes together when a visitor selects a product.
+                    // The page hero, FAQs, and AppLayout stay fixed.
+                    function ProductExperience() {
+    const [active, setActive] = useState(0);
+                    const product = products[active];
+                    const productQuality = ['artemis', 'nervana', 'peakolyte'].includes(product.id)
+                    ? [...quality.slice(0, 1), {icon: 'leaf', name: 'Vegan Friendly' }, ...quality.slice(1)]
+                    : quality;
+                    const sections = [
+                    {title: 'PURPOSEFUL FORMULATION', text: product.description, image: 'product' },
+                    {title: 'ACTIVE INGREDIENTS', text: product.ingredientIntro, image: 'ingredients' },
+                    {title: 'KEY BENEFITS', text: product.benefitIntro, image: 'benefits' },
+                    ];
+
+                    return (
+                    <section
+                        className="ew-luxury-experience"
+                        id="products"
+                        aria-label="Interactive EU Wellness collection"
+                        style={{
+                            '--lux-accent': product.accent,
+                            '--lux-soft': product.soft,
+                            '--lux-dark': product.dark,
+                        }}
                     >
-                        {sections.map((section, i) => (
-                            <article
-                                className={`ew-refined-card ew-refined-card-${i}`}
-                                key={section.title}
-                            >
-                                <div className="ew-refined-heading">
-                                    <span className="ew-refined-icon">
-                                        <Icon name={['sparkles', 'leaf', 'shield'][i]} size={26} />
-                                    </span>
-                                    <div>
-                                        <span className="ew-refined-step">
-                                            0{i + 1} / PRODUCT INFORMATION
+                        <div className="ew-luxury-stage">
+                            <div className="ew-luxury-inner ew-container">
+                                <div className="ew-luxury-scene" key={product.id}>
+                                    <div className="ew-luxury-hero-copy">
+                                        <span className="ew-luxury-eyebrow">EU WELLNESS · TARGETED NUTRITION</span>
+                                        <h2>
+                                            {product.name}
+                                            <br />
+                                            <em>{product.focus}</em>
+                                        </h2>
+                                        <span className="ew-luxury-rule" aria-hidden="true">
+                                            ✧
                                         </span>
-                                        <h3>{section.title}</h3>
+                                        <p>{product.description}</p>
+                                        <div className="ew-luxury-picker-label">SELECT PRODUCT</div>
+                                        <div
+                                            className="ew-luxury-picker"
+                                            role="group"
+                                            aria-label="Select an EU Wellness product"
+                                        >
+                                            {products.map((item, i) => (
+                                                <button
+                                                    type="button"
+                                                    key={item.id}
+                                                    className={'ew-luxury-choice' + (i === active ? ' active' : '')}
+                                                    aria-label={`Show ${item.name}`}
+                                                    aria-pressed={i === active}
+                                                    title={item.name}
+                                                    onClick={() => setActive(i)}
+                                                >
+                                                    <img
+                                                        src={`${IMAGE_ROOT}/${item.image}`}
+                                                        alt=""
+                                                        loading="lazy"
+                                                    />
+                                                    <span>{item.name}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="ew-luxury-hero-product">
+                                        <div className="ew-luxury-sun" aria-hidden="true" />
+                                        <img
+                                            src={`${IMAGE_ROOT}/${product.image}`}
+                                            alt={`${product.name} supplement`}
+                                        />
+                                        <span className="ew-luxury-product-stamp">
+                                            EU
+                                            <br />
+                                            WELLNESS
+                                        </span>
                                     </div>
                                 </div>
-                                <p>{section.text}</p>
-                                {i === 1 && (
-                                    <ul className="ew-refined-list">
-                                        {product.ingredients.map((ing) => (
-                                            <li key={ing}>
-                                                <Icon name="leaf" size={17} />
-                                                <span>{ing}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                                {i === 2 && (
-                                    <ul className="ew-refined-list ew-refined-benefits">
-                                        {product.benefits.map((benefit) => (
-                                            <li key={benefit.label}>
-                                                <Icon name="check" size={19} />
-                                                <span>{benefit.label}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </article>
-                        ))}
-                    </div>
 
-                    <div className="ew-luxury-bottom" key={`${product.id}-bottom`}>
-                        <p className="ew-quality-source-note">
-                            Quality assurance marks reproduced from the supplied EU Wellness
-                            presentation; certifications have not been independently verified.
-                        </p>
-                        <div className="ew-luxury-quality">
-                            {productQuality.map((q) => (
-                                <div key={q.name}>
-                                    <Icon name={q.icon} size={25} />
-                                    <span>{q.name}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="ew-luxury-bottom-cta">
-                            <span className="ew-luxury-seal">✧</span>
-                            <div>
-                                <h3>WELLNESS FOR EVERY STAGE OF LIFE</h3>
-                                <p>
-                                    Review each product’s presentation and check the label for
-                                    recommended use, precautions and suitability.
-                                </p>
-                            </div>
-                            <a href="#ew-faq">VIEW FAQ</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function CollectionIntro() {
-    return (
-        <section className="ew-intro" aria-labelledby="ew-intro-title">
-            <div className="ew-container ew-intro-inner">
-                <div className="ew-brandmark">
-                    <span>✦</span> EU WELLNESS
-                </div>
-                <h2 id="ew-intro-title">
-                    Holistic Wellness from
-                    <br />
-                    Europe to the World
-                </h2>
-                <p className="ew-intro-sub">Targeted support for every stage of life.</p>
-                <div className="ew-quality-strip">
-                    {quality.map((q) => (
-                        <div className="ew-quality-item" key={q.name}>
-                            <span className="ew-quality-icon">
-                                <Icon name={q.icon} />
-                            </span>
-                            {q.name}
-                        </div>
-                    ))}
-                </div>
-                <p className="ew-intro-note">
-                    Quality marks as listed in the product presentation; country of manufacture and
-                    certifications have not been independently verified.
-                </p>
-            </div>
-        </section>
-    );
-}
-
-function ProductComparison() {
-    const rows = [
-        ['Best For', 'bestFor'],
-        ['Main Benefits', 'mainBenefits'],
-        ['Key Ingredients', 'ingredientSummary'],
-    ];
-
-    return (
-        <section className="ew-comparison-wrap" aria-labelledby="ew-comparison-title">
-            <div className="ew-container ew-comparison">
-                <div className="ew-section-heading">
-                    <span aria-hidden="true" />
-                    <h2 id="ew-comparison-title">Find Your Perfect Wellness Solution</h2>
-                    <span aria-hidden="true" />
-                </div>
-                <p>Explore the formulas and find the product that suits your routine.</p>
-                <div
-                    className="ew-table-scroll"
-                    tabIndex={0}
-                    role="region"
-                    aria-label="Scrollable product comparison"
-                >
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Compare</th>
-                                {products.map((p) => (
-                                    <th scope="col" key={p.id}>
-                                        <span
-                                            className="ew-table-product"
-                                            style={{ '--ew-accent': p.accent }}
-                                        >
-                                            {p.name}
-                                        </span>
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows.map(([label, field]) => (
-                                <tr key={field}>
-                                    <th scope="row">{label}</th>
-                                    {products.map((p) => (
-                                        <td key={p.id}>{p[field]}</td>
+                                <div className="ew-luxury-benefit-bar" key={`${product.id}-benefits`}>
+                                    {product.benefits.slice(0, 3).map((benefit) => (
+                                        <div key={benefit.label}>
+                                            <Icon name={benefit.icon} size={29} />
+                                            <div>
+                                                <strong>{benefit.label}</strong>
+                                                <small>As described in the product presentation</small>
+                                            </div>
+                                        </div>
                                     ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <p className="ew-disclaimer">
-                    Dietary supplements. No approved therapeutic claims. Follow product labeling and
-                    professional guidance.
-                </p>
-            </div>
-        </section>
-    );
-}
+                                </div>
 
-function WhyEuropeanWellness() {
-    const pillars = [
-        [
-            'globe',
-            'European Quality Standards',
-            'The collection’s product presentation identifies European Union standards as part of its quality assurance approach.',
-        ],
-        [
-            'shield',
-            'Good Manufacturing Practices',
-            'GMP focuses on consistent manufacturing processes, hygiene and quality controls. The presentation lists GMP among its quality marks.',
-        ],
-        [
-            'check',
-            'Food Safety & Quality Control',
-            'HACCP is a systematic approach to identifying and controlling food safety hazards during production.',
-        ],
-        [
-            'leaf',
-            'Purposeful Ingredients',
-            'The six formulas feature selected vitamins, minerals and botanical ingredients, depending on the product and its intended nutritional purpose.',
-        ],
-        [
-            'heart',
-            'Targeted Nutritional Support',
-            'Distinct formulas address different nutritional needs, from children’s nutrition to everyday vitality, relaxation and active lifestyles.',
-        ],
-        [
-            'sparkles',
-            'Dietary Considerations',
-            'The presentation lists vegetarian-friendly and non-GMO marks, with vegan-friendly options for selected products. Check individual labels for suitability.',
-        ],
-    ];
+                                <div
+                                    className="ew-luxury-details ew-refined-details"
+                                    key={`${product.id}-details`}
+                                >
+                                    {sections.map((section, i) => (
+                                        <article
+                                            className={`ew-refined-card ew-refined-card-${i}`}
+                                            key={section.title}
+                                        >
+                                            <div className="ew-refined-heading">
+                                                <span className="ew-refined-icon">
+                                                    <Icon name={['sparkles', 'leaf', 'shield'][i]} size={26} />
+                                                </span>
+                                                <div>
+                                                    <span className="ew-refined-step">
+                                                        0{i + 1} / PRODUCT INFORMATION
+                                                    </span>
+                                                    <h3>{section.title}</h3>
+                                                </div>
+                                            </div>
+                                            <p>{section.text}</p>
+                                            {i === 1 && (
+                                                <ul className="ew-refined-list">
+                                                    {product.ingredients.map((ing) => (
+                                                        <li key={ing}>
+                                                            <Icon name="leaf" size={17} />
+                                                            <span>{ing}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                            {i === 2 && (
+                                                <ul className="ew-refined-list ew-refined-benefits">
+                                                    {product.benefits.map((benefit) => (
+                                                        <li key={benefit.label}>
+                                                            <Icon name="check" size={19} />
+                                                            <span>{benefit.label}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </article>
+                                    ))}
+                                </div>
 
-    return (
-        <section className="ew-why" aria-labelledby="ew-why-title">
-            <div className="ew-container">
-                <header className="ew-why-head">
-                    <span className="ew-why-kicker">
-                        EUROPEAN WELLNESS SCIENCE · QUALITY &amp; NUTRITION
-                    </span>
-                    <h2 id="ew-why-title">
-                        THE <em>EUROPEAN ADVANTAGE</em>
-                    </h2>
-                    <p>
-                        Discover the advantages of a European wellness approach: purposeful
-                        nutrition, structured quality standards and formulations for different stages
-                        of life.
-                    </p>
-                </header>
-                <div className="ew-europe-highlight">
-                    <div className="ew-europe-symbol">
-                        <Icon name="globe" size={48} />
-                    </div>
-                    <div>
-                        <span>EUROPEAN QUALITY APPROACH</span>
-                        <h3>Quality with purpose. Wellness with confidence.</h3>
-                        <p>
-                            The EU Wellness collection identifies European Union standards, GMP and
-                            HACCP among its quality marks. These frameworks emphasize consistent
-                            production, food safety and quality management — important
-                            considerations when choosing dietary supplements.
-                        </p>
-                    </div>
-                </div>
-                <div className="ew-why-grid">
-                    {pillars.map(([icon, title, description]) => (
-                        <article className="ew-why-card" key={title}>
-                            <div className="ew-why-icon">
-                                <Icon name={icon} size={27} />
+                                <div className="ew-luxury-bottom" key={`${product.id}-bottom`}>
+                                    <p className="ew-quality-source-note">
+                                        Quality assurance marks reproduced from the supplied EU Wellness
+                                        presentation; certifications have not been independently verified.
+                                    </p>
+                                    <div className="ew-luxury-quality">
+                                        {productQuality.map((q) => (
+                                            <div key={q.name}>
+                                                <Icon name={q.icon} size={25} />
+                                                <span>{q.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="ew-luxury-bottom-cta">
+                                        <span className="ew-luxury-seal">✧</span>
+                                        <div>
+                                            <h3>WELLNESS FOR EVERY STAGE OF LIFE</h3>
+                                            <p>
+                                                Review each product’s presentation and check the label for
+                                                recommended use, precautions and suitability.
+                                            </p>
+                                        </div>
+                                        <a href="#ew-faq">VIEW FAQ</a>
+                                    </div>
+                                </div>
                             </div>
-                            <h3>{title}</h3>
-                            <p>{description}</p>
-                        </article>
-                    ))}
-                </div>
-                <p className="ew-why-note">
-                    Quality marks are based on the supplied product presentation and have not been
-                    independently verified. Country of manufacture has not been confirmed. Check
-                    individual product labels and certification documentation for details. Dietary
-                    supplements are not medicines.
-                </p>
-            </div>
-        </section>
-    );
-}
-
-function WellnessFAQ() {
-    const questions = [
-        [
-            'What is EU Wellness?',
-            'EU Wellness is a collection of targeted dietary supplement products for different everyday nutritional and wellness needs.',
-        ],
-        [
-            'How do I choose the right EU Wellness product?',
-            'Explore each product’s description, ingredients and intended benefits, then check the official product label or consult a qualified healthcare professional.',
-        ],
-        [
-            'How should I use EU Wellness products?',
-            'Always follow the instructions, warnings and recommended use printed on the individual product packaging.',
-        ],
-        [
-            'Are EU Wellness products medicines?',
-            'These are dietary supplements, not substitutes for a balanced diet or prescribed medical treatment. Check the official product label for applicable regulatory information.',
-        ],
-    ];
-    const [open, setOpen] = useState(-1);
-
-    return (
-        <section className="ew-luxury-faq" id="ew-faq" aria-labelledby="ew-faq-title">
-            <div className="ew-container ew-luxury-faq-inner">
-                <span>HELP CENTER</span>
-                <h2 id="ew-faq-title">
-                    FREQUENTLY ASKED <em>QUESTIONS</em>
-                </h2>
-                <p>Everything you need to know about the EU Wellness collection.</p>
-                <div className="ew-luxury-faq-list">
-                    {questions.map(([q, a], i) => (
-                        <div key={q} className="ew-luxury-faq-item">
-                            <button
-                                type="button"
-                                aria-expanded={open === i}
-                                onClick={() => setOpen(open === i ? -1 : i)}
-                            >
-                                {q}
-                                <span>{open === i ? '−' : '+'}</span>
-                            </button>
-                            {open === i ? <p>{a}</p> : null}
                         </div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
+                    </section>
+                    );
 }
 
-export default function EUWellness() {
+                    function CollectionIntro() {
     return (
-        <AppLayout>
-            <Head>
-                <title>EU Wellness | INFINITE Live Limitless</title>
-                <meta
-                    name="description"
-                    content="Discover EU Wellness: six targeted nutritional supplement formulas for everyday wellbeing."
-                />
-            </Head>
-            <div className="ew-page">
-                <style>{EU_WELLNESS_STYLES}</style>
-                <div>
-                    <Hero />
-                    <CollectionIntro />
-                    <ProductExperience />
-                    <ProductComparison />
-                    <WhyEuropeanWellness />
-                    <WellnessFAQ />
-                </div>
-            </div>
-        </AppLayout>
-    );
+                    <section className="ew-intro" aria-labelledby="ew-intro-title">
+                        <div className="ew-container ew-intro-inner">
+                            <div className="ew-brandmark">
+                                <span>✦</span> EU WELLNESS
+                            </div>
+                            <h2 id="ew-intro-title">
+                                Holistic Wellness from
+                                <br />
+                                Europe to the World
+                            </h2>
+                            <p className="ew-intro-sub">Targeted support for every stage of life.</p>
+                            <div className="ew-quality-strip">
+                                {quality.map((q) => (
+                                    <div className="ew-quality-item" key={q.name}>
+                                        <span className="ew-quality-icon">
+                                            <Icon name={q.icon} />
+                                        </span>
+                                        {q.name}
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="ew-intro-note">
+                                Quality marks as listed in the product presentation; country of manufacture and
+                                certifications have not been independently verified.
+                            </p>
+                        </div>
+                    </section>
+                    );
+}
+
+                    function ProductComparison() {
+    const rows = [
+                    ['Best For', 'bestFor'],
+                    ['Main Benefits', 'mainBenefits'],
+                    ['Key Ingredients', 'ingredientSummary'],
+                    ];
+
+                    return (
+                    <section className="ew-comparison-wrap" aria-labelledby="ew-comparison-title">
+                        <div className="ew-container ew-comparison">
+                            <div className="ew-section-heading">
+                                <span aria-hidden="true" />
+                                <h2 id="ew-comparison-title">Find Your Perfect Wellness Solution</h2>
+                                <span aria-hidden="true" />
+                            </div>
+                            <p>Explore the formulas and find the product that suits your routine.</p>
+                            <div
+                                className="ew-table-scroll"
+                                tabIndex={0}
+                                role="region"
+                                aria-label="Scrollable product comparison"
+                            >
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Compare</th>
+                                            {products.map((p) => (
+                                                <th scope="col" key={p.id}>
+                                                    <span
+                                                        className="ew-table-product"
+                                                        style={{ '--ew-accent': p.accent }}
+                                                    >
+                                                        {p.name}
+                                                    </span>
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rows.map(([label, field]) => (
+                                            <tr key={field}>
+                                                <th scope="row">{label}</th>
+                                                {products.map((p) => (
+                                                    <td key={p.id}>{p[field]}</td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="ew-disclaimer">
+                                Dietary supplements. No approved therapeutic claims. Follow product labeling and
+                                professional guidance.
+                            </p>
+                        </div>
+                    </section>
+                    );
+}
+
+                    function WhyEuropeanWellness() {
+    const pillars = [
+                    [
+                    'globe',
+                    'European Quality Standards',
+                    'The collection’s product presentation identifies European Union standards as part of its quality assurance approach.',
+                    ],
+                    [
+                    'shield',
+                    'Good Manufacturing Practices',
+                    'GMP focuses on consistent manufacturing processes, hygiene and quality controls. The presentation lists GMP among its quality marks.',
+                    ],
+                    [
+                    'check',
+                    'Food Safety & Quality Control',
+                    'HACCP is a systematic approach to identifying and controlling food safety hazards during production.',
+                    ],
+                    [
+                    'leaf',
+                    'Purposeful Ingredients',
+                    'The six formulas feature selected vitamins, minerals and botanical ingredients, depending on the product and its intended nutritional purpose.',
+                    ],
+                    [
+                    'heart',
+                    'Targeted Nutritional Support',
+                    'Distinct formulas address different nutritional needs, from children’s nutrition to everyday vitality, relaxation and active lifestyles.',
+                    ],
+                    [
+                    'sparkles',
+                    'Dietary Considerations',
+                    'The presentation lists vegetarian-friendly and non-GMO marks, with vegan-friendly options for selected products. Check individual labels for suitability.',
+                    ],
+                    ];
+
+                    return (
+                    <section className="ew-why" aria-labelledby="ew-why-title">
+                        <div className="ew-container">
+                            <header className="ew-why-head">
+                                <span className="ew-why-kicker">
+                                    EUROPEAN WELLNESS SCIENCE · QUALITY &amp; NUTRITION
+                                </span>
+                                <h2 id="ew-why-title">
+                                    THE <em>EUROPEAN ADVANTAGE</em>
+                                </h2>
+                                <p>
+                                    Discover the advantages of a European wellness approach: purposeful
+                                    nutrition, structured quality standards and formulations for different stages
+                                    of life.
+                                </p>
+                            </header>
+                            <div className="ew-europe-highlight">
+                                <div className="ew-europe-symbol">
+                                    <Icon name="globe" size={48} />
+                                </div>
+                                <div>
+                                    <span>EUROPEAN QUALITY APPROACH</span>
+                                    <h3>Quality with purpose. Wellness with confidence.</h3>
+                                    <p>
+                                        The EU Wellness collection identifies European Union standards, GMP and
+                                        HACCP among its quality marks. These frameworks emphasize consistent
+                                        production, food safety and quality management — important
+                                        considerations when choosing dietary supplements.
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="ew-why-grid">
+                                {pillars.map(([icon, title, description]) => (
+                                    <article className="ew-why-card" key={title}>
+                                        <div className="ew-why-icon">
+                                            <Icon name={icon} size={27} />
+                                        </div>
+                                        <h3>{title}</h3>
+                                        <p>{description}</p>
+                                    </article>
+                                ))}
+                            </div>
+                            <p className="ew-why-note">
+                                Quality marks are based on the supplied product presentation and have not been
+                                independently verified. Country of manufacture has not been confirmed. Check
+                                individual product labels and certification documentation for details. Dietary
+                                supplements are not medicines.
+                            </p>
+                        </div>
+                    </section>
+                    );
+}
+
+                    function WellnessFAQ() {
+    const questions = [
+                    [
+                    'What is EU Wellness?',
+                    'EU Wellness is a collection of targeted dietary supplement products for different everyday nutritional and wellness needs.',
+                    ],
+                    [
+                    'How do I choose the right EU Wellness product?',
+                    'Explore each product’s description, ingredients and intended benefits, then check the official product label or consult a qualified healthcare professional.',
+                    ],
+                    [
+                    'How should I use EU Wellness products?',
+                    'Always follow the instructions, warnings and recommended use printed on the individual product packaging.',
+                    ],
+                    [
+                    'Are EU Wellness products medicines?',
+                    'These are dietary supplements, not substitutes for a balanced diet or prescribed medical treatment. Check the official product label for applicable regulatory information.',
+                    ],
+                    ];
+                    const [open, setOpen] = useState(-1);
+
+                    return (
+                    <section className="ew-luxury-faq" id="ew-faq" aria-labelledby="ew-faq-title">
+                        <div className="ew-container ew-luxury-faq-inner">
+                            <span>HELP CENTER</span>
+                            <h2 id="ew-faq-title">
+                                FREQUENTLY ASKED <em>QUESTIONS</em>
+                            </h2>
+                            <p>Everything you need to know about the EU Wellness collection.</p>
+                            <div className="ew-luxury-faq-list">
+                                {questions.map(([q, a], i) => (
+                                    <div key={q} className="ew-luxury-faq-item">
+                                        <button
+                                            type="button"
+                                            aria-expanded={open === i}
+                                            onClick={() => setOpen(open === i ? -1 : i)}
+                                        >
+                                            {q}
+                                            <span>{open === i ? '−' : '+'}</span>
+                                        </button>
+                                        {open === i ? <p>{a}</p> : null}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    );
+}
+
+                    export default function EUWellness() {
+    return (
+                    <AppLayout>
+                        <Head>
+                            <title>EU Wellness | INFINITE Live Limitless</title>
+                            <meta
+                                name="description"
+                                content="Discover EU Wellness: six targeted nutritional supplement formulas for everyday wellbeing."
+                            />
+                        </Head>
+                        <style>{EU_WELLNESS_HERO_STYLES}</style>
+                        <Hero />
+                        <div className="ew-page">
+                            <style>{EU_WELLNESS_STYLES}</style>
+                            <div>
+                                <CollectionIntro />
+                                <ProductExperience />
+                                <ProductComparison />
+                                <WhyEuropeanWellness />
+                                <WellnessFAQ />
+                            </div>
+                        </div>
+                    </AppLayout>
+                    );
 }
